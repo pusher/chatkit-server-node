@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "sourceMap": true,
+    "module": "commonjs",
+    "declaration": true ,
+    "noImplicitAny": true,
+    "outDir": "target"
+  },
+  "exclude": [
+    "node_modules",
+    "target",
+    "test"
+  ]
+}

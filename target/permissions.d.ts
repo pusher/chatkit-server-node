@@ -1,0 +1,17 @@
+export declare type RoleScope = 'global' | 'room';
+export declare const JOIN_PUBLIC_ROOM = "join_public_room";
+export declare const JOIN_PRIVATE_ROOM = "join_private_room";
+export declare const LEAVE_ROOM = "leave_room";
+export declare const ADD_ROOM_MEMBER = "add_room_member";
+export declare const REMOVE_ROOM_MEMBER = "remove_room_member";
+export declare const CREATE_ROOM = "create_room";
+export declare const DELETE_ROOM = "delete_room";
+export declare const UPDATE_ROOM = "update_room";
+export declare const ADD_MESSAGE = "add_message";
+export declare const CREATE_TYPING_EVENT = "create_typing_event";
+export declare const SUBSCRIBE_PRESENCE = "subscribe_presence";
+export declare const UPDATE_USER = "update_user";
+export declare const GET_USER = "get_user";
+export declare const GET_ROOM = "get_room";
+export declare const GET_USER_ROOMS = "get_user_rooms";
+export declare const JOIN_ROOM = "join_room";
