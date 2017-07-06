@@ -16,7 +16,7 @@ const chatkit = new ChatKit.ChatKit({
   client: baseClient
 });
 
-chatkit.deleteGlobalRole('admin')
+chatkit.deleteGlobalRole('alan')
   .then(() => {
     console.log('Success');
   }).catch((err) => {

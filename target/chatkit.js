@@ -23,6 +23,7 @@ var ChatKit = (function () {
                 'Content-Type': 'application/json'
             },
             body: pusher_platform_node_1.writeJSON({ id: id, name: name }),
+            jwt: this.getServerToken(),
         }).then(function () { });
     };
     // Authorizer interactions
@@ -45,18 +46,21 @@ var ChatKit = (function () {
                 'Content-Type': 'application/json'
             },
             body: pusher_platform_node_1.writeJSON({ scope: scope, name: name, permissions: permissions }),
+            jwt: this.getServerToken(),
         }).then(function () { });
     };
     ChatKit.prototype.deleteGlobalRole = function (roleName) {
         return this.pusherService.request({
             method: 'DELETE',
             path: this.authorizerBasePath + "/roles/" + roleName + "/scope/global",
+            jwt: this.getServerToken(),
         }).then(function () { });
     };
     ChatKit.prototype.deleteRoomRole = function (roleName) {
         return this.pusherService.request({
             method: 'DELETE',
             path: this.authorizerBasePath + "/roles/" + roleName + "/scope/room",
+            jwt: this.getServerToken(),
         }).then(function () { });
     };
     ChatKit.prototype.assignGlobalRoleToUser = function (userId, roleName) {
@@ -67,6 +71,7 @@ var ChatKit = (function () {
                 'Content-Type': 'application/json'
             },
             body: pusher_platform_node_1.writeJSON({ name: roleName }),
+            jwt: this.getServerToken(),
         }).then(function () { });
     };
     ChatKit.prototype.assignRoomRoleToUser = function (userId, roleName, roomId) {
@@ -77,12 +82,14 @@ var ChatKit = (function () {
                 'Content-Type': 'application/json'
             },
             body: pusher_platform_node_1.writeJSON({ name: roleName, room_id: roomId }),
+            jwt: this.getServerToken(),
         }).then(function () { });
     };
     ChatKit.prototype.getUserRoles = function (userId) {
         return this.pusherService.request({
             method: 'GET',
             path: this.authorizerBasePath + "/users/" + userId + "/roles",
+            jwt: this.getServerToken(),
         }).then(function (res) {
             return pusher_platform_node_1.readJSON(res);
         });
@@ -94,6 +101,7 @@ var ChatKit = (function () {
             headers: {
                 'Content-Type': 'application/json'
             },
+            jwt: this.getServerToken(),
         }).then(function () { });
     };
     ChatKit.prototype.removeRoomRoleForUser = function (userId, roomId) {
@@ -104,12 +112,14 @@ var ChatKit = (function () {
                 'Content-Type': 'application/json'
             },
             body: pusher_platform_node_1.writeJSON({ room_id: roomId }),
+            jwt: this.getServerToken(),
         }).then(function () { });
     };
     ChatKit.prototype.getPermissionsForGlobalRole = function (roleName) {
         return this.pusherService.request({
             method: 'GET',
             path: this.authorizerBasePath + "/roles/" + roleName + "/scope/global/permissions\"",
+            jwt: this.getServerToken(),
         }).then(function (res) {
             return pusher_platform_node_1.readJSON(res);
         });
@@ -118,6 +128,7 @@ var ChatKit = (function () {
         return this.pusherService.request({
             method: 'GET',
             path: this.authorizerBasePath + "/roles/" + roleName + "/scope/room/permissions\"",
+            jwt: this.getServerToken(),
         }).then(function (res) {
             return pusher_platform_node_1.readJSON(res);
         });

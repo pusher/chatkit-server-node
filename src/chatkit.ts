@@ -97,6 +97,7 @@ export default class ChatKit {
         'Content-Type': 'application/json'
       },
       body: writeJSON({ id, name }),
+      jwt: this.getServerToken(),
     }).then(() => {})
   }
 
@@ -125,6 +126,7 @@ export default class ChatKit {
         'Content-Type': 'application/json'
       },
       body: writeJSON({ scope, name, permissions }),
+      jwt: this.getServerToken(),
     }).then(() => {})
   }
 
@@ -132,6 +134,7 @@ export default class ChatKit {
     return this.pusherService.request({
       method: 'DELETE',
       path: `${this.authorizerBasePath}/roles/${roleName}/scope/global`,
+      jwt: this.getServerToken(),
     }).then(() => {})
   }
 
@@ -139,6 +142,7 @@ export default class ChatKit {
     return this.pusherService.request({
       method: 'DELETE',
       path: `${this.authorizerBasePath}/roles/${roleName}/scope/room`,
+      jwt: this.getServerToken(),
     }).then(() => {})
   }
 
@@ -150,6 +154,7 @@ export default class ChatKit {
         'Content-Type': 'application/json'
       },
       body: writeJSON({ name: roleName }),
+      jwt: this.getServerToken(),
     }).then(() => {})
   }
 
@@ -161,6 +166,7 @@ export default class ChatKit {
         'Content-Type': 'application/json'
       },
       body: writeJSON({ name: roleName, room_id: roomId }),
+      jwt: this.getServerToken(),
     }).then(() => {})
   }
 
@@ -168,6 +174,7 @@ export default class ChatKit {
     return this.pusherService.request({
       method: 'GET',
       path: `${this.authorizerBasePath}/users/${userId}/roles`,
+      jwt: this.getServerToken(),
     }).then((res) => {
       return readJSON(res)
     })
@@ -180,6 +187,7 @@ export default class ChatKit {
       headers: {
         'Content-Type': 'application/json'
       },
+      jwt: this.getServerToken(),
     }).then(() => {})
   }
 
@@ -191,6 +199,7 @@ export default class ChatKit {
         'Content-Type': 'application/json'
       },
       body: writeJSON({ room_id: roomId }),
+      jwt: this.getServerToken(),
     }).then(() => {})
   }
 
@@ -198,6 +207,7 @@ export default class ChatKit {
    return this.pusherService.request({
       method: 'GET',
       path: `${this.authorizerBasePath}/roles/${roleName}/scope/global/permissions"`,
+      jwt: this.getServerToken(),
     }).then((res) => {
       return readJSON(res)
     })
@@ -207,6 +217,7 @@ export default class ChatKit {
    return this.pusherService.request({
       method: 'GET',
       path: `${this.authorizerBasePath}/roles/${roleName}/scope/room/permissions"`,
+      jwt: this.getServerToken(),
     }).then((res) => {
       return readJSON(res)
     })
