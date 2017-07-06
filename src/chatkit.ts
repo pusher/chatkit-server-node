@@ -1,14 +1,19 @@
 import { Readable } from 'stream';
 import { IncomingMessage } from 'http';
-import { App as PusherService, BaseClient } from 'pusher-platform-node';
+import {
+  App as PusherService,
+  BaseClient,
+  readJSON,
+  writeJSON
+} from 'pusher-platform-node';
 
 import { JOIN_PUBLIC_ROOM, JOIN_PRIVATE_ROOM, LEAVE_ROOM,
   ADD_ROOM_MEMBER, REMOVE_ROOM_MEMBER, CREATE_ROOM, DELETE_ROOM,
   UPDATE_ROOM, ADD_MESSAGE, CREATE_TYPING_EVENT, SUBSCRIBE_PRESENCE,
   UPDATE_USER, GET_USER, GET_ROOM, GET_USER_ROOMS, JOIN_ROOM
 } from './permissions';
-import { RoleScope } from './permissions';
-import { jsonToReadable, getCurrentTimeInSeconds } from './utils';
+import { RoleScope, validPermissions } from './permissions';
+import { getCurrentTimeInSeconds } from './utils';
 import { ClientError } from './errors';
 
 import { defaultCluster, cacheExpiryTolerance } from './constants';
@@ -73,6 +78,13 @@ export default class ChatKit {
     this.pusherService = new PusherService(pusherServiceConfig);
   }
 
+  // Token generation
+
+  // ** TODO **
+
+
+  // User interactions
+
   createUser(id: string, name: string): Promise<IncomingMessage> {
     return this.pusherService.request({
       method: 'POST',
@@ -80,20 +92,122 @@ export default class ChatKit {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: jsonToReadable({ id, name }),
+      body: writeJSON({ id, name }),
     })
   }
 
-  createRole(name: string, scope: string, permissions: Array<string>): Promise<IncomingMessage> {
+
+  // Authorizer interactions
+
+  createRoomRole(name: string, permissions: Array<string>): Promise<IncomingMessage> {
+    return this.createRole(name, 'room', permissions)
+  }
+
+  createGlobalRole(name: string, permissions: Array<string>): Promise<IncomingMessage> {
+    return this.createRole(name, 'global', permissions)
+  }
+
+  private createRole(name: string, scope: string, permissions: Array<string>): Promise<IncomingMessage> {
+    permissions.forEach((perm) => {
+      if (validPermissions.indexOf(perm) < 0) {
+        throw new Error(`Permission value "${perm}" is invalid`);
+      }
+    })
+
     return this.pusherService.request({
       method: 'POST',
       path: `${this.authorizerBasePath}/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
-      body: jsonToReadable({ scope, name, permissions }),
+      body: writeJSON({ scope, name, permissions }),
     })
   }
+
+  deleteGlobalRole(roleName: string): Promise<any> {
+    return this.pusherService.request({
+      method: 'DELETE',
+      path: `${this.authorizerBasePath}/roles/${roleName}/scope/global`,
+    })
+  }
+
+  deleteRoomRole(roleName: string): Promise<any> {
+    return this.pusherService.request({
+      method: 'DELETE',
+      path: `${this.authorizerBasePath}/roles/${roleName}/scope/room`,
+    })
+  }
+
+  assignGlobalRoleToUser(userId: string, roleName: string): Promise<any> {
+    return this.pusherService.request({
+      method: 'POST',
+      path: `${this.authorizerBasePath}/users/${userId}/roles`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: writeJSON({ name: roleName }),
+    })
+  }
+
+  assignRoomRoleToUser(userId: string, roleName: string, roomId: number): Promise<any> {
+    return this.pusherService.request({
+      method: 'POST',
+      path: `${this.authorizerBasePath}/users/${userId}/roles`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: writeJSON({ name: roleName, room_id: roomId }),
+    })
+  }
+
+  getUserRoles(userId: string): Promise<any> {
+    return this.pusherService.request({
+      method: 'GET',
+      path: `${this.authorizerBasePath}/users/${userId}/roles`,
+    }).then((res) => {
+      return readJSON(res)
+    })
+  }
+
+  removeGlobalRoleForUser(userId: string): Promise<any> {
+    return this.pusherService.request({
+      method: 'PUT',
+      path: `${this.authorizerBasePath}/users/${userId}/roles`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+  }
+
+  removeRoomRoleForUser(userId: string, roomId: number): Promise<any> {
+    return this.pusherService.request({
+      method: 'PUT',
+      path: `${this.authorizerBasePath}/users/${userId}/roles`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: writeJSON({ room_id: roomId }),
+    })
+  }
+
+  getPermissionsForGlobalRole(roleName: string): Promise<any> {
+   return this.pusherService.request({
+      method: 'GET',
+      path: `${this.authorizerBasePath}/roles/${roleName}/scope/global/permissions"`,
+    }).then((res) => {
+      return readJSON(res)
+    })
+  }
+
+  getPermissionsForRoomRole(roleName: string): Promise<any> {
+   return this.pusherService.request({
+      method: 'GET',
+      path: `${this.authorizerBasePath}/roles/${roleName}/scope/room/permissions"`,
+    }).then((res) => {
+      return readJSON(res)
+    })
+  }
+
 
   /**
    * This method manages the token for http library and pusher platform
@@ -117,10 +231,7 @@ export default class ChatKit {
     //   token,
     //   expiresIn: getCurrentTimeInSeconds() + expires_in - cacheExpiryTolerance
     // };
-    const t = this.pusherService.generateSuperuserJWT();
 
-    const token = 'test';
-
-    return token;
+    return this.pusherService.generateSuperuserJWT().jwt;
   };
 };

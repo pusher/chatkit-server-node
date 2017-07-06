@@ -17,4 +17,22 @@ exports.GET_USER = "get_user";
 exports.GET_ROOM = "get_room";
 exports.GET_USER_ROOMS = "get_user_rooms";
 exports.JOIN_ROOM = "join_room";
+exports.validPermissions = [
+    exports.JOIN_PUBLIC_ROOM,
+    exports.JOIN_PRIVATE_ROOM,
+    exports.LEAVE_ROOM,
+    exports.ADD_ROOM_MEMBER,
+    exports.REMOVE_ROOM_MEMBER,
+    exports.CREATE_ROOM,
+    exports.DELETE_ROOM,
+    exports.UPDATE_ROOM,
+    exports.ADD_MESSAGE,
+    exports.CREATE_TYPING_EVENT,
+    exports.SUBSCRIBE_PRESENCE,
+    exports.UPDATE_USER,
+    exports.GET_USER,
+    exports.GET_ROOM,
+    exports.GET_USER_ROOMS,
+    exports.JOIN_ROOM
+];
 //# sourceMappingURL=permissions.js.map

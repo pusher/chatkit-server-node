@@ -17,3 +17,22 @@ export const GET_USER = "get_user";
 export const GET_ROOM = "get_room";
 export const GET_USER_ROOMS = "get_user_rooms";
 export const JOIN_ROOM = "join_room";
+
+export const validPermissions = [
+  JOIN_PUBLIC_ROOM,
+  JOIN_PRIVATE_ROOM,
+  LEAVE_ROOM,
+  ADD_ROOM_MEMBER,
+  REMOVE_ROOM_MEMBER,
+  CREATE_ROOM,
+  DELETE_ROOM,
+  UPDATE_ROOM,
+  ADD_MESSAGE,
+  CREATE_TYPING_EVENT,
+  SUBSCRIBE_PRESENCE,
+  UPDATE_USER,
+  GET_USER,
+  GET_ROOM,
+  GET_USER_ROOMS,
+  JOIN_ROOM
+];

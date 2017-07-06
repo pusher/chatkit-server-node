@@ -16,8 +16,9 @@ const chatkit = new ChatKit.ChatKit({
   client: baseClient
 });
 
-chatkit.createUser('cashback', 'Test McTest').then((msg) => {
-  console.log(msg);
-}).catch((err) => {
-  console.log(err);
-})
+chatkit.getUserRoles('ham')
+  .then((msg) => {
+    console.log(msg);
+  }).catch((err) => {
+    console.log(err);
+  })

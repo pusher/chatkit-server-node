@@ -16,7 +16,10 @@ const chatkit = new ChatKit.ChatKit({
   client: baseClient
 });
 
-chatkit.createUser('cashback', 'Test McTest').then((msg) => {
+chatkit.createRoomRole(
+  'admin',
+  ['add_message', 'leave_room', 'add_room_member']
+).then((msg) => {
   console.log(msg);
 }).catch((err) => {
   console.log(err);
