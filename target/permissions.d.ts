@@ -1,4 +1,3 @@
-export declare type RoleScope = 'global' | 'room';
 export declare const JOIN_PUBLIC_ROOM = "join_public_room";
 export declare const JOIN_PRIVATE_ROOM = "join_private_room";
 export declare const LEAVE_ROOM = "leave_room";

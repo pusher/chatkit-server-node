@@ -1,5 +1,3 @@
-export type RoleScope = 'global' | 'room';
-
 // All possible permissions
 export const JOIN_PUBLIC_ROOM = "join_public_room";
 export const JOIN_PRIVATE_ROOM = "join_private_room";

@@ -12,7 +12,7 @@ import { JOIN_PUBLIC_ROOM, JOIN_PRIVATE_ROOM, LEAVE_ROOM,
   UPDATE_ROOM, ADD_MESSAGE, CREATE_TYPING_EVENT, SUBSCRIBE_PRESENCE,
   UPDATE_USER, GET_USER, GET_ROOM, GET_USER_ROOMS, JOIN_ROOM
 } from './permissions';
-import { RoleScope, validPermissions } from './permissions';
+import { validPermissions } from './permissions';
 import { getCurrentTimeInSeconds } from './utils';
 import { ClientError } from './errors';
 
