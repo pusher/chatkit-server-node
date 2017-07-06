@@ -26,6 +26,13 @@ var ChatKit = (function () {
             jwt: this.getServerToken(),
         }).then(function () { });
     };
+    ChatKit.prototype.deleteUser = function (id) {
+        return this.pusherService.request({
+            method: 'DELETE',
+            path: this.apiBasePath + "/users/" + id,
+            jwt: this.getServerToken(),
+        }).then(function () { });
+    };
     // Authorizer interactions
     ChatKit.prototype.createRoomRole = function (name, permissions) {
         return this.createRole(name, 'room', permissions);

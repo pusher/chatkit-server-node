@@ -16,6 +16,7 @@ export default class ChatKit {
     private tokenWithExpiry?;
     constructor(pusherServiceConfig: Options);
     createUser(id: string, name: string): Promise<void>;
+    deleteUser(id: string): Promise<void>;
     createRoomRole(name: string, permissions: Array<string>): Promise<void>;
     createGlobalRole(name: string, permissions: Array<string>): Promise<void>;
     private createRole(name, scope, permissions);

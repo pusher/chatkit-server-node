@@ -16,7 +16,7 @@ const chatkit = new ChatKit.ChatKit({
   client: baseClient
 });
 
-chatkit.createUser('extender', 'Test McTest')
+chatkit.deleteUser('extender')
   .then(() => {
     console.log('Success');
   }).catch((err) => {

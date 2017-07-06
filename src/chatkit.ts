@@ -101,6 +101,14 @@ export default class ChatKit {
     }).then(() => {})
   }
 
+  deleteUser(id: string): Promise<void> {
+    return this.pusherService.request({
+      method: 'DELETE',
+      path: `${this.apiBasePath}/users/${id}`,
+      jwt: this.getServerToken(),
+    }).then(() => {})
+  }
+
 
   // Authorizer interactions
 
