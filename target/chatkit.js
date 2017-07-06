@@ -2,7 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var pusher_platform_node_1 = require("pusher-platform-node");
 var permissions_1 = require("./permissions");
+var utils_1 = require("./utils");
 ;
+;
+var TOKEN_EXPIRY_LEEWAY = 30;
 var ChatKit = (function () {
     function ChatKit(pusherServiceConfig) {
         this.apiBasePath = 'services/chat_api/v1';
@@ -20,7 +23,7 @@ var ChatKit = (function () {
                 'Content-Type': 'application/json'
             },
             body: pusher_platform_node_1.writeJSON({ id: id, name: name }),
-        });
+        }).then(function () { });
     };
     // Authorizer interactions
     ChatKit.prototype.createRoomRole = function (name, permissions) {
@@ -42,19 +45,19 @@ var ChatKit = (function () {
                 'Content-Type': 'application/json'
             },
             body: pusher_platform_node_1.writeJSON({ scope: scope, name: name, permissions: permissions }),
-        });
+        }).then(function () { });
     };
     ChatKit.prototype.deleteGlobalRole = function (roleName) {
         return this.pusherService.request({
             method: 'DELETE',
             path: this.authorizerBasePath + "/roles/" + roleName + "/scope/global",
-        });
+        }).then(function () { });
     };
     ChatKit.prototype.deleteRoomRole = function (roleName) {
         return this.pusherService.request({
             method: 'DELETE',
             path: this.authorizerBasePath + "/roles/" + roleName + "/scope/room",
-        });
+        }).then(function () { });
     };
     ChatKit.prototype.assignGlobalRoleToUser = function (userId, roleName) {
         return this.pusherService.request({
@@ -64,7 +67,7 @@ var ChatKit = (function () {
                 'Content-Type': 'application/json'
             },
             body: pusher_platform_node_1.writeJSON({ name: roleName }),
-        });
+        }).then(function () { });
     };
     ChatKit.prototype.assignRoomRoleToUser = function (userId, roleName, roomId) {
         return this.pusherService.request({
@@ -74,7 +77,7 @@ var ChatKit = (function () {
                 'Content-Type': 'application/json'
             },
             body: pusher_platform_node_1.writeJSON({ name: roleName, room_id: roomId }),
-        });
+        }).then(function () { });
     };
     ChatKit.prototype.getUserRoles = function (userId) {
         return this.pusherService.request({
@@ -91,7 +94,7 @@ var ChatKit = (function () {
             headers: {
                 'Content-Type': 'application/json'
             },
-        });
+        }).then(function () { });
     };
     ChatKit.prototype.removeRoomRoleForUser = function (userId, roomId) {
         return this.pusherService.request({
@@ -101,7 +104,7 @@ var ChatKit = (function () {
                 'Content-Type': 'application/json'
             },
             body: pusher_platform_node_1.writeJSON({ room_id: roomId }),
-        });
+        }).then(function () { });
     };
     ChatKit.prototype.getPermissionsForGlobalRole = function (roleName) {
         return this.pusherService.request({
@@ -124,22 +127,16 @@ var ChatKit = (function () {
      * communication
      */
     ChatKit.prototype.getServerToken = function () {
-        // let tokenWithExpirationTime: TokenWithExpiry = {
-        //   token: '',
-        //   expiresIn: 0
-        // };
-        // const {token, expiresIn} = tokenWithExpirationTime;
-        // // If token exists and is still valid just return it..
-        // if (token && expiresIn > getCurrentTimeInSeconds()) {
-        //   return token;
-        // }
-        // // Otherwise generate new token and its expiration time
-        // const {token, expires_in} = this.pusherService.generateSuperuserJWT();
-        // tokenWithExpirationTime = {
-        //   token,
-        //   expiresIn: getCurrentTimeInSeconds() + expires_in - cacheExpiryTolerance
-        // };
-        return this.pusherService.generateSuperuserJWT().jwt;
+        if (this.tokenWithExpiry && this.tokenWithExpiry.expiresAt > utils_1.getCurrentTimeInSeconds()) {
+            return this.tokenWithExpiry.token;
+        }
+        // Otherwise generate new token and its expiration time
+        var tokenWithExpiresIn = this.pusherService.generateSuperuserJWT();
+        this.tokenWithExpiry = {
+            token: tokenWithExpiresIn.jwt,
+            expiresAt: utils_1.getCurrentTimeInSeconds() + tokenWithExpiresIn.expires_in - TOKEN_EXPIRY_LEEWAY,
+        };
+        return this.tokenWithExpiry.token;
     };
     ;
     return ChatKit;

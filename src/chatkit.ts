@@ -18,10 +18,10 @@ import { ClientError } from './errors';
 
 import { defaultCluster, cacheExpiryTolerance } from './constants';
 
-// export interface TokenWithExpiry {
-//   token: string;
-//   expiresIn: number;
-// };
+export interface TokenWithExpiry {
+  token: string;
+  expiresAt: number;
+};
 
 // export interface AuthorizePayload {
 //   path: string;
@@ -68,11 +68,15 @@ export interface Options {
   client?: BaseClient;
 };
 
+const TOKEN_EXPIRY_LEEWAY = 30;
+
 export default class ChatKit {
   pusherService: PusherService;
 
   private apiBasePath = 'services/chat_api/v1';
   private authorizerBasePath = 'services/chat_api_authorizer/v1';
+
+  private tokenWithExpiry?: TokenWithExpiry;
 
   constructor(pusherServiceConfig: Options) {
     this.pusherService = new PusherService(pusherServiceConfig);
@@ -85,7 +89,7 @@ export default class ChatKit {
 
   // User interactions
 
-  createUser(id: string, name: string): Promise<IncomingMessage> {
+  createUser(id: string, name: string): Promise<void> {
     return this.pusherService.request({
       method: 'POST',
       path: `${this.apiBasePath}/users`,
@@ -93,21 +97,21 @@ export default class ChatKit {
         'Content-Type': 'application/json'
       },
       body: writeJSON({ id, name }),
-    })
+    }).then(() => {})
   }
 
 
   // Authorizer interactions
 
-  createRoomRole(name: string, permissions: Array<string>): Promise<IncomingMessage> {
+  createRoomRole(name: string, permissions: Array<string>): Promise<void> {
     return this.createRole(name, 'room', permissions)
   }
 
-  createGlobalRole(name: string, permissions: Array<string>): Promise<IncomingMessage> {
+  createGlobalRole(name: string, permissions: Array<string>): Promise<void> {
     return this.createRole(name, 'global', permissions)
   }
 
-  private createRole(name: string, scope: string, permissions: Array<string>): Promise<IncomingMessage> {
+  private createRole(name: string, scope: string, permissions: Array<string>): Promise<void> {
     permissions.forEach((perm) => {
       if (validPermissions.indexOf(perm) < 0) {
         throw new Error(`Permission value "${perm}" is invalid`);
@@ -121,24 +125,24 @@ export default class ChatKit {
         'Content-Type': 'application/json'
       },
       body: writeJSON({ scope, name, permissions }),
-    })
+    }).then(() => {})
   }
 
-  deleteGlobalRole(roleName: string): Promise<any> {
+  deleteGlobalRole(roleName: string): Promise<void> {
     return this.pusherService.request({
       method: 'DELETE',
       path: `${this.authorizerBasePath}/roles/${roleName}/scope/global`,
-    })
+    }).then(() => {})
   }
 
-  deleteRoomRole(roleName: string): Promise<any> {
+  deleteRoomRole(roleName: string): Promise<void> {
     return this.pusherService.request({
       method: 'DELETE',
       path: `${this.authorizerBasePath}/roles/${roleName}/scope/room`,
-    })
+    }).then(() => {})
   }
 
-  assignGlobalRoleToUser(userId: string, roleName: string): Promise<any> {
+  assignGlobalRoleToUser(userId: string, roleName: string): Promise<void> {
     return this.pusherService.request({
       method: 'POST',
       path: `${this.authorizerBasePath}/users/${userId}/roles`,
@@ -146,10 +150,10 @@ export default class ChatKit {
         'Content-Type': 'application/json'
       },
       body: writeJSON({ name: roleName }),
-    })
+    }).then(() => {})
   }
 
-  assignRoomRoleToUser(userId: string, roleName: string, roomId: number): Promise<any> {
+  assignRoomRoleToUser(userId: string, roleName: string, roomId: number): Promise<void> {
     return this.pusherService.request({
       method: 'POST',
       path: `${this.authorizerBasePath}/users/${userId}/roles`,
@@ -157,7 +161,7 @@ export default class ChatKit {
         'Content-Type': 'application/json'
       },
       body: writeJSON({ name: roleName, room_id: roomId }),
-    })
+    }).then(() => {})
   }
 
   getUserRoles(userId: string): Promise<any> {
@@ -169,17 +173,17 @@ export default class ChatKit {
     })
   }
 
-  removeGlobalRoleForUser(userId: string): Promise<any> {
+  removeGlobalRoleForUser(userId: string): Promise<void> {
     return this.pusherService.request({
       method: 'PUT',
       path: `${this.authorizerBasePath}/users/${userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
-    })
+    }).then(() => {})
   }
 
-  removeRoomRoleForUser(userId: string, roomId: number): Promise<any> {
+  removeRoomRoleForUser(userId: string, roomId: number): Promise<void> {
     return this.pusherService.request({
       method: 'PUT',
       path: `${this.authorizerBasePath}/users/${userId}/roles`,
@@ -187,7 +191,7 @@ export default class ChatKit {
         'Content-Type': 'application/json'
       },
       body: writeJSON({ room_id: roomId }),
-    })
+    }).then(() => {})
   }
 
   getPermissionsForGlobalRole(roleName: string): Promise<any> {
@@ -214,24 +218,18 @@ export default class ChatKit {
    * communication
    */
   private getServerToken(): string {
-    // let tokenWithExpirationTime: TokenWithExpiry = {
-    //   token: '',
-    //   expiresIn: 0
-    // };
+    if (this.tokenWithExpiry && this.tokenWithExpiry.expiresAt > getCurrentTimeInSeconds()) {
+      return this.tokenWithExpiry.token;
+    }
 
-    // const {token, expiresIn} = tokenWithExpirationTime;
-    // // If token exists and is still valid just return it..
-    // if (token && expiresIn > getCurrentTimeInSeconds()) {
-    //   return token;
-    // }
-    // // Otherwise generate new token and its expiration time
-    // const {token, expires_in} = this.pusherService.generateSuperuserJWT();
+    // Otherwise generate new token and its expiration time
+    const tokenWithExpiresIn = this.pusherService.generateSuperuserJWT();
 
-    // tokenWithExpirationTime = {
-    //   token,
-    //   expiresIn: getCurrentTimeInSeconds() + expires_in - cacheExpiryTolerance
-    // };
+    this.tokenWithExpiry = {
+      token: tokenWithExpiresIn.jwt,
+      expiresAt: getCurrentTimeInSeconds() + tokenWithExpiresIn.expires_in - TOKEN_EXPIRY_LEEWAY,
+    }
 
-    return this.pusherService.generateSuperuserJWT().jwt;
+    return this.tokenWithExpiry.token;
   };
 };

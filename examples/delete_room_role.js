@@ -17,8 +17,8 @@ const chatkit = new ChatKit.ChatKit({
 });
 
 chatkit.deleteRoomRole('admin')
-  .then((msg) => {
-    console.log(msg);
+  .then(() => {
+    console.log('Success');
   }).catch((err) => {
     console.log(err);
   })

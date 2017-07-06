@@ -19,8 +19,8 @@ const chatkit = new ChatKit.ChatKit({
 chatkit.createRoomRole(
   'admin',
   ['add_message', 'leave_room', 'add_room_member']
-).then((msg) => {
-  console.log(msg);
+).then(() => {
+  console.log('Success');
 }).catch((err) => {
   console.log(err);
 })

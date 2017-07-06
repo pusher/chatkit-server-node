@@ -1,6 +1,8 @@
-/// <reference types="node" />
-import { IncomingMessage } from 'http';
 import { App as PusherService, BaseClient } from 'pusher-platform-node';
+export interface TokenWithExpiry {
+    token: string;
+    expiresAt: number;
+}
 export interface Options {
     cluster: string;
     appId: string;
@@ -11,18 +13,19 @@ export default class ChatKit {
     pusherService: PusherService;
     private apiBasePath;
     private authorizerBasePath;
+    private tokenWithExpiry?;
     constructor(pusherServiceConfig: Options);
-    createUser(id: string, name: string): Promise<IncomingMessage>;
-    createRoomRole(name: string, permissions: Array<string>): Promise<IncomingMessage>;
-    createGlobalRole(name: string, permissions: Array<string>): Promise<IncomingMessage>;
+    createUser(id: string, name: string): Promise<void>;
+    createRoomRole(name: string, permissions: Array<string>): Promise<void>;
+    createGlobalRole(name: string, permissions: Array<string>): Promise<void>;
     private createRole(name, scope, permissions);
-    deleteGlobalRole(roleName: string): Promise<any>;
-    deleteRoomRole(roleName: string): Promise<any>;
-    assignGlobalRoleToUser(userId: string, roleName: string): Promise<any>;
-    assignRoomRoleToUser(userId: string, roleName: string, roomId: number): Promise<any>;
+    deleteGlobalRole(roleName: string): Promise<void>;
+    deleteRoomRole(roleName: string): Promise<void>;
+    assignGlobalRoleToUser(userId: string, roleName: string): Promise<void>;
+    assignRoomRoleToUser(userId: string, roleName: string, roomId: number): Promise<void>;
     getUserRoles(userId: string): Promise<any>;
-    removeGlobalRoleForUser(userId: string): Promise<any>;
-    removeRoomRoleForUser(userId: string, roomId: number): Promise<any>;
+    removeGlobalRoleForUser(userId: string): Promise<void>;
+    removeRoomRoleForUser(userId: string, roomId: number): Promise<void>;
     getPermissionsForGlobalRole(roleName: string): Promise<any>;
     getPermissionsForRoomRole(roleName: string): Promise<any>;
     /**

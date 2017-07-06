@@ -17,8 +17,8 @@ const chatkit = new ChatKit.ChatKit({
 });
 
 chatkit.getPermissionsForRoomRole('admin')
-  .then((msg) => {
-    console.log(msg);
+  .then((res) => {
+    console.log(res);
   }).catch((err) => {
     console.log(err);
   })
