@@ -11,8 +11,8 @@ export interface AuthenticationResponse {
 }
 export interface Options {
     cluster: string;
-    appId: string;
-    appKey: string;
+    instanceId: string;
+    key: string;
     client?: BaseClient;
 }
 export default class ChatKit {

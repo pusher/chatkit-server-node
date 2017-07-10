@@ -10,7 +10,12 @@ var ChatKit = (function () {
     function ChatKit(pusherServiceConfig) {
         this.apiBasePath = 'services/chat_api/v1';
         this.authorizerBasePath = 'services/chat_api_authorizer/v1';
-        this.pusherService = new pusher_platform_node_1.App(pusherServiceConfig);
+        this.pusherService = new pusher_platform_node_1.App({
+            cluster: pusherServiceConfig.cluster,
+            appId: pusherServiceConfig.instanceId,
+            appKey: pusherServiceConfig.key,
+            client: pusherServiceConfig.client
+        });
     }
     // Token generation
     // TODO: Make this proper

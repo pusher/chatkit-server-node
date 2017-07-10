@@ -32,8 +32,8 @@ export interface AuthenticationResponse {
 
 export interface Options {
   cluster: string;
-  appId: string;
-  appKey: string;
+  instanceId: string;
+  key: string;
   client?: BaseClient;
 };
 
@@ -48,7 +48,12 @@ export default class ChatKit {
   private tokenWithExpiry?: TokenWithExpiry;
 
   constructor(pusherServiceConfig: Options) {
-    this.pusherService = new PusherService(pusherServiceConfig);
+    this.pusherService = new PusherService({
+      cluster: pusherServiceConfig.cluster,
+      appId: pusherServiceConfig.instanceId,
+      appKey: pusherServiceConfig.key,
+      client: pusherServiceConfig.client
+    });
   }
 
   // Token generation
