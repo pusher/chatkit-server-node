@@ -13,7 +13,10 @@ var ChatKit = (function () {
         this.pusherService = new pusher_platform_node_1.App(pusherServiceConfig);
     }
     // Token generation
-    // ** TODO **
+    // TODO: Make this proper
+    // authenticate(grantType: string, userId: string): AuthenticationResponse {
+    //   return this.pusherService.authenticate({ body: { grantType } }, { userId });
+    // }
     // User interactions
     ChatKit.prototype.createUser = function (id, name) {
         return this.pusherService.request({

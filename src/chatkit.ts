@@ -23,43 +23,12 @@ export interface TokenWithExpiry {
   expiresAt: number;
 };
 
-// export interface AuthorizePayload {
-//   path: string;
-//   action: ActionType;
-//   grant_type: string;
-// };
-
-// const authorize = async (
-//   payload: AuthorizePayload,
-//   hasPermissionCallback: (action: ActionType, b: string) => Promise<bool> | bool,
-//   supplyFeedIdToCallback: bool = false
-// ): Promise<any> => {
-//   if (typeof hasPermissionCallback !== 'function') {
-//     throw new Error('HasPermission must be a function');
-//   }
-
-//   if (!payload) {
-//     throw new ClientError('Payload must be provided');
-//   }
-
-//   const { action, path }: {action: ActionType; path: string; } = payload;
-
-//   if (!action || !path) {
-//     throw new ClientError('Must provide "action" and "path" in the request body');
-//   }
-
-//   if (clientPermissionTypes.indexOf(action)) {
-//     throw new ClientError(`Action must be one of ${JSON.stringify(clientPermissionTypes)}`);
-//   }
-
-//   const hasPermission = await hasPermissionCallback(action, path);
-
-//   if (!hasPermission) {
-//     throw new ClientError('Forbidden');
-//   }
-
-//   return pusherService.authenticate({ body: payload }, getFeedsPermissionClaims(action, path));
-// };
+export interface AuthenticationResponse {
+  access_token: string | TokenWithExpiry;
+  token_type: string;
+  expires_in: number;
+  refresh_token: string;
+}
 
 export interface Options {
   cluster: string;
@@ -84,7 +53,11 @@ export default class ChatKit {
 
   // Token generation
 
-  // ** TODO **
+  // TODO: Make this proper
+
+  // authenticate(grantType: string, userId: string): AuthenticationResponse {
+  //   return this.pusherService.authenticate({ body: { grantType } }, { userId });
+  // }
 
 
   // User interactions

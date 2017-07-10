@@ -3,6 +3,12 @@ export interface TokenWithExpiry {
     token: string;
     expiresAt: number;
 }
+export interface AuthenticationResponse {
+    access_token: string | TokenWithExpiry;
+    token_type: string;
+    expires_in: number;
+    refresh_token: string;
+}
 export interface Options {
     cluster: string;
     appId: string;
