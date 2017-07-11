@@ -13,6 +13,7 @@ exports.ADD_MESSAGE = "add_message";
 exports.CREATE_TYPING_EVENT = "create_typing_event";
 exports.SUBSCRIBE_PRESENCE = "subscribe_presence";
 exports.UPDATE_USER = "update_user";
+exports.GET_ROOM_MESSAGES = "get_room_messages";
 exports.GET_USER = "get_user";
 exports.GET_USERS = "get_users";
 exports.GET_ROOM = "get_room";
@@ -32,6 +33,7 @@ exports.validPermissions = [
     exports.CREATE_TYPING_EVENT,
     exports.SUBSCRIBE_PRESENCE,
     exports.UPDATE_USER,
+    exports.GET_ROOM_MESSAGES,
     exports.GET_USER,
     exports.GET_USERS,
     exports.GET_ROOM,

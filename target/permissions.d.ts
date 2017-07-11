@@ -10,6 +10,7 @@ export declare const ADD_MESSAGE = "add_message";
 export declare const CREATE_TYPING_EVENT = "create_typing_event";
 export declare const SUBSCRIBE_PRESENCE = "subscribe_presence";
 export declare const UPDATE_USER = "update_user";
+export declare const GET_ROOM_MESSAGES = "get_room_messages";
 export declare const GET_USER = "get_user";
 export declare const GET_USERS = "get_users";
 export declare const GET_ROOM = "get_room";

@@ -11,6 +11,7 @@ export const ADD_MESSAGE = "add_message";
 export const CREATE_TYPING_EVENT = "create_typing_event";
 export const SUBSCRIBE_PRESENCE = "subscribe_presence";
 export const UPDATE_USER = "update_user";
+export const GET_ROOM_MESSAGES = "get_room_messages";
 export const GET_USER = "get_user";
 export const GET_USERS = "get_users";
 export const GET_ROOM = "get_room";
@@ -31,6 +32,7 @@ export const validPermissions = [
   CREATE_TYPING_EVENT,
   SUBSCRIBE_PRESENCE,
   UPDATE_USER,
+  GET_ROOM_MESSAGES,
   GET_USER,
   GET_USERS,
   GET_ROOM,
