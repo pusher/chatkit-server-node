@@ -14,7 +14,9 @@ exports.CREATE_TYPING_EVENT = "create_typing_event";
 exports.SUBSCRIBE_PRESENCE = "subscribe_presence";
 exports.UPDATE_USER = "update_user";
 exports.GET_USER = "get_user";
+exports.GET_USERS = "get_users";
 exports.GET_ROOM = "get_room";
+exports.GET_ROOMS = "get_rooms";
 exports.GET_USER_ROOMS = "get_user_rooms";
 exports.JOIN_ROOM = "join_room";
 exports.validPermissions = [
@@ -31,8 +33,12 @@ exports.validPermissions = [
     exports.SUBSCRIBE_PRESENCE,
     exports.UPDATE_USER,
     exports.GET_USER,
+    exports.GET_USERS,
     exports.GET_ROOM,
+    exports.GET_ROOMS,
     exports.GET_USER_ROOMS,
     exports.JOIN_ROOM
 ];
+// TODO: export a room set and a global set of valid permissions
+// separately
 //# sourceMappingURL=permissions.js.map

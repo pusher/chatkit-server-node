@@ -12,7 +12,9 @@ export const CREATE_TYPING_EVENT = "create_typing_event";
 export const SUBSCRIBE_PRESENCE = "subscribe_presence";
 export const UPDATE_USER = "update_user";
 export const GET_USER = "get_user";
+export const GET_USERS = "get_users";
 export const GET_ROOM = "get_room";
+export const GET_ROOMS = "get_rooms";
 export const GET_USER_ROOMS = "get_user_rooms";
 export const JOIN_ROOM = "join_room";
 
@@ -30,7 +32,12 @@ export const validPermissions = [
   SUBSCRIBE_PRESENCE,
   UPDATE_USER,
   GET_USER,
+  GET_USERS,
   GET_ROOM,
+  GET_ROOMS,
   GET_USER_ROOMS,
   JOIN_ROOM
 ];
+
+// TODO: export a room set and a global set of valid permissions
+// separately
