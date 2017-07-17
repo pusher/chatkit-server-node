@@ -1,26 +1,25 @@
-import { App as PusherService, BaseClient } from 'pusher-platform-node';
+import { Instance, AuthenticationResponse, BaseClient } from 'pusher-platform-node';
 export interface TokenWithExpiry {
     token: string;
     expiresAt: number;
 }
-export interface AuthenticationResponse {
-    access_token: string | TokenWithExpiry;
-    token_type: string;
-    expires_in: number;
-    refresh_token: string;
+export interface AuthenticatePayload {
+    grant_type?: string;
+    refresh_token?: string;
 }
 export interface Options {
-    cluster: string;
-    instanceId: string;
+    instance: string;
     key: string;
+    port?: number;
+    host?: string;
     client?: BaseClient;
 }
 export default class ChatKit {
-    pusherService: PusherService;
-    private apiBasePath;
-    private authorizerBasePath;
+    apiInstance: Instance;
+    authorizerInstance: Instance;
     private tokenWithExpiry?;
-    constructor(pusherServiceConfig: Options);
+    constructor(options: Options);
+    authenticate(authPayload: AuthenticatePayload, userId: string): AuthenticationResponse;
     createUser(id: string, name: string): Promise<void>;
     deleteUser(id: string): Promise<void>;
     createRoomRole(name: string, permissions: Array<string>): Promise<void>;

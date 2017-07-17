@@ -1,19 +1,19 @@
 import { Readable } from 'stream';
 import { IncomingMessage } from 'http';
+
 import {
-  App as PusherService,
+  Instance,
+  InstanceOptions,
+  AuthenticationResponse,
   BaseClient,
   readJSON,
   writeJSON
 } from 'pusher-platform-node';
 
-import { JOIN_PUBLIC_ROOM, JOIN_PRIVATE_ROOM, LEAVE_ROOM,
-  ADD_ROOM_MEMBER, REMOVE_ROOM_MEMBER, CREATE_ROOM, DELETE_ROOM,
-  UPDATE_ROOM, ADD_MESSAGE, CREATE_TYPING_EVENT, SUBSCRIBE_PRESENCE,
-  UPDATE_USER, GET_ROOM_MESSAGES, GET_USER, GET_USERS, GET_ROOM,
-  GET_ROOMS, GET_USER_ROOMS, JOIN_ROOM
+import {
+  validRoomPermissions,
+  validGlobalPermissions
 } from './permissions';
-import { validPermissions } from './permissions';
 import { getCurrentTimeInSeconds } from './utils';
 import { ClientError } from './errors';
 
@@ -24,54 +24,71 @@ export interface TokenWithExpiry {
   expiresAt: number;
 };
 
-export interface AuthenticationResponse {
-  access_token: string | TokenWithExpiry;
-  token_type: string;
-  expires_in: number;
-  refresh_token: string;
+export interface AuthenticatePayload {
+  grant_type?: string;
+  refresh_token?: string;
 }
 
 export interface Options {
-  cluster: string;
-  instanceId: string;
+  instance: string
   key: string;
+
+  port?: number;
+  host?: string;
   client?: BaseClient;
-};
+}
 
 const TOKEN_EXPIRY_LEEWAY = 30;
 
 export default class ChatKit {
-  pusherService: PusherService;
+  apiInstance: Instance;
+  authorizerInstance: Instance;
 
-  private apiBasePath = 'services/chat_api/v1';
-  private authorizerBasePath = 'services/chat_api_authorizer/v1';
+  // private apiBasePath = 'services/chat_api/v1';
+  // private authorizerBasePath = 'services/chat_api_authorizer/v1';
 
   private tokenWithExpiry?: TokenWithExpiry;
 
-  constructor(pusherServiceConfig: Options) {
-    this.pusherService = new PusherService({
-      cluster: pusherServiceConfig.cluster,
-      appId: pusherServiceConfig.instanceId,
-      appKey: pusherServiceConfig.key,
-      client: pusherServiceConfig.client
-    });
+  constructor(options: Options) {
+    const { instance, key, port, host, client } = options;
+
+    const apiInstanceOptions = ({
+      instance,
+      key,
+      port,
+      host,
+      client,
+      serviceName: 'chat_api',
+      serviceVersion: 'v1',
+    })
+
+    const authorizerInstanceOptions = ({
+      instance,
+      key,
+      port,
+      host,
+      client,
+      serviceName: 'chat_api_authorizer',
+      serviceVersion: 'v1',
+    })
+
+    this.apiInstance = new Instance(apiInstanceOptions);
+    this.authorizerInstance = new Instance(authorizerInstanceOptions);
   }
 
   // Token generation
 
-  // TODO: Make this proper
-
-  // authenticate(grantType: string, userId: string): AuthenticationResponse {
-  //   return this.pusherService.authenticate({ body: { grantType } }, { userId });
-  // }
+  authenticate(authPayload: AuthenticatePayload, userId: string): AuthenticationResponse {
+    return this.apiInstance.authenticate(authPayload, { userId });
+  }
 
 
   // User interactions
 
   createUser(id: string, name: string): Promise<void> {
-    return this.pusherService.request({
+    return this.apiInstance.request({
       method: 'POST',
-      path: `${this.apiBasePath}/users`,
+      path: `/users`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -81,9 +98,9 @@ export default class ChatKit {
   }
 
   deleteUser(id: string): Promise<void> {
-    return this.pusherService.request({
+    return this.apiInstance.request({
       method: 'DELETE',
-      path: `${this.apiBasePath}/users/${id}`,
+      path: `/users/${id}`,
       jwt: this.getServerToken(),
     }).then(() => {})
   }
@@ -92,23 +109,27 @@ export default class ChatKit {
   // Authorizer interactions
 
   createRoomRole(name: string, permissions: Array<string>): Promise<void> {
+    permissions.forEach((perm) => {
+      if (validRoomPermissions.indexOf(perm) < 0) {
+        throw new Error(`Permission value "${perm}" is invalid`);
+      }
+    })
     return this.createRole(name, 'room', permissions)
   }
 
   createGlobalRole(name: string, permissions: Array<string>): Promise<void> {
+    permissions.forEach((perm) => {
+      if (validGlobalPermissions.indexOf(perm) < 0) {
+        throw new Error(`Permission value "${perm}" is invalid`);
+      }
+    })
     return this.createRole(name, 'global', permissions)
   }
 
   private createRole(name: string, scope: string, permissions: Array<string>): Promise<void> {
-    permissions.forEach((perm) => {
-      if (validPermissions.indexOf(perm) < 0) {
-        throw new Error(`Permission value "${perm}" is invalid`);
-      }
-    })
-
-    return this.pusherService.request({
+    return this.authorizerInstance.request({
       method: 'POST',
-      path: `${this.authorizerBasePath}/roles`,
+      path: `/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -118,25 +139,25 @@ export default class ChatKit {
   }
 
   deleteGlobalRole(roleName: string): Promise<void> {
-    return this.pusherService.request({
+    return this.authorizerInstance.request({
       method: 'DELETE',
-      path: `${this.authorizerBasePath}/roles/${roleName}/scope/global`,
+      path: `/roles/${roleName}/scope/global`,
       jwt: this.getServerToken(),
     }).then(() => {})
   }
 
   deleteRoomRole(roleName: string): Promise<void> {
-    return this.pusherService.request({
+    return this.authorizerInstance.request({
       method: 'DELETE',
-      path: `${this.authorizerBasePath}/roles/${roleName}/scope/room`,
+      path: `/roles/${roleName}/scope/room`,
       jwt: this.getServerToken(),
     }).then(() => {})
   }
 
   assignGlobalRoleToUser(userId: string, roleName: string): Promise<void> {
-    return this.pusherService.request({
+    return this.authorizerInstance.request({
       method: 'POST',
-      path: `${this.authorizerBasePath}/users/${userId}/roles`,
+      path: `/users/${userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -146,9 +167,9 @@ export default class ChatKit {
   }
 
   assignRoomRoleToUser(userId: string, roleName: string, roomId: number): Promise<void> {
-    return this.pusherService.request({
+    return this.authorizerInstance.request({
       method: 'POST',
-      path: `${this.authorizerBasePath}/users/${userId}/roles`,
+      path: `/users/${userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -158,9 +179,9 @@ export default class ChatKit {
   }
 
   getUserRoles(userId: string): Promise<any> {
-    return this.pusherService.request({
+    return this.authorizerInstance.request({
       method: 'GET',
-      path: `${this.authorizerBasePath}/users/${userId}/roles`,
+      path: `/users/${userId}/roles`,
       jwt: this.getServerToken(),
     }).then((res) => {
       return readJSON(res)
@@ -168,9 +189,9 @@ export default class ChatKit {
   }
 
   removeGlobalRoleForUser(userId: string): Promise<void> {
-    return this.pusherService.request({
+    return this.authorizerInstance.request({
       method: 'PUT',
-      path: `${this.authorizerBasePath}/users/${userId}/roles`,
+      path: `/users/${userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -179,9 +200,9 @@ export default class ChatKit {
   }
 
   removeRoomRoleForUser(userId: string, roomId: number): Promise<void> {
-    return this.pusherService.request({
+    return this.authorizerInstance.request({
       method: 'PUT',
-      path: `${this.authorizerBasePath}/users/${userId}/roles`,
+      path: `/users/${userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -191,9 +212,9 @@ export default class ChatKit {
   }
 
   getPermissionsForGlobalRole(roleName: string): Promise<any> {
-   return this.pusherService.request({
+   return this.authorizerInstance.request({
       method: 'GET',
-      path: `${this.authorizerBasePath}/roles/${roleName}/scope/global/permissions"`,
+      path: `/roles/${roleName}/scope/global/permissions"`,
       jwt: this.getServerToken(),
     }).then((res) => {
       return readJSON(res)
@@ -201,9 +222,9 @@ export default class ChatKit {
   }
 
   getPermissionsForRoomRole(roleName: string): Promise<any> {
-   return this.pusherService.request({
+   return this.authorizerInstance.request({
       method: 'GET',
-      path: `${this.authorizerBasePath}/roles/${roleName}/scope/room/permissions"`,
+      path: `/roles/${roleName}/scope/room/permissions"`,
       jwt: this.getServerToken(),
     }).then((res) => {
       return readJSON(res)
@@ -221,7 +242,7 @@ export default class ChatKit {
     }
 
     // Otherwise generate new token and its expiration time
-    const tokenWithExpiresIn = this.pusherService.generateSuperuserJWT();
+    const tokenWithExpiresIn = this.apiInstance.generateSuperuserJWT();
 
     this.tokenWithExpiry = {
       token: tokenWithExpiresIn.jwt,

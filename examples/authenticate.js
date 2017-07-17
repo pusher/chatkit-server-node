@@ -17,9 +17,5 @@ const chatkit = new ChatKit.default({
   serviceVersion: 'v1'
 });
 
-chatkit.deleteUser('extender')
-  .then(() => {
-    console.log('Success');
-  }).catch((err) => {
-    console.log(err);
-  })
+var res = chatkit.authenticate({ grant_type: 'client_credentials' }, 'hamtest');
+console.log(res);

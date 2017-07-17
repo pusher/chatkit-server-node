@@ -17,4 +17,5 @@ export declare const GET_ROOM = "get_room";
 export declare const GET_ROOMS = "get_rooms";
 export declare const GET_USER_ROOMS = "get_user_rooms";
 export declare const JOIN_ROOM = "join_room";
-export declare const validPermissions: string[];
+export declare const validRoomPermissions: string[];
+export declare const validGlobalPermissions: string[];

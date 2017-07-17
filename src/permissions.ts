@@ -19,7 +19,20 @@ export const GET_ROOMS = "get_rooms";
 export const GET_USER_ROOMS = "get_user_rooms";
 export const JOIN_ROOM = "join_room";
 
-export const validPermissions = [
+export const validRoomPermissions = [
+  JOIN_ROOM,
+  LEAVE_ROOM,
+  ADD_ROOM_MEMBER,
+  REMOVE_ROOM_MEMBER,
+  DELETE_ROOM,
+  UPDATE_ROOM,
+  ADD_MESSAGE,
+  CREATE_TYPING_EVENT,
+  SUBSCRIBE_PRESENCE,
+  GET_ROOM_MESSAGES,
+];
+
+export const validGlobalPermissions = [
   JOIN_PUBLIC_ROOM,
   JOIN_PRIVATE_ROOM,
   LEAVE_ROOM,
@@ -38,8 +51,4 @@ export const validPermissions = [
   GET_ROOM,
   GET_ROOMS,
   GET_USER_ROOMS,
-  JOIN_ROOM
 ];
-
-// TODO: export a room set and a global set of valid permissions
-// separately

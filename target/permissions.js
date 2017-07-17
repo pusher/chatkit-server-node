@@ -20,7 +20,19 @@ exports.GET_ROOM = "get_room";
 exports.GET_ROOMS = "get_rooms";
 exports.GET_USER_ROOMS = "get_user_rooms";
 exports.JOIN_ROOM = "join_room";
-exports.validPermissions = [
+exports.validRoomPermissions = [
+    exports.JOIN_ROOM,
+    exports.LEAVE_ROOM,
+    exports.ADD_ROOM_MEMBER,
+    exports.REMOVE_ROOM_MEMBER,
+    exports.DELETE_ROOM,
+    exports.UPDATE_ROOM,
+    exports.ADD_MESSAGE,
+    exports.CREATE_TYPING_EVENT,
+    exports.SUBSCRIBE_PRESENCE,
+    exports.GET_ROOM_MESSAGES,
+];
+exports.validGlobalPermissions = [
     exports.JOIN_PUBLIC_ROOM,
     exports.JOIN_PRIVATE_ROOM,
     exports.LEAVE_ROOM,
@@ -39,8 +51,5 @@ exports.validPermissions = [
     exports.GET_ROOM,
     exports.GET_ROOMS,
     exports.GET_USER_ROOMS,
-    exports.JOIN_ROOM
 ];
-// TODO: export a room set and a global set of valid permissions
-// separately
 //# sourceMappingURL=permissions.js.map
