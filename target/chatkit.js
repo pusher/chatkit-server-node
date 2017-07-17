@@ -41,7 +41,7 @@ var ChatKit = (function () {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: pusher_platform_node_1.writeJSON({ id: id, name: name }),
+            body: { id: id, name: name },
             jwt: this.getServerToken(),
         }).then(function () { });
     };
@@ -76,7 +76,7 @@ var ChatKit = (function () {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: pusher_platform_node_1.writeJSON({ scope: scope, name: name, permissions: permissions }),
+            body: { scope: scope, name: name, permissions: permissions },
             jwt: this.getServerToken(),
         }).then(function () { });
     };
@@ -101,7 +101,7 @@ var ChatKit = (function () {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: pusher_platform_node_1.writeJSON({ name: roleName }),
+            body: { name: roleName },
             jwt: this.getServerToken(),
         }).then(function () { });
     };
@@ -112,7 +112,7 @@ var ChatKit = (function () {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: pusher_platform_node_1.writeJSON({ name: roleName, room_id: roomId }),
+            body: { name: roleName, room_id: roomId },
             jwt: this.getServerToken(),
         }).then(function () { });
     };
@@ -122,7 +122,7 @@ var ChatKit = (function () {
             path: "/users/" + userId + "/roles",
             jwt: this.getServerToken(),
         }).then(function (res) {
-            return pusher_platform_node_1.readJSON(res);
+            return JSON.parse(res.body);
         });
     };
     ChatKit.prototype.removeGlobalRoleForUser = function (userId) {
@@ -142,26 +142,26 @@ var ChatKit = (function () {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: pusher_platform_node_1.writeJSON({ room_id: roomId }),
+            body: { room_id: roomId },
             jwt: this.getServerToken(),
         }).then(function () { });
     };
     ChatKit.prototype.getPermissionsForGlobalRole = function (roleName) {
         return this.authorizerInstance.request({
             method: 'GET',
-            path: "/roles/" + roleName + "/scope/global/permissions\"",
+            path: "/roles/" + roleName + "/scope/global/permissions",
             jwt: this.getServerToken(),
         }).then(function (res) {
-            return pusher_platform_node_1.readJSON(res);
+            return JSON.parse(res.body);
         });
     };
     ChatKit.prototype.getPermissionsForRoomRole = function (roleName) {
         return this.authorizerInstance.request({
             method: 'GET',
-            path: "/roles/" + roleName + "/scope/room/permissions\"",
+            path: "/roles/" + roleName + "/scope/room/permissions",
             jwt: this.getServerToken(),
         }).then(function (res) {
-            return pusher_platform_node_1.readJSON(res);
+            return JSON.parse(res.body);
         });
     };
     /**
@@ -173,9 +173,9 @@ var ChatKit = (function () {
             return this.tokenWithExpiry.token;
         }
         // Otherwise generate new token and its expiration time
-        var tokenWithExpiresIn = this.apiInstance.generateSuperuserJWT();
+        var tokenWithExpiresIn = this.apiInstance.generateAccessToken({ su: true });
         this.tokenWithExpiry = {
-            token: tokenWithExpiresIn.jwt,
+            token: tokenWithExpiresIn.token,
             expiresAt: utils_1.getCurrentTimeInSeconds() + tokenWithExpiresIn.expires_in - TOKEN_EXPIRY_LEEWAY,
         };
         return this.tokenWithExpiry.token;

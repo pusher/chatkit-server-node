@@ -12,9 +12,7 @@ var ChatKit = require('../target/index');
 
 const chatkit = new ChatKit.default({
   instance: 'v1:api-ceres:auth-example-app-another',
-  key: 'the-id-bit:the-secret-bit',
-  serviceName: 'chat_api',
-  serviceVersion: 'v1'
+  key: 'the-id-bit:the-secret-bit'
 });
 
 chatkit.deleteGlobalRole('alan')

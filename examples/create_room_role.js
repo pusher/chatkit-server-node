@@ -12,13 +12,11 @@ var ChatKit = require('../target/index');
 
 const chatkit = new ChatKit.default({
   instance: 'v1:api-ceres:auth-example-app-another',
-  key: 'the-id-bit:the-secret-bit',
-  serviceName: 'chat_api',
-  serviceVersion: 'v1'
+  key: 'the-id-bit:the-secret-bit'
 });
 
 chatkit.createRoomRole(
-  'admin',
+  'admin-another',
   ['add_message', 'leave_room', 'add_room_member']
 ).then(() => {
   console.log('Success');

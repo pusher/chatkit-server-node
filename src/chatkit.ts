@@ -1,13 +1,8 @@
-import { Readable } from 'stream';
-import { IncomingMessage } from 'http';
-
 import {
   Instance,
   InstanceOptions,
   AuthenticationResponse,
-  BaseClient,
-  readJSON,
-  writeJSON
+  BaseClient
 } from 'pusher-platform-node';
 
 import {
@@ -43,9 +38,6 @@ const TOKEN_EXPIRY_LEEWAY = 30;
 export default class ChatKit {
   apiInstance: Instance;
   authorizerInstance: Instance;
-
-  // private apiBasePath = 'services/chat_api/v1';
-  // private authorizerBasePath = 'services/chat_api_authorizer/v1';
 
   private tokenWithExpiry?: TokenWithExpiry;
 
@@ -92,7 +84,7 @@ export default class ChatKit {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: writeJSON({ id, name }),
+      body: { id, name },
       jwt: this.getServerToken(),
     }).then(() => {})
   }
@@ -133,7 +125,7 @@ export default class ChatKit {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: writeJSON({ scope, name, permissions }),
+      body: { scope, name, permissions },
       jwt: this.getServerToken(),
     }).then(() => {})
   }
@@ -161,7 +153,7 @@ export default class ChatKit {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: writeJSON({ name: roleName }),
+      body: { name: roleName },
       jwt: this.getServerToken(),
     }).then(() => {})
   }
@@ -173,7 +165,7 @@ export default class ChatKit {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: writeJSON({ name: roleName, room_id: roomId }),
+      body: { name: roleName, room_id: roomId },
       jwt: this.getServerToken(),
     }).then(() => {})
   }
@@ -184,7 +176,7 @@ export default class ChatKit {
       path: `/users/${userId}/roles`,
       jwt: this.getServerToken(),
     }).then((res) => {
-      return readJSON(res)
+      return JSON.parse(res.body);
     })
   }
 
@@ -206,7 +198,7 @@ export default class ChatKit {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: writeJSON({ room_id: roomId }),
+      body: { room_id: roomId },
       jwt: this.getServerToken(),
     }).then(() => {})
   }
@@ -214,20 +206,20 @@ export default class ChatKit {
   getPermissionsForGlobalRole(roleName: string): Promise<any> {
    return this.authorizerInstance.request({
       method: 'GET',
-      path: `/roles/${roleName}/scope/global/permissions"`,
+      path: `/roles/${roleName}/scope/global/permissions`,
       jwt: this.getServerToken(),
     }).then((res) => {
-      return readJSON(res)
+      return JSON.parse(res.body);
     })
   }
 
   getPermissionsForRoomRole(roleName: string): Promise<any> {
    return this.authorizerInstance.request({
       method: 'GET',
-      path: `/roles/${roleName}/scope/room/permissions"`,
+      path: `/roles/${roleName}/scope/room/permissions`,
       jwt: this.getServerToken(),
     }).then((res) => {
-      return readJSON(res)
+      return JSON.parse(res.body);
     })
   }
 
@@ -242,10 +234,10 @@ export default class ChatKit {
     }
 
     // Otherwise generate new token and its expiration time
-    const tokenWithExpiresIn = this.apiInstance.generateSuperuserJWT();
+    const tokenWithExpiresIn = this.apiInstance.generateAccessToken({ su: true });
 
     this.tokenWithExpiry = {
-      token: tokenWithExpiresIn.jwt,
+      token: tokenWithExpiresIn.token,
       expiresAt: getCurrentTimeInSeconds() + tokenWithExpiresIn.expires_in - TOKEN_EXPIRY_LEEWAY,
     }
 
