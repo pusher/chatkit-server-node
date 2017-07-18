@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "jsonwebtoken": "^7.4.1",
-    "pusher-platform-node": "^0.7.0"
+    "pusher-platform-node": "^0.7.1"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
