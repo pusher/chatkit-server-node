@@ -13,9 +13,7 @@ export const SUBSCRIBE_PRESENCE = "subscribe_presence";
 export const UPDATE_USER = "update_user";
 export const GET_ROOM_MESSAGES = "get_room_messages";
 export const GET_USER = "get_user";
-export const GET_USERS = "get_users";
 export const GET_ROOM = "get_room";
-export const GET_ROOMS = "get_rooms";
 export const GET_USER_ROOMS = "get_user_rooms";
 export const JOIN_ROOM = "join_room";
 
@@ -47,8 +45,6 @@ export const validGlobalPermissions = [
   UPDATE_USER,
   GET_ROOM_MESSAGES,
   GET_USER,
-  GET_USERS,
   GET_ROOM,
-  GET_ROOMS,
   GET_USER_ROOMS,
 ];

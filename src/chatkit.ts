@@ -50,7 +50,7 @@ export default class ChatKit {
       port,
       host,
       client,
-      serviceName: 'chat_api',
+      serviceName: 'chatkit',
       serviceVersion: 'v1',
     })
 
@@ -60,7 +60,7 @@ export default class ChatKit {
       port,
       host,
       client,
-      serviceName: 'chat_api_authorizer',
+      serviceName: 'chatkit_authorizer',
       serviceVersion: 'v1',
     })
 

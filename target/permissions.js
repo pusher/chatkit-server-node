@@ -15,9 +15,7 @@ exports.SUBSCRIBE_PRESENCE = "subscribe_presence";
 exports.UPDATE_USER = "update_user";
 exports.GET_ROOM_MESSAGES = "get_room_messages";
 exports.GET_USER = "get_user";
-exports.GET_USERS = "get_users";
 exports.GET_ROOM = "get_room";
-exports.GET_ROOMS = "get_rooms";
 exports.GET_USER_ROOMS = "get_user_rooms";
 exports.JOIN_ROOM = "join_room";
 exports.validRoomPermissions = [
@@ -47,9 +45,7 @@ exports.validGlobalPermissions = [
     exports.UPDATE_USER,
     exports.GET_ROOM_MESSAGES,
     exports.GET_USER,
-    exports.GET_USERS,
     exports.GET_ROOM,
-    exports.GET_ROOMS,
     exports.GET_USER_ROOMS,
 ];
 //# sourceMappingURL=permissions.js.map

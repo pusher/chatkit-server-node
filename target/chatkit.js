@@ -14,7 +14,7 @@ var ChatKit = (function () {
             port: port,
             host: host,
             client: client,
-            serviceName: 'chat_api',
+            serviceName: 'chatkit',
             serviceVersion: 'v1',
         });
         var authorizerInstanceOptions = ({
@@ -23,7 +23,7 @@ var ChatKit = (function () {
             port: port,
             host: host,
             client: client,
-            serviceName: 'chat_api_authorizer',
+            serviceName: 'chatkit_authorizer',
             serviceVersion: 'v1',
         });
         this.apiInstance = new pusher_platform_node_1.Instance(apiInstanceOptions);
