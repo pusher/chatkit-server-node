@@ -164,6 +164,15 @@ var ChatKit = (function () {
             return JSON.parse(res.body);
         });
     };
+    ChatKit.prototype.getRoles = function () {
+        return this.authorizerInstance.request({
+            method: 'GET',
+            path: "/roles",
+            jwt: this.getServerToken(),
+        }).then(function (res) {
+            return JSON.parse(res.body);
+        });
+    };
     /**
      * This method manages the token for http library and pusher platform
      * communication

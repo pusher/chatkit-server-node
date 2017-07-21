@@ -34,6 +34,7 @@ export default class ChatKit {
     removeRoomRoleForUser(userId: string, roomId: number): Promise<void>;
     getPermissionsForGlobalRole(roleName: string): Promise<any>;
     getPermissionsForRoomRole(roleName: string): Promise<any>;
+    getRoles(): Promise<any>;
     /**
      * This method manages the token for http library and pusher platform
      * communication
