@@ -204,7 +204,7 @@ export default class ChatKit {
   }
 
   getPermissionsForGlobalRole(roleName: string): Promise<any> {
-   return this.authorizerInstance.request({
+    return this.authorizerInstance.request({
       method: 'GET',
       path: `/roles/${roleName}/scope/global/permissions`,
       jwt: this.getServerToken(),
@@ -214,7 +214,7 @@ export default class ChatKit {
   }
 
   getPermissionsForRoomRole(roleName: string): Promise<any> {
-   return this.authorizerInstance.request({
+    return this.authorizerInstance.request({
       method: 'GET',
       path: `/roles/${roleName}/scope/room/permissions`,
       jwt: this.getServerToken(),
