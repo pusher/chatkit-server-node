@@ -22,7 +22,7 @@ export interface AuthenticatePayload {
 }
 
 export interface Options {
-  instance: string
+  instanceId: string
   key: string;
 
   port?: number;
@@ -39,10 +39,10 @@ export default class ChatKit {
   private tokenWithExpiry?: TokenWithExpiry;
 
   constructor(options: Options) {
-    const { instance, key, port, host, client } = options;
+    const { instanceId, key, port, host, client } = options;
 
     const apiInstanceOptions = ({
-      instance,
+      instanceId,
       key,
       port,
       host,
@@ -52,7 +52,7 @@ export default class ChatKit {
     })
 
     const authorizerInstanceOptions = ({
-      instance,
+      instanceId,
       key,
       port,
       host,

@@ -7,9 +7,9 @@ var utils_1 = require("./utils");
 var TOKEN_EXPIRY_LEEWAY = 30;
 var ChatKit = (function () {
     function ChatKit(options) {
-        var instance = options.instance, key = options.key, port = options.port, host = options.host, client = options.client;
+        var instanceId = options.instanceId, key = options.key, port = options.port, host = options.host, client = options.client;
         var apiInstanceOptions = ({
-            instance: instance,
+            instanceId: instanceId,
             key: key,
             port: port,
             host: host,
@@ -18,7 +18,7 @@ var ChatKit = (function () {
             serviceVersion: 'v1',
         });
         var authorizerInstanceOptions = ({
-            instance: instance,
+            instanceId: instanceId,
             key: key,
             port: port,
             host: host,

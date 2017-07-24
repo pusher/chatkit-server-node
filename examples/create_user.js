@@ -11,11 +11,11 @@ var ChatKit = require('../target/index');
 // })
 
 const chatkit = new ChatKit.default({
-  instance: 'v1:api-ceres:auth-example-app-another',
+  instanceId: 'v1:api-ceres:auth-example-app-another',
   key: 'the-id-bit:the-secret-bit'
 });
 
-chatkit.createUser('extender5', 'Test McTest')
+chatkit.createUser('extender7', 'Test McTest')
   .then(() => {
     console.log('Success');
   }).catch((err) => {

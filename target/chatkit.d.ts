@@ -8,7 +8,7 @@ export interface AuthenticatePayload {
     refresh_token?: string;
 }
 export interface Options {
-    instance: string;
+    instanceId: string;
     key: string;
     port?: number;
     host?: string;
