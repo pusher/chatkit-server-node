@@ -10,9 +10,6 @@ import {
   validGlobalPermissions
 } from './permissions';
 import { getCurrentTimeInSeconds } from './utils';
-import { ClientError } from './errors';
-
-import { defaultCluster, cacheExpiryTolerance } from './constants';
 
 export interface TokenWithExpiry {
   token: string;

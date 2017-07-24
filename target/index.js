@@ -8,7 +8,5 @@ exports.default = chatkit_1.default;
 var pusher_platform_node_1 = require("pusher-platform-node");
 exports.UnsupportedGrantTypeError = pusher_platform_node_1.UnsupportedGrantTypeError;
 exports.InvalidGrantTypeError = pusher_platform_node_1.InvalidGrantTypeError;
-__export(require("./errors"));
-__export(require("./constants"));
 __export(require("./permissions"));
 //# sourceMappingURL=index.js.map
