@@ -4,6 +4,9 @@ var pusher_platform_node_1 = require("pusher-platform-node");
 var permissions_1 = require("./permissions");
 var utils_1 = require("./utils");
 ;
+;
+;
+;
 var TOKEN_EXPIRY_LEEWAY = 30;
 var ChatKit = (function () {
     function ChatKit(options) {
@@ -33,6 +36,9 @@ var ChatKit = (function () {
     ChatKit.prototype.authenticate = function (authPayload, userId) {
         return this.apiInstance.authenticate(authPayload, { userId: userId });
     };
+    ChatKit.prototype.generateAccessToken = function (authOptions) {
+        return this.apiInstance.generateAccessToken(authOptions);
+    };
     // User interactions
     ChatKit.prototype.createUser = function (id, name) {
         return this.apiInstance.request({
@@ -51,6 +57,25 @@ var ChatKit = (function () {
             path: "/users/" + id,
             jwt: this.getServerToken(),
         }).then(function () { });
+    };
+    ChatKit.prototype.getUsers = function () {
+        return this.apiInstance.request({
+            method: 'GET',
+            path: "/users",
+            jwt: this.getServerToken(),
+        }).then(function (res) {
+            return JSON.parse(res.body);
+        });
+    };
+    // Room interactions
+    ChatKit.prototype.getRooms = function () {
+        return this.apiInstance.request({
+            method: 'GET',
+            path: "/rooms",
+            jwt: this.getServerToken(),
+        }).then(function (res) {
+            return JSON.parse(res.body);
+        });
     };
     // Authorizer interactions
     ChatKit.prototype.createRoomRole = function (name, permissions) {

@@ -1,9 +1,13 @@
-import { Instance, AuthenticationResponse, BaseClient } from 'pusher-platform-node';
-export interface TokenWithExpiry {
+import { Instance, AuthenticationResponse, AuthenticateOptions, BaseClient, TokenWithExpiry } from 'pusher-platform-node';
+export interface TokenWithExpiryAt {
     token: string;
     expiresAt: number;
 }
 export interface AuthenticatePayload {
+    grant_type?: string;
+    refresh_token?: string;
+}
+export interface AccessTokenOptions {
     grant_type?: string;
     refresh_token?: string;
 }
@@ -20,8 +24,11 @@ export default class ChatKit {
     private tokenWithExpiry?;
     constructor(options: Options);
     authenticate(authPayload: AuthenticatePayload, userId: string): AuthenticationResponse;
+    generateAccessToken(authOptions: AuthenticateOptions): TokenWithExpiry;
     createUser(id: string, name: string): Promise<void>;
     deleteUser(id: string): Promise<void>;
+    getUsers(): Promise<any>;
+    getRooms(): Promise<any>;
     createRoomRole(name: string, permissions: Array<string>): Promise<void>;
     createGlobalRole(name: string, permissions: Array<string>): Promise<void>;
     private createRole(name, scope, permissions);

@@ -2,7 +2,9 @@ import {
   Instance,
   InstanceOptions,
   AuthenticationResponse,
-  BaseClient
+  AuthenticateOptions,
+  BaseClient,
+  TokenWithExpiry
 } from 'pusher-platform-node';
 
 import {
@@ -11,7 +13,7 @@ import {
 } from './permissions';
 import { getCurrentTimeInSeconds } from './utils';
 
-export interface TokenWithExpiry {
+export interface TokenWithExpiryAt {
   token: string;
   expiresAt: number;
 };
@@ -19,7 +21,12 @@ export interface TokenWithExpiry {
 export interface AuthenticatePayload {
   grant_type?: string;
   refresh_token?: string;
-}
+};
+
+export interface AccessTokenOptions {
+  grant_type?: string;
+  refresh_token?: string;
+};
 
 export interface Options {
   instanceId: string
@@ -28,7 +35,7 @@ export interface Options {
   port?: number;
   host?: string;
   client?: BaseClient;
-}
+};
 
 const TOKEN_EXPIRY_LEEWAY = 30;
 
@@ -36,7 +43,7 @@ export default class ChatKit {
   apiInstance: Instance;
   authorizerInstance: Instance;
 
-  private tokenWithExpiry?: TokenWithExpiry;
+  private tokenWithExpiry?: TokenWithExpiryAt;
 
   constructor(options: Options) {
     const { instanceId, key, port, host, client } = options;
@@ -71,6 +78,9 @@ export default class ChatKit {
     return this.apiInstance.authenticate(authPayload, { userId });
   }
 
+  generateAccessToken(authOptions: AuthenticateOptions): TokenWithExpiry {
+    return this.apiInstance.generateAccessToken(authOptions);
+  }
 
   // User interactions
 
@@ -94,6 +104,27 @@ export default class ChatKit {
     }).then(() => {})
   }
 
+  getUsers(): Promise<any> {
+    return this.apiInstance.request({
+      method: 'GET',
+      path: `/users`,
+      jwt: this.getServerToken(),
+    }).then((res) => {
+      return JSON.parse(res.body);
+    })
+  }
+
+  // Room interactions
+
+  getRooms(): Promise<any> {
+    return this.apiInstance.request({
+      method: 'GET',
+      path: `/rooms`,
+      jwt: this.getServerToken(),
+    }).then((res) => {
+      return JSON.parse(res.body);
+    })
+  }
 
   // Authorizer interactions
 
