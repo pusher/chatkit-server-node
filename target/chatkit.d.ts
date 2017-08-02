@@ -18,6 +18,11 @@ export interface Options {
     host?: string;
     client?: BaseClient;
 }
+export interface GeneralRequestOptions {
+    method: string;
+    path: string;
+    jwt?: string;
+}
 export default class ChatKit {
     apiInstance: Instance;
     authorizerInstance: Instance;
@@ -42,6 +47,8 @@ export default class ChatKit {
     getPermissionsForGlobalRole(roleName: string): Promise<any>;
     getPermissionsForRoomRole(roleName: string): Promise<any>;
     getRoles(): Promise<any>;
+    apiRequest(options: GeneralRequestOptions): Promise<any>;
+    authorizerRequest(options: GeneralRequestOptions): Promise<any>;
     /**
      * This method manages the token for http library and pusher platform
      * communication

@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // All possible permissions
-exports.JOIN_PUBLIC_ROOM = "join_public_room";
-exports.JOIN_PRIVATE_ROOM = "join_private_room";
+exports.JOIN_ROOM = "join_room";
 exports.LEAVE_ROOM = "leave_room";
 exports.ADD_ROOM_MEMBER = "add_room_member";
 exports.REMOVE_ROOM_MEMBER = "remove_room_member";
@@ -17,7 +16,6 @@ exports.GET_ROOM_MESSAGES = "get_room_messages";
 exports.GET_USER = "get_user";
 exports.GET_ROOM = "get_room";
 exports.GET_USER_ROOMS = "get_user_rooms";
-exports.JOIN_ROOM = "join_room";
 exports.validRoomPermissions = [
     exports.JOIN_ROOM,
     exports.LEAVE_ROOM,
@@ -31,8 +29,7 @@ exports.validRoomPermissions = [
     exports.GET_ROOM_MESSAGES,
 ];
 exports.validGlobalPermissions = [
-    exports.JOIN_PUBLIC_ROOM,
-    exports.JOIN_PRIVATE_ROOM,
+    exports.JOIN_ROOM,
     exports.LEAVE_ROOM,
     exports.ADD_ROOM_MEMBER,
     exports.REMOVE_ROOM_MEMBER,

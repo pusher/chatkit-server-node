@@ -1,5 +1,4 @@
-export declare const JOIN_PUBLIC_ROOM = "join_public_room";
-export declare const JOIN_PRIVATE_ROOM = "join_private_room";
+export declare const JOIN_ROOM = "join_room";
 export declare const LEAVE_ROOM = "leave_room";
 export declare const ADD_ROOM_MEMBER = "add_room_member";
 export declare const REMOVE_ROOM_MEMBER = "remove_room_member";
@@ -14,6 +13,5 @@ export declare const GET_ROOM_MESSAGES = "get_room_messages";
 export declare const GET_USER = "get_user";
 export declare const GET_ROOM = "get_room";
 export declare const GET_USER_ROOMS = "get_user_rooms";
-export declare const JOIN_ROOM = "join_room";
 export declare const validRoomPermissions: string[];
 export declare const validGlobalPermissions: string[];

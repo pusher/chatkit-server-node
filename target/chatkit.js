@@ -198,6 +198,29 @@ var ChatKit = (function () {
             return JSON.parse(res.body);
         });
     };
+    // General requests
+    ChatKit.prototype.apiRequest = function (options) {
+        var method = options.method, path = options.path;
+        var jwt = options.jwt || this.getServerToken();
+        return this.apiInstance.request({
+            method: method,
+            path: path,
+            jwt: jwt,
+        }).then(function (res) {
+            return JSON.parse(res.body);
+        });
+    };
+    ChatKit.prototype.authorizerRequest = function (options) {
+        var method = options.method, path = options.path;
+        var jwt = options.jwt || this.getServerToken();
+        return this.authorizerInstance.request({
+            method: method,
+            path: path,
+            jwt: jwt,
+        }).then(function (res) {
+            return JSON.parse(res.body);
+        });
+    };
     /**
      * This method manages the token for http library and pusher platform
      * communication

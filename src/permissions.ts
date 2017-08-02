@@ -1,6 +1,5 @@
 // All possible permissions
-export const JOIN_PUBLIC_ROOM = "join_public_room";
-export const JOIN_PRIVATE_ROOM = "join_private_room";
+export const JOIN_ROOM = "join_room";
 export const LEAVE_ROOM = "leave_room";
 export const ADD_ROOM_MEMBER = "add_room_member";
 export const REMOVE_ROOM_MEMBER = "remove_room_member";
@@ -15,7 +14,6 @@ export const GET_ROOM_MESSAGES = "get_room_messages";
 export const GET_USER = "get_user";
 export const GET_ROOM = "get_room";
 export const GET_USER_ROOMS = "get_user_rooms";
-export const JOIN_ROOM = "join_room";
 
 export const validRoomPermissions = [
   JOIN_ROOM,
@@ -31,8 +29,7 @@ export const validRoomPermissions = [
 ];
 
 export const validGlobalPermissions = [
-  JOIN_PUBLIC_ROOM,
-  JOIN_PRIVATE_ROOM,
+  JOIN_ROOM,
   LEAVE_ROOM,
   ADD_ROOM_MEMBER,
   REMOVE_ROOM_MEMBER,

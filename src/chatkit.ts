@@ -29,13 +29,19 @@ export interface AccessTokenOptions {
 };
 
 export interface Options {
-  instanceId: string
+  instanceId: string;
   key: string;
 
   port?: number;
   host?: string;
   client?: BaseClient;
 };
+
+export interface GeneralRequestOptions {
+  method: string;
+  path: string;
+  jwt?: string;
+}
 
 const TOKEN_EXPIRY_LEEWAY = 30;
 
@@ -259,6 +265,33 @@ export default class ChatKit {
     }).then((res) => {
       return JSON.parse(res.body);
     })
+  }
+
+
+  // General requests
+
+  apiRequest(options: GeneralRequestOptions): Promise<any> {
+    const { method, path } = options;
+    const jwt = options.jwt || this.getServerToken();
+    return this.apiInstance.request({
+      method,
+      path,
+      jwt,
+    }).then((res) => {
+      return JSON.parse(res.body);
+    });
+  }
+
+  authorizerRequest(options: GeneralRequestOptions): Promise<any> {
+    const { method, path } = options;
+    const jwt = options.jwt || this.getServerToken();
+    return this.authorizerInstance.request({
+      method,
+      path,
+      jwt,
+    }).then((res) => {
+      return JSON.parse(res.body);
+    });
   }
 
 
