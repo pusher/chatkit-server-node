@@ -41,6 +41,7 @@ export interface GeneralRequestOptions {
   method: string;
   path: string;
   jwt?: string;
+  qs?: object;
 }
 
 const TOKEN_EXPIRY_LEEWAY = 30;
@@ -120,7 +121,40 @@ export default class ChatKit {
     })
   }
 
+  getUsersByIds(userIds: Array<number>): Promise<any> {
+    return this.apiInstance.request({
+      method: 'GET',
+      path: `/users_by_ids`,
+      qs: {
+        user_ids: userIds.join(','),
+      },
+      jwt: this.getServerToken(),
+    }).then((res) => {
+      return JSON.parse(res.body);
+    })
+  }
+
   // Room interactions
+
+  getRoom(roomId: number): Promise<any> {
+    return this.apiInstance.request({
+      method: 'GET',
+      path: `/rooms/${roomId}`,
+      jwt: this.getServerToken(),
+    }).then((res) => {
+      return JSON.parse(res.body);
+    })
+  }
+
+  getRoomMessages(roomId: number, initialId: number, direction: string, limit: number): Promise<any> {
+    return this.apiInstance.request({
+      method: 'GET',
+      path: `/rooms/${roomId}/messages`,
+      jwt: this.getServerToken(),
+    }).then((res) => {
+      return JSON.parse(res.body);
+    })
+  }
 
   getRooms(): Promise<any> {
     return this.apiInstance.request({

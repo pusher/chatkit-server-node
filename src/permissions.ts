@@ -24,7 +24,6 @@ export const validRoomPermissions = [
   UPDATE_ROOM,
   ADD_MESSAGE,
   CREATE_TYPING_EVENT,
-  SUBSCRIBE_PRESENCE,
   GET_ROOM_MESSAGES,
 ];
 
