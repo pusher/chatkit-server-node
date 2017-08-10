@@ -44,6 +44,12 @@ export interface GeneralRequestOptions {
   qs?: object;
 }
 
+export interface GetRoomMessagesOptions {
+  initial_id?: string;
+  direction?: string;
+  limit?: number;
+}
+
 const TOKEN_EXPIRY_LEEWAY = 30;
 
 export default class ChatKit {
@@ -91,14 +97,19 @@ export default class ChatKit {
 
   // User interactions
 
-  createUser(id: string, name: string): Promise<void> {
+  createUser(id: string, name: string, avatarURL?: string, customData?: any): Promise<void> {
     return this.apiInstance.request({
       method: 'POST',
       path: `/users`,
       headers: {
         'Content-Type': 'application/json'
       },
-      body: { id, name },
+      body: {
+        id,
+        name,
+        avatar_url: avatarURL,
+        custom_data: customData,
+       },
       jwt: this.getServerToken(),
     }).then(() => {})
   }
@@ -146,11 +157,17 @@ export default class ChatKit {
     })
   }
 
-  getRoomMessages(roomId: number, initialId: number, direction: string, limit: number): Promise<any> {
+  getRoomMessages(roomId: number, initialId: string, direction: string, limit: number): Promise<any> {
+    let qs: GetRoomMessagesOptions = {};
+    if (initialId) { qs['initial_id'] = initialId; }
+    if (direction) { qs['direction'] = direction; }
+    if (limit) { qs['limit'] = limit; }
+
     return this.apiInstance.request({
       method: 'GET',
       path: `/rooms/${roomId}/messages`,
       jwt: this.getServerToken(),
+      qs: qs,
     }).then((res) => {
       return JSON.parse(res.body);
     })
@@ -305,24 +322,26 @@ export default class ChatKit {
   // General requests
 
   apiRequest(options: GeneralRequestOptions): Promise<any> {
-    const { method, path } = options;
+    const { method, path, qs } = options;
     const jwt = options.jwt || this.getServerToken();
     return this.apiInstance.request({
       method,
       path,
       jwt,
+      qs,
     }).then((res) => {
       return JSON.parse(res.body);
     });
   }
 
   authorizerRequest(options: GeneralRequestOptions): Promise<any> {
-    const { method, path } = options;
+    const { method, path, qs } = options;
     const jwt = options.jwt || this.getServerToken();
     return this.authorizerInstance.request({
       method,
       path,
       jwt,
+      qs,
     }).then((res) => {
       return JSON.parse(res.body);
     });
