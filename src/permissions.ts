@@ -1,19 +1,19 @@
 // All possible permissions
-export const JOIN_ROOM = "join_room";
-export const LEAVE_ROOM = "leave_room";
-export const ADD_ROOM_MEMBER = "add_room_member";
-export const REMOVE_ROOM_MEMBER = "remove_room_member";
-export const CREATE_ROOM = "create_room";
-export const DELETE_ROOM = "delete_room";
-export const UPDATE_ROOM = "update_room";
-export const ADD_MESSAGE = "add_message";
-export const CREATE_TYPING_EVENT = "create_typing_event";
-export const SUBSCRIBE_PRESENCE = "subscribe_presence";
-export const UPDATE_USER = "update_user";
-export const GET_ROOM_MESSAGES = "get_room_messages";
-export const GET_USER = "get_user";
-export const GET_ROOM = "get_room";
-export const GET_USER_ROOMS = "get_user_rooms";
+export const JOIN_ROOM = "room:join";
+export const LEAVE_ROOM = "room:leave";
+export const ADD_ROOM_MEMBER = "room:members:add";
+export const REMOVE_ROOM_MEMBER = "room:members:remove";
+export const CREATE_ROOM = "room:create";
+export const DELETE_ROOM = "room:delete";
+export const UPDATE_ROOM = "room:update";
+export const CREATE_MESSAGE = "message:create";
+export const CREATE_TYPING_EVENT = "room:typing_indicator:create";
+export const SUBSCRIBE_PRESENCE = "presence:subscribe";
+export const UPDATE_USER = "user:update";
+export const GET_ROOM_MESSAGES = "room:messages:get";
+export const GET_USER = "user:get";
+export const GET_ROOM = "room:get";
+export const GET_USER_ROOMS = "user:rooms:get";
 
 export const validRoomPermissions = [
   JOIN_ROOM,
@@ -22,7 +22,7 @@ export const validRoomPermissions = [
   REMOVE_ROOM_MEMBER,
   DELETE_ROOM,
   UPDATE_ROOM,
-  ADD_MESSAGE,
+  CREATE_MESSAGE,
   CREATE_TYPING_EVENT,
   GET_ROOM_MESSAGES,
 ];
@@ -35,7 +35,7 @@ export const validGlobalPermissions = [
   CREATE_ROOM,
   DELETE_ROOM,
   UPDATE_ROOM,
-  ADD_MESSAGE,
+  CREATE_MESSAGE,
   CREATE_TYPING_EVENT,
   SUBSCRIBE_PRESENCE,
   UPDATE_USER,
