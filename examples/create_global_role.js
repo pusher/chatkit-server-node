@@ -17,7 +17,7 @@ const chatkit = new ChatKit.default({
 
 chatkit.createGlobalRole(
   'steve',
-  ['add_message', 'leave_room', 'add_room_member']
+  ['message:create', 'room:leave', 'room:members:add']
 ).then(() => {
   console.log('Success');
 }).catch((err) => {
