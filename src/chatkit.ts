@@ -265,9 +265,33 @@ export default class ChatKit {
     })
   }
 
-  removeGlobalRoleForUser(userId: string): Promise<void> {
+  reassignGlobalRoleForUser(userId: string, roleName: string): Promise<void> {
     return this.authorizerInstance.request({
       method: 'PUT',
+      path: `/users/${userId}/roles`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: { name: roleName },
+      jwt: this.getServerToken(),
+    }).then(() => {})
+  }
+
+  reassignRoomRoleForUser(userId: string, roleName: string, roomId: number): Promise<void> {
+    return this.authorizerInstance.request({
+      method: 'PUT',
+      path: `/users/${userId}/roles`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: { name: roleName, room_id: roomId },
+      jwt: this.getServerToken(),
+    }).then(() => {})
+  }
+
+  removeGlobalRoleForUser(userId: string): Promise<void> {
+    return this.authorizerInstance.request({
+      method: 'DELETE',
       path: `/users/${userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
@@ -278,12 +302,12 @@ export default class ChatKit {
 
   removeRoomRoleForUser(userId: string, roomId: number): Promise<void> {
     return this.authorizerInstance.request({
-      method: 'PUT',
+      method: 'DELETE',
       path: `/users/${userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
-      body: { room_id: roomId },
+      qs: { room_id: roomId },
       jwt: this.getServerToken(),
     }).then(() => {})
   }
