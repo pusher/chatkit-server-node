@@ -11,8 +11,8 @@ var ChatKit = require('../target/index');
 // })
 
 const chatkit = new ChatKit.default({
-  instanceId: 'v1:api-deneb:e8f29828-3a12-4a3e-ac7d-a1c79caee867',
-  key: 'a620ded4-45f5-464d-901c-4f9c1b961a36:bB+hJBEkxwoGkm+kwGs1OwBCW+9l7E/fKYHNQig9744='
+  instanceId: 'v1:us1:example',
+  key: 'your:key'
 });
 
 chatkit.getUsersByIds(['harrypotter'])
@@ -20,4 +20,4 @@ chatkit.getUsersByIds(['harrypotter'])
     console.log(res);
   }).catch((err) => {
     console.log(err);
-  })
+  });

@@ -11,8 +11,8 @@ var ChatKit = require('../target/index');
 // })
 
 const chatkit = new ChatKit.default({
-  instanceId: 'v1:api-ceres:auth-example-app-another',
-  key: 'the-id-bit:the-secret-bit'
+  instanceId: 'v1:us1:example',
+  key: 'your:key'
 });
 
 chatkit.deleteGlobalRole('alan')
@@ -20,4 +20,4 @@ chatkit.deleteGlobalRole('alan')
     console.log('Success');
   }).catch((err) => {
     console.log(err);
-  })
+  });
