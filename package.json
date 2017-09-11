@@ -1,7 +1,7 @@
 {
   "name": "pusher-chatkit-server",
   "description": "Pusher ChatKit server library",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "main": "./target/index.js",
   "license": "MIT",
   "author": "Pusher",
