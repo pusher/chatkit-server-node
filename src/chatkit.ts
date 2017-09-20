@@ -52,7 +52,7 @@ export interface GetRoomMessagesOptions {
 
 const TOKEN_EXPIRY_LEEWAY = 30;
 
-export default class ChatKit {
+export default class Chatkit {
   apiInstance: Instance;
   authorizerInstance: Instance;
   instanceId: string;

@@ -1,4 +1,4 @@
-var ChatKit = require('../target/index');
+var Chatkit = require('../target/index');
 
 // var PusherPlatform = require('../node_modules/pusher-platform-node/target/index');
 
@@ -10,12 +10,12 @@ var ChatKit = require('../target/index');
 //   port: 10443
 // })
 
-const chatkit = new ChatKit.default({
+const chatkit = new Chatkit.default({
   instanceId: 'v1:us1:example',
   key: 'your:key'
 });
 
-chatkit.createUser('testman', 'Test McTest')
+chatkit.createUser('example', 'Superuser')
   .then(() => {
     console.log('Success');
   }).catch((err) => {
