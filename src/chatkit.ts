@@ -55,6 +55,7 @@ const TOKEN_EXPIRY_LEEWAY = 30;
 export default class ChatKit {
   apiInstance: Instance;
   authorizerInstance: Instance;
+  instanceId: string;
 
   private tokenWithExpiry?: TokenWithExpiryAt;
 
@@ -81,6 +82,7 @@ export default class ChatKit {
       serviceVersion: 'v1',
     })
 
+    this.instanceId = instanceId;
     this.apiInstance = new Instance(apiInstanceOptions);
     this.authorizerInstance = new Instance(authorizerInstanceOptions);
   }
@@ -180,6 +182,18 @@ export default class ChatKit {
       jwt: this.getServerToken(),
     }).then((res) => {
       return JSON.parse(res.body);
+    })
+  }
+
+  createRoom(userId: string, name: string): Promise<any> {
+    const actualInstanceId = this.instanceId.split(':')[2];
+    const jwt = this.generateAccessToken({ userId: actualInstanceId });
+
+    return this.apiInstance.request({
+      method: 'POST',
+      path: '/rooms',
+      jwt: jwt.token,
+      body: { name },
     })
   }
 
@@ -346,27 +360,15 @@ export default class ChatKit {
   // General requests
 
   apiRequest(options: GeneralRequestOptions): Promise<any> {
-    const { method, path, qs } = options;
-    const jwt = options.jwt || this.getServerToken();
-    return this.apiInstance.request({
-      method,
-      path,
-      jwt,
-      qs,
-    }).then((res) => {
+    options.jwt = options.jwt || this.getServerToken();
+    return this.apiInstance.request(options).then((res) => {
       return JSON.parse(res.body);
     });
   }
 
   authorizerRequest(options: GeneralRequestOptions): Promise<any> {
-    const { method, path, qs } = options;
-    const jwt = options.jwt || this.getServerToken();
-    return this.authorizerInstance.request({
-      method,
-      path,
-      jwt,
-      qs,
-    }).then((res) => {
+    options.jwt = options.jwt || this.getServerToken();
+    return this.authorizerInstance.request(options).then((res) => {
       return JSON.parse(res.body);
     });
   }
