@@ -11,7 +11,7 @@ var Chatkit = require('../target/index');
 // })
 
 const chatkit = new Chatkit.default({
-  instanceId: 'v1:us1:example',
+  instanceLocator: 'v1:us1:example',
   key: 'your:key'
 });
 

@@ -29,7 +29,7 @@ export interface AccessTokenOptions {
 };
 
 export interface Options {
-  instanceId: string;
+  instanceLocator: string;
   key: string;
 
   port?: number;
@@ -55,15 +55,15 @@ const TOKEN_EXPIRY_LEEWAY = 30;
 export default class Chatkit {
   apiInstance: Instance;
   authorizerInstance: Instance;
-  instanceId: string;
+  instanceLocator: string;
 
   private tokenWithExpiry?: TokenWithExpiryAt;
 
   constructor(options: Options) {
-    const { instanceId, key, port, host, client } = options;
+    const { instanceLocator, key, port, host, client } = options;
 
     const apiInstanceOptions = ({
-      instanceId,
+      locator: instanceLocator,
       key,
       port,
       host,
@@ -73,7 +73,7 @@ export default class Chatkit {
     })
 
     const authorizerInstanceOptions = ({
-      instanceId,
+      locator: instanceLocator,
       key,
       port,
       host,
@@ -82,7 +82,7 @@ export default class Chatkit {
       serviceVersion: 'v1',
     })
 
-    this.instanceId = instanceId;
+    this.instanceLocator = instanceLocator;
     this.apiInstance = new Instance(apiInstanceOptions);
     this.authorizerInstance = new Instance(authorizerInstanceOptions);
   }
@@ -186,8 +186,10 @@ export default class Chatkit {
   }
 
   createRoom(userId: string, name: string): Promise<any> {
-    const actualInstanceId = this.instanceId.split(':')[2];
-    const jwt = this.generateAccessToken({ userId: actualInstanceId });
+    const jwt = this.generateAccessToken({
+      userId: '_superuser',
+      su: true,
+    });
 
     return this.apiInstance.request({
       method: 'POST',
