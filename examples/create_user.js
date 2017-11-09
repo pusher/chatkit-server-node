@@ -15,7 +15,7 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.createUser('example', 'Superuser')
+chatkit.createUser('example', 'mycooluser')
   .then(() => {
     console.log('Success');
   }).catch((err) => {

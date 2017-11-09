@@ -187,7 +187,7 @@ export default class Chatkit {
 
   createRoom(userId: string, name: string): Promise<any> {
     const jwt = this.generateAccessToken({
-      userId: '_superuser',
+      userId: userId,
       su: true,
     });
 
