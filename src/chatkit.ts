@@ -208,6 +208,8 @@ export default class Chatkit {
         private: isPrivate || false,
         user_ids: userIds || [],
       },
+    }).then((res) => {
+      return JSON.parse(res.body);
     })
   }
 
