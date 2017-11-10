@@ -50,6 +50,12 @@ export interface GetRoomMessagesOptions {
   limit?: number;
 }
 
+export interface CreateRoomOptions {
+  name: string;
+  isPrivate?: boolean;
+  userIds?: Array<string>;
+}
+
 const TOKEN_EXPIRY_LEEWAY = 30;
 
 export default class Chatkit {
@@ -185,17 +191,23 @@ export default class Chatkit {
     })
   }
 
-  createRoom(userId: string, name: string): Promise<any> {
+  createRoom(userId: string, options: CreateRoomOptions): Promise<any> {
     const jwt = this.generateAccessToken({
       userId: userId,
       su: true,
     });
 
+    const { name, isPrivate, userIds } = options;
+
     return this.apiInstance.request({
       method: 'POST',
       path: '/rooms',
       jwt: jwt.token,
-      body: { name },
+      body: {
+        name,
+        private: isPrivate || false,
+        user_ids: userIds || [],
+      },
     })
   }
 
