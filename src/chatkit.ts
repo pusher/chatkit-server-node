@@ -199,15 +199,20 @@ export default class Chatkit {
 
     const { name, isPrivate, userIds } = options;
 
+    let roomPayload: any = {
+      name,
+      private: isPrivate || false,
+    }
+
+    if (userIds && userIds.length !== 0) {
+      roomPayload['user_ids'] = userIds;
+    }
+
     return this.apiInstance.request({
       method: 'POST',
       path: '/rooms',
       jwt: jwt.token,
-      body: {
-        name,
-        private: isPrivate || false,
-        user_ids: userIds || [],
-      },
+      body: roomPayload,
     }).then((res) => {
       return JSON.parse(res.body);
     })
