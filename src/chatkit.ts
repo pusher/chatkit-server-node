@@ -56,6 +56,11 @@ export interface CreateRoomOptions {
   userIds?: Array<string>;
 }
 
+export interface UpdateRolePermissionsOptions {
+  add_permissions?: Array<string>;
+  remove_permissions?: Array<string>;
+}
+
 const TOKEN_EXPIRY_LEEWAY = 30;
 
 export default class Chatkit {
@@ -372,14 +377,14 @@ export default class Chatkit {
     permissionsToAdd: Array<string>,
     permissionsToRemove: Array<string>,
   ): Promise<any> {
-    var permsToCheck: Array<string> = permissionsToadd.concat(permissionsToRemove)
-    (permsToCheck).forEach((perm) => {
+    var permsToCheck: Array<string> = permissionsToAdd.concat(permissionsToRemove)
+    permsToCheck.forEach((perm: string) => {
       if (validGlobalPermissions.indexOf(perm) < 0) {
         throw new Error(`Permission value "${perm}" is invalid`);
       }
     })
 
-    return updatePermissionsForRole(roleName, 'global', permissionsToadd, permissionsToRemove)
+    return this.updatePermissionsForRole(roleName, 'global', permissionsToAdd, permissionsToRemove)
   }
 
   updatePermissionsForRoomRole(
@@ -387,14 +392,14 @@ export default class Chatkit {
     permissionsToAdd: Array<string>,
     permissionsToRemove: Array<string>,
   ): Promise<any> {
-    var permsToCheck: Array<string> = permissionsToadd.concat(permissionsToRemove)
-    permsToCheck.forEach((perm) => {
+    var permsToCheck: Array<string> = permissionsToAdd.concat(permissionsToRemove)
+    permsToCheck.forEach((perm: string) => {
       if (validRoomPermissions.indexOf(perm) < 0) {
         throw new Error(`Permission value "${perm}" is invalid`);
       }
     })
 
-    return updatePermissionsForRole(roleName, 'room', permissionsToadd, permissionsToRemove)
+    return this.updatePermissionsForRole(roleName, 'room', permissionsToAdd, permissionsToRemove)
   }
 
   getRoles(): Promise<any> {
@@ -430,16 +435,16 @@ export default class Chatkit {
     permissionsToadd: Array<string>,
     permissionsToRemove: Array<string>,
   ): Promise<any> {
-    if (len(permissionsToadd) == 0 && len(permissionsToRemove) == 0) {
-      throw new Error(`Either permissionsToAdd or permissionsToRemove is required`)
+    if (permissionsToadd.length === 0 && permissionsToRemove.length === 0) {
+      throw new Error(`Either permissionsToAdd or permissionsToRemove is required`);
     }
 
-    var body: object = {}
-    if (len(permissionsToadd) > 0) {
+    let body: UpdateRolePermissionsOptions = {};
+    if (permissionsToadd.length > 0) {
       body['add_permissions'] = permissionsToadd
     }
 
-    if (len(permissionsToRemove) > 0) {
+    if (permissionsToRemove.length > 0) {
       body['remove_permissions'] = permissionsToRemove
     }
 
