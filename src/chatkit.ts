@@ -56,6 +56,11 @@ export interface CreateRoomOptions {
   userIds?: Array<string>;
 }
 
+export interface UpdateRolePermissionsOptions {
+  add_permissions?: Array<string>;
+  remove_permissions?: Array<string>;
+}
+
 const TOKEN_EXPIRY_LEEWAY = 30;
 
 export default class Chatkit {
@@ -367,6 +372,36 @@ export default class Chatkit {
     })
   }
 
+  updatePermissionsForGlobalRole(
+    roleName: string,
+    permissionsToAdd: Array<string>,
+    permissionsToRemove: Array<string>,
+  ): Promise<any> {
+    var permsToCheck: Array<string> = permissionsToAdd.concat(permissionsToRemove)
+    permsToCheck.forEach((perm: string) => {
+      if (validGlobalPermissions.indexOf(perm) < 0) {
+        throw new Error(`Permission value "${perm}" is invalid`);
+      }
+    })
+
+    return this.updatePermissionsForRole(roleName, 'global', permissionsToAdd, permissionsToRemove)
+  }
+
+  updatePermissionsForRoomRole(
+    roleName: string,
+    permissionsToAdd: Array<string>,
+    permissionsToRemove: Array<string>,
+  ): Promise<any> {
+    var permsToCheck: Array<string> = permissionsToAdd.concat(permissionsToRemove)
+    permsToCheck.forEach((perm: string) => {
+      if (validRoomPermissions.indexOf(perm) < 0) {
+        throw new Error(`Permission value "${perm}" is invalid`);
+      }
+    })
+
+    return this.updatePermissionsForRole(roleName, 'room', permissionsToAdd, permissionsToRemove)
+  }
+
   getRoles(): Promise<any> {
     return this.authorizerInstance.request({
       method: 'GET',
@@ -392,6 +427,36 @@ export default class Chatkit {
     return this.authorizerInstance.request(options).then((res) => {
       return JSON.parse(res.body);
     });
+  }
+
+  private updatePermissionsForRole(
+    roleName: string,
+    scope: string,
+    permissionsToadd: Array<string>,
+    permissionsToRemove: Array<string>,
+  ): Promise<any> {
+    if (permissionsToadd.length === 0 && permissionsToRemove.length === 0) {
+      throw new Error(`Either permissionsToAdd or permissionsToRemove is required`);
+    }
+
+    let body: UpdateRolePermissionsOptions = {};
+    if (permissionsToadd.length > 0) {
+      body['add_permissions'] = permissionsToadd
+    }
+
+    if (permissionsToRemove.length > 0) {
+      body['remove_permissions'] = permissionsToRemove
+    }
+
+    return this.authorizerInstance.request({
+      method: 'PUT',
+      path: `/roles/${roleName}/scope/${scope}/permissions`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: body,
+      jwt: this.getServerToken(),
+    }).then(() => {})
   }
 
 
