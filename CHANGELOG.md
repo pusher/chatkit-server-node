@@ -1,5 +1,11 @@
 # Change Log
 
+## [v0.6.0] 2017-11-16
+
+### Additions
+
+- Adds functionality to update permissions for existing roles by introducing two new functions: `updatePermissionsForRoomRole` and `updatePermissionsForGlobalRole`.
+
 ## [v0.5.2] 2017-11-10
 
 ### Fixes
