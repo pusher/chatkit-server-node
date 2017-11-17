@@ -245,7 +245,7 @@ export default class Chatkit {
 
   private createRole(name: string, scope: string, permissions: Array<string>): Promise<void> {
     return this.authorizerInstance.request({
-      method: 'PUT',
+      method: 'POST',
       path: `/roles`,
       headers: {
         'Content-Type': 'application/json'
@@ -273,7 +273,7 @@ export default class Chatkit {
 
   assignGlobalRoleToUser(userId: string, roleName: string): Promise<void> {
     return this.authorizerInstance.request({
-      method: 'SET',
+      method: 'PUT',
       path: `/users/${userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
@@ -283,13 +283,13 @@ export default class Chatkit {
     }).then(() => {})
   }
 
-    assignRoomRoleToUser(
-      userId: string,
-      roleName: string,
-      roomId: number,
-    ): Promise<void> {
+  assignRoomRoleToUser(
+    userId: string,
+    roleName: string,
+    roomId: number,
+  ): Promise<void> {
     return this.authorizerInstance.request({
-      method: 'SET',
+      method: 'PUT',
       path: `/users/${userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
