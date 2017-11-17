@@ -272,21 +272,21 @@ export default class Chatkit {
   }
 
   assignGlobalRoleToUser(userId: string, roleName: string): Promise<void> {
-    return this.authorizerInstance.request({
-      method: 'PUT',
-      path: `/users/${userId}/roles`,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: { name: roleName },
-      jwt: this.getServerToken(),
-    }).then(() => {})
+    return this.assignRoleToUser(userId, roleName);
   }
 
   assignRoomRoleToUser(
     userId: string,
     roleName: string,
     roomId: number,
+  ): Promise<void> {
+    return this.assignRoleToUser(userId, roleName, roomId);
+  }
+
+  private assignRoleToUser(
+    userId: string,
+    roleName: string,
+    roomId?: number,
   ): Promise<void> {
     return this.authorizerInstance.request({
       method: 'PUT',
