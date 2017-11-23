@@ -145,7 +145,7 @@ export default class Chatkit {
     })
   }
 
-  getUsersByIds(userIds: Array<number>): Promise<any> {
+  getUsersByIds(userIds: Array<string>): Promise<any> {
     return this.apiInstance.request({
       method: 'GET',
       path: `/users_by_ids`,
