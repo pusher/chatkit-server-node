@@ -1,5 +1,21 @@
 # Change Log
 
+## [v0.7.1] 2017-11-23
+
+### Fixes
+
+- Correctly type the user id array in `getUsersByIds` as `Array<string>` instead of `Array<number>`
+
+## [v0.7.0] 2017-11-20
+
+### Changes
+
+- `assignRoomRoleToUser` and `assignGlobalRoleToUser` now work regardless of whether or not a role has previously been assigned for a user
+
+### Removals
+
+- `reassignRoomRoleForUser` and `reassignGlobalRoleForUser` were removed
+
 ## [v0.6.0] 2017-11-16
 
 ### Additions
