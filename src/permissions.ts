@@ -14,6 +14,8 @@ export const GET_ROOM_MESSAGES = "room:messages:get";
 export const GET_USER = "user:get";
 export const GET_ROOM = "room:get";
 export const GET_USER_ROOMS = "user:rooms:get";
+export const GET_FILE = "file:get";
+export const CREATE_FILE = "file:create";
 
 export const validRoomPermissions = [
   JOIN_ROOM,
@@ -25,6 +27,8 @@ export const validRoomPermissions = [
   CREATE_MESSAGE,
   CREATE_TYPING_EVENT,
   GET_ROOM_MESSAGES,
+  GET_FILE,
+  CREATE_FILE,
 ];
 
 export const validGlobalPermissions = [
@@ -43,4 +47,6 @@ export const validGlobalPermissions = [
   GET_USER,
   GET_ROOM,
   GET_USER_ROOMS,
+  GET_FILE,
+  CREATE_FILE,
 ];
