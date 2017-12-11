@@ -1,5 +1,11 @@
 # Change Log
 
+## [v0.7.2] 2017-12-11
+
+### Changes
+
+- Add the `file:get` and `file:create` permissions to the list of supported permissions
+
 ## [v0.7.1] 2017-11-23
 
 ### Fixes
