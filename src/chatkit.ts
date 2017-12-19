@@ -397,9 +397,7 @@ export default class Chatkit {
 
   apiRequest(options: GeneralRequestOptions): Promise<any> {
     options.jwt = options.jwt || this.getServerToken();
-    return this.apiInstance.request(options).then((res) => {
-      return JSON.parse(res.body);
-    });
+    return this.apiInstance.request(options);
   }
 
   authorizerRequest(options: GeneralRequestOptions): Promise<any> {
