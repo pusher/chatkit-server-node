@@ -16,6 +16,8 @@ export const GET_ROOM = "room:get";
 export const GET_USER_ROOMS = "user:rooms:get";
 export const GET_FILE = "file:get";
 export const CREATE_FILE = "file:create";
+export const GET_READ_CURSORS = "cursors:read:get";
+export const SET_READ_CURSORS = "cursors:read:set";
 
 export const validRoomPermissions = [
   JOIN_ROOM,
@@ -29,6 +31,8 @@ export const validRoomPermissions = [
   GET_ROOM_MESSAGES,
   GET_FILE,
   CREATE_FILE,
+  GET_READ_CURSORS,
+  SET_READ_CURSORS,
 ];
 
 export const validGlobalPermissions = [
@@ -49,4 +53,6 @@ export const validGlobalPermissions = [
   GET_USER_ROOMS,
   GET_FILE,
   CREATE_FILE,
+  GET_READ_CURSORS,
+  SET_READ_CURSORS,
 ];
