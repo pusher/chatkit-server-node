@@ -1,5 +1,17 @@
 # Change Log
 
+## [v0.8.3] 2018-01-04
+
+### Additions
+
+- Support cursors permissions "cursors:read:get" and "cursors:read:set"
+
+## [v0.8.0] 2017-12-19
+
+### Changes
+
+- Don't parse response in apiRequest (since it isn't always JSON)
+
 ## [v0.7.2] 2017-12-11
 
 ### Changes
