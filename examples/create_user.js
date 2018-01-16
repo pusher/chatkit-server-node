@@ -16,8 +16,8 @@ const chatkit = new Chatkit.default({
 });
 
 chatkit.createUser('example', 'mycooluser')
-  .then(() => {
-    console.log('Success');
+  .then((user) => {
+    console.log('Success', user);
   }).catch((err) => {
     console.log(err);
   });
