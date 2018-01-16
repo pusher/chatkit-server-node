@@ -1,4 +1,15 @@
-# Change Log
+# Changelog
+
+## [v0.9.0] 2018-01-16
+
+### Additions
+
+- Removed permissions constants and permissions checking from the SDK. The API will return a sensible error if you provide an invalid permission name
+- Added `updateGlobalRoomPermissions` example
+
+### Changes
+
+- When using `createUser` the promise that is returned now resolves with the JSON response from the API (which contains the user information), if the request succeeds
 
 ## [v0.8.3] 2018-01-04
 
