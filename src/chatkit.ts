@@ -106,7 +106,7 @@ export default class Chatkit {
 
   // User interactions
 
-  createUser(id: string, name: string, avatarURL?: string, customData?: any): Promise<void> {
+  createUser(id: string, name: string, avatarURL?: string, customData?: any): Promise<any> {
     return this.apiInstance.request({
       method: 'POST',
       path: `/users`,
@@ -120,7 +120,9 @@ export default class Chatkit {
         custom_data: customData,
        },
       jwt: this.getServerToken(),
-    }).then(() => {})
+    }).then((res) => {
+      return JSON.parse(res.body);
+    })
   }
 
   deleteUser(id: string): Promise<void> {
