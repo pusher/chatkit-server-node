@@ -7,10 +7,6 @@ import {
   TokenWithExpiry
 } from 'pusher-platform-node';
 
-import {
-  validRoomPermissions,
-  validGlobalPermissions
-} from './permissions';
 import { getCurrentTimeInSeconds } from './utils';
 
 export interface TokenWithExpiryAt {
@@ -226,21 +222,11 @@ export default class Chatkit {
   // Authorizer interactions
 
   createRoomRole(name: string, permissions: Array<string>): Promise<void> {
-    permissions.forEach((perm) => {
-      if (validRoomPermissions.indexOf(perm) < 0) {
-        throw new Error(`Permission value "${perm}" is invalid`);
-      }
-    })
-    return this.createRole(name, 'room', permissions)
+    return this.createRole(name, 'room', permissions);
   }
 
   createGlobalRole(name: string, permissions: Array<string>): Promise<void> {
-    permissions.forEach((perm) => {
-      if (validGlobalPermissions.indexOf(perm) < 0) {
-        throw new Error(`Permission value "${perm}" is invalid`);
-      }
-    })
-    return this.createRole(name, 'global', permissions)
+    return this.createRole(name, 'global', permissions);
   }
 
   private createRole(name: string, scope: string, permissions: Array<string>): Promise<void> {
@@ -354,31 +340,17 @@ export default class Chatkit {
 
   updatePermissionsForGlobalRole(
     roleName: string,
-    permissionsToAdd: Array<string>,
-    permissionsToRemove: Array<string>,
+    permissionsToAdd: Array<string> = [],
+    permissionsToRemove: Array<string> = [],
   ): Promise<any> {
-    var permsToCheck: Array<string> = permissionsToAdd.concat(permissionsToRemove)
-    permsToCheck.forEach((perm: string) => {
-      if (validGlobalPermissions.indexOf(perm) < 0) {
-        throw new Error(`Permission value "${perm}" is invalid`);
-      }
-    })
-
     return this.updatePermissionsForRole(roleName, 'global', permissionsToAdd, permissionsToRemove)
   }
 
   updatePermissionsForRoomRole(
     roleName: string,
-    permissionsToAdd: Array<string>,
-    permissionsToRemove: Array<string>,
+    permissionsToAdd: Array<string> = [],
+    permissionsToRemove: Array<string> = [],
   ): Promise<any> {
-    var permsToCheck: Array<string> = permissionsToAdd.concat(permissionsToRemove)
-    permsToCheck.forEach((perm: string) => {
-      if (validRoomPermissions.indexOf(perm) < 0) {
-        throw new Error(`Permission value "${perm}" is invalid`);
-      }
-    })
-
     return this.updatePermissionsForRole(roleName, 'room', permissionsToAdd, permissionsToRemove)
   }
 
@@ -410,8 +382,8 @@ export default class Chatkit {
   private updatePermissionsForRole(
     roleName: string,
     scope: string,
-    permissionsToadd: Array<string>,
-    permissionsToRemove: Array<string>,
+    permissionsToadd: Array<string> = [],
+    permissionsToRemove: Array<string>  = [],
   ): Promise<any> {
     if (permissionsToadd.length === 0 && permissionsToRemove.length === 0) {
       throw new Error(`Either permissionsToAdd or permissionsToRemove is required`);
