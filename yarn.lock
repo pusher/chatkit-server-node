@@ -961,9 +961,9 @@ punycode@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
 
-pusher-platform-node@~0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/pusher-platform-node/-/pusher-platform-node-0.10.0.tgz#71602f73a91c472ffe893baf2d34e0dcb726827a"
+pusher-platform-node@~0.11.1:
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/pusher-platform-node/-/pusher-platform-node-0.11.1.tgz#29ccc2de4cc2009a789517e09dc6bf3639013b0d"
   dependencies:
     body-parser "^1.17.2"
     extend "^2.0.1"
