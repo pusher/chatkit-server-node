@@ -16,8 +16,25 @@ const chatkit = new Chatkit.default({
 });
 
 chatkit.createGlobalRole(
-  'steve',
-  ['message:create', 'room:leave', 'room:members:add']
+  'default',
+  [
+    'message:create',
+    'room:join',
+    'room:leave',
+    'room:members:add',
+    'room:members:remove',
+    'room:get',
+    'room:create',
+    'room:messages:get',
+    'room:typing_indicator:create',
+    'presence:subscribe',
+    'user:get',
+    'user:rooms:get',
+    'cursors:read:get',
+    'cursors:read:set',
+    'file:create',
+    'file:get'
+  ]
 ).then(() => {
   console.log('Success');
 }).catch((err) => {
