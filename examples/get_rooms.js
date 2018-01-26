@@ -15,7 +15,7 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.getRooms()
+chatkit.getRooms('ham')
   .then((res) => {
     console.log(res);
   }).catch((err) => {

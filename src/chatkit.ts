@@ -184,11 +184,16 @@ export default class Chatkit {
     })
   }
 
-  getRooms(): Promise<any> {
+  getRooms(userId: string): Promise<any> {
+    const jwt = this.generateAccessToken({
+      userId: userId,
+      su: true,
+    });
+
     return this.apiInstance.request({
       method: 'GET',
       path: `/rooms`,
-      jwt: this.getServerToken(),
+      jwt: jwt.token,
     }).then((res) => {
       return JSON.parse(res.body);
     })
