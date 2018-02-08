@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.9.2] 2018-02-08
+
+### Changes
+
+- `getRoomMessages` now has a signature of `getRoomMessages(userId: string, roomId: number, options: GetRoomMessagesOptions = {})`
+
+### Fixes
+
+- `getRoomMessages` now generates a valid token when provided with an appropriate `userId` as the first parameter
+
 ## [v0.9.1] 2018-01-26
 
 ### Additions
