@@ -41,6 +41,12 @@ export interface GeneralRequestOptions {
 }
 
 export interface GetRoomMessagesOptions {
+  initialId?: string;
+  direction?: string;
+  limit?: number;
+}
+
+export interface GetRoomMessagesOptionsPayload {
   initial_id?: string;
   direction?: string;
   limit?: number;
@@ -168,16 +174,20 @@ export default class Chatkit {
     })
   }
 
-  getRoomMessages(roomId: number, initialId: string, direction: string, limit: number): Promise<any> {
-    let qs: GetRoomMessagesOptions = {};
+  getRoomMessages(userId: string, roomId: number, options: GetRoomMessagesOptions = {}): Promise<any> {
+    const jwt = this.generateAccessToken({
+      userId: userId,
+      su: true,
+    });
+
+    const { initialId, ...optionsMinusInitialId } = options;
+    let qs: GetRoomMessagesOptionsPayload = optionsMinusInitialId;
     if (initialId) { qs['initial_id'] = initialId; }
-    if (direction) { qs['direction'] = direction; }
-    if (limit) { qs['limit'] = limit; }
 
     return this.apiInstance.request({
       method: 'GET',
       path: `/rooms/${roomId}/messages`,
-      jwt: this.getServerToken(),
+      jwt: jwt.token,
       qs: qs,
     }).then((res) => {
       return JSON.parse(res.body);

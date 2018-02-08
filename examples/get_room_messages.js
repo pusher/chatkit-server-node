@@ -15,7 +15,7 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.getRoomMessages(123)
+chatkit.getRoomMessages('harrypotter', 123, {})
   .then((res) => {
     console.log(res);
   }).catch((err) => {
