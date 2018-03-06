@@ -202,7 +202,7 @@ export default class Chatkit {
 
     return this.apiInstance.request({
       method: 'GET',
-      path: `/rooms`,
+      path: `/users/${userId}/rooms`,
       jwt: jwt.token,
     }).then((res) => {
       return JSON.parse(res.body);
