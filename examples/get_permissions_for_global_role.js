@@ -15,7 +15,7 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.getPermissionsForGlobalRole('steve')
+chatkit.getPermissionsForGlobalRole('default')
   .then((res) => {
     console.log(res);
   }).catch((err) => {
