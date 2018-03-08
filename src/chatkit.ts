@@ -63,6 +63,13 @@ export interface UpdateRolePermissionsOptions {
   remove_permissions?: Array<string>;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  avatarURL?: string;
+  customData?: any;
+}
+
 const TOKEN_EXPIRY_LEEWAY = 30;
 
 export default class Chatkit {
@@ -124,7 +131,23 @@ export default class Chatkit {
         name,
         avatar_url: avatarURL,
         custom_data: customData,
-       },
+      },
+      jwt: this.getServerToken(),
+    }).then((res) => {
+      return JSON.parse(res.body);
+    })
+  }
+
+  createUsers(users: Array<User>): Promise<any> {
+    return this.apiInstance.request({
+      method: 'POST',
+      path: `/batch_users`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: {
+        users
+      },
       jwt: this.getServerToken(),
     }).then((res) => {
       return JSON.parse(res.body);
@@ -202,7 +225,38 @@ export default class Chatkit {
 
     return this.apiInstance.request({
       method: 'GET',
+      path: `/rooms`,
+      jwt: jwt.token,
+    }).then((res) => {
+      return JSON.parse(res.body);
+    })
+  }
+
+  getUserRooms(userId: string): Promise<any> {
+    const jwt = this.generateAccessToken({
+      userId: userId,
+      su: true,
+    });
+
+    return this.apiInstance.request({
+      method: 'GET',
       path: `/users/${userId}/rooms`,
+      jwt: jwt.token,
+    }).then((res) => {
+      return JSON.parse(res.body);
+    })
+  }
+
+  getUserJoinableRooms(userId: string): Promise<any> {
+    const jwt = this.generateAccessToken({
+      userId: userId,
+      su: true,
+    });
+
+    return this.apiInstance.request({
+      method: 'GET',
+      path: `/users/${userId}/rooms`,
+      qs: { joinable: true },
       jwt: jwt.token,
     }).then((res) => {
       return JSON.parse(res.body);
