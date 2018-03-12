@@ -1,0 +1,34 @@
+var Chatkit = require('../target/index');
+
+// var PusherPlatform = require('../node_modules/pusher-platform-node/target/index');
+
+// Just for local testing where using self signed certs
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+// const baseClient = new PusherPlatform.BaseClient({
+//   host: 'localhost',
+//   port: 10443
+// })
+
+const chatkit = new Chatkit.default({
+  instanceLocator: 'v1:us1:example',
+  key: 'your:key'
+});
+
+const usersToCreate = [
+  {
+    id: 'example',
+    name: 'Example Example',
+  },
+  {
+    id: 'another_user',
+    name: 'Some Name',
+  }
+];
+
+chatkit.createUsers(usersToCreate)
+  .then((user) => {
+    console.log('Success', user);
+  }).catch((err) => {
+    console.log(err);
+  });
