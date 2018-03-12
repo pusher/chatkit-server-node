@@ -1,6 +1,18 @@
 # Changelog
 
-## [v0.9.2] 2018-02-08
+## [0.10.0] 2018-03-12
+
+### Changes
+
+- Update jsonwebtoken dependency
+
+### Additions
+
+- Added support for `getUserRooms`
+- Added support for `getUserJoinableRooms`
+- Added support for `createUsers`
+
+## [0.9.2] 2018-02-08
 
 ### Changes
 
@@ -10,7 +22,7 @@
 
 - `getRoomMessages` now generates a valid token when provided with an appropriate `userId` as the first parameter
 
-## [v0.9.1] 2018-01-26
+## [0.9.1] 2018-01-26
 
 ### Additions
 
@@ -22,7 +34,7 @@
 - Updated `getRooms` example
 - Bumped pusher-platform-node dependency to 0.11.1
 
-## [v0.9.0] 2018-01-16
+## [0.9.0] 2018-01-16
 
 ### Additions
 
@@ -32,36 +44,35 @@
 
 - When using `createUser` the promise that is returned now resolves with the JSON response from the API (which contains the user information), if the request succeeds
 
-
 ### Removals
 
 - Removed permissions constants and permissions checking from the SDK. The API will return a sensible error if you provide an invalid permission name
 
-## [v0.8.3] 2018-01-04
+## [0.8.3] 2018-01-04
 
 ### Additions
 
 - Support cursors permissions "cursors:read:get" and "cursors:read:set"
 
-## [v0.8.0] 2017-12-19
+## [0.8.0] 2017-12-19
 
 ### Changes
 
 - Don't parse response in apiRequest (since it isn't always JSON)
 
-## [v0.7.2] 2017-12-11
+## [0.7.2] 2017-12-11
 
 ### Changes
 
 - Add the `file:get` and `file:create` permissions to the list of supported permissions
 
-## [v0.7.1] 2017-11-23
+## [0.7.1] 2017-11-23
 
 ### Fixes
 
 - Correctly type the user id array in `getUsersByIds` as `Array<string>` instead of `Array<number>`
 
-## [v0.7.0] 2017-11-20
+## [0.7.0] 2017-11-20
 
 ### Changes
 
@@ -71,13 +82,13 @@
 
 - `reassignRoomRoleForUser` and `reassignGlobalRoleForUser` were removed
 
-## [v0.6.0] 2017-11-16
+## [0.6.0] 2017-11-16
 
 ### Additions
 
 - Adds functionality to update permissions for existing roles by introducing two new functions: `updatePermissionsForRoomRole` and `updatePermissionsForGlobalRole`.
 
-## [v0.5.2] 2017-11-10
+## [0.5.2] 2017-11-10
 
 ### Fixes
 
@@ -87,7 +98,7 @@
 
 - Make the response in the success case of room creation into an appropriate object from the body's JSON as opposed to an `IncomingMessage` object.
 
-## [v0.5.1] 2017-11-10
+## [0.5.1] 2017-11-10
 
 ### Changes
 
