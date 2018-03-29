@@ -15,5 +15,5 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-var res = chatkit.authenticate({ grant_type: 'client_credentials' }, 'hamtest');
+var res = chatkit.authenticate('jamie');
 console.log(res);

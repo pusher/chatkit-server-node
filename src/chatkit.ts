@@ -1,10 +1,11 @@
 import {
-  Instance,
-  InstanceOptions,
   AuthenticationResponse,
   AuthenticateOptions,
+  AuthenticatePayload,
   BaseClient,
-  TokenWithExpiry
+  Instance,
+  InstanceOptions,
+  TokenWithExpiry,
 } from 'pusher-platform-node';
 
 import { getCurrentTimeInSeconds } from './utils';
@@ -12,16 +13,6 @@ import { getCurrentTimeInSeconds } from './utils';
 export interface TokenWithExpiryAt {
   token: string;
   expiresAt: number;
-};
-
-export interface AuthenticatePayload {
-  grant_type?: string;
-  refresh_token?: string;
-};
-
-export interface AccessTokenOptions {
-  grant_type?: string;
-  refresh_token?: string;
 };
 
 export interface Options {
@@ -109,10 +100,12 @@ export default class Chatkit {
 
   // Token generation
 
-  authenticate(authPayload: AuthenticatePayload, userId: string): AuthenticationResponse {
-    return this.apiInstance.authenticate(authPayload, { userId });
+  authenticate(userId: string, authPayload?: AuthenticatePayload): AuthenticationResponse {
+    const authData = authPayload || { grant_type: 'client_credentials' };
+    return this.apiInstance.authenticate(authData, { userId });
   }
 
+  // Used internally - not designed to be used externally
   generateAccessToken(authOptions: AuthenticateOptions): TokenWithExpiry {
     return this.apiInstance.generateAccessToken(authOptions);
   }
