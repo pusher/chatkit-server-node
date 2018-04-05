@@ -15,5 +15,8 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-var res = chatkit.authenticate('jamie');
+var res = chatkit.authenticate({
+  userId: 'jamie'
+});
+
 console.log(res);

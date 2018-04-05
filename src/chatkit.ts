@@ -10,6 +10,11 @@ import {
 
 import { getCurrentTimeInSeconds } from './utils';
 
+export interface AuthenticationOptions {
+  userId: string;
+  authPayload?: AuthenticatePayload;
+}
+
 export interface TokenWithExpiryAt {
   token: string;
   expiresAt: number;
@@ -100,9 +105,12 @@ export default class Chatkit {
 
   // Token generation
 
-  authenticate(userId: string, authPayload?: AuthenticatePayload): AuthenticationResponse {
-    const authData = authPayload || { grant_type: 'client_credentials' };
-    return this.apiInstance.authenticate(authData, { userId });
+  authenticate(options: AuthenticationOptions): AuthenticationResponse {
+    const { userId, authPayload } = options;
+    return this.apiInstance.authenticate(
+      authPayload || { grant_type: 'client_credentials' },
+      { userId }
+    );
   }
 
   // Used internally - not designed to be used externally
