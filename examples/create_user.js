@@ -15,7 +15,10 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.createUser('example', 'mycooluser')
+chatkit.createUser({
+  id: 'extender',
+  name: 'It is an extender',
+})
   .then((user) => {
     console.log('Success', user);
   }).catch((err) => {

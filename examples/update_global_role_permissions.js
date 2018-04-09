@@ -15,7 +15,29 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.updatePermissionsForGlobalRole('default', ['file:create', 'file:get'])
+chatkit.updatePermissionsForGlobalRole({
+  roleName: 'default',
+  permissionsToAdd: [
+    'message:create',
+    'room:join',
+    'room:leave',
+    'room:members:add',
+    'room:members:remove',
+    'room:get',
+    'room:create',
+    'room:messages:get',
+    'room:typing_indicator:create',
+    'presence:subscribe',
+    'user:get',
+    'user:rooms:get',
+    'cursors:read:get',
+    'cursors:read:set',
+    'file:create',
+    'file:get',
+    'room:delete',
+    'room:update'
+  ]
+})
   .then(() => {
     console.log('Success');
   }).catch((err) => {

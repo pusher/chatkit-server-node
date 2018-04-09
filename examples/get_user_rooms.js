@@ -15,7 +15,9 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.getUserRooms('ham')
+chatkit.getUserRooms({
+  userId: 'ham',
+})
   .then((res) => {
     console.log(res);
   }).catch((err) => {

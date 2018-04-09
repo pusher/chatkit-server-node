@@ -15,7 +15,10 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.assignGlobalRoleToUser('example', 'admin')
+chatkit.assignGlobalRoleToUser({
+  userId: 'ham',
+  roleName: 'admin'
+})
   .then(() => {
     console.log('Success');
   }).catch((err) => {

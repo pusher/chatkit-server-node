@@ -15,12 +15,12 @@ export interface AuthenticationOptions {
   authPayload?: AuthenticatePayload;
 }
 
-export interface GetRoomOptions {
-  roomId: number;
-}
-
 export interface UserIdOptions {
   userId: string;
+}
+
+export interface GetRoomOptions extends UserIdOptions {
+  roomId: number;
 }
 
 export interface DeleteUserOptions extends UserIdOptions {}
@@ -50,7 +50,7 @@ export interface AssignRoomRoleToUserOptions extends BasicAssignRoleToUserOption
 }
 
 export interface DeleteRoleOptions {
-  roleName: string;
+  name: string;
 }
 
 export interface CreateRoleOptions {
@@ -114,7 +114,7 @@ export interface CreateUserOptions {
 }
 
 export interface CreateRoomOptions {
-  creatingUserId: string;
+  creatorId: string;
   name: string;
   isPrivate?: boolean;
   userIds?: Array<string>;
@@ -258,10 +258,15 @@ export default class Chatkit {
   // Room interactions
 
   getRoom(options: GetRoomOptions): Promise<any> {
+    const jwt = this.generateAccessToken({
+      su: true,
+      userId: options.userId,
+    });
+
     return this.apiInstance.request({
       method: 'GET',
       path: `/rooms/${options.roomId}`,
-      jwt: this.getServerToken(),
+      jwt: jwt.token,
     }).then((res) => {
       return JSON.parse(res.body);
     })
@@ -336,7 +341,7 @@ export default class Chatkit {
   createRoom(options: CreateRoomOptions): Promise<any> {
     const jwt = this.generateAccessToken({
       su: true,
-      userId: options.creatingUserId,
+      userId: options.creatorId,
     });
 
     const { name, isPrivate, userIds } = options;
@@ -391,7 +396,7 @@ export default class Chatkit {
   deleteGlobalRole(options: DeleteRoleOptions): Promise<void> {
     return this.authorizerInstance.request({
       method: 'DELETE',
-      path: `/roles/${options.roleName}/scope/global`,
+      path: `/roles/${options.name}/scope/global`,
       jwt: this.getServerToken(),
     }).then(() => {})
   }
@@ -399,7 +404,7 @@ export default class Chatkit {
   deleteRoomRole(options: DeleteRoleOptions): Promise<void> {
     return this.authorizerInstance.request({
       method: 'DELETE',
-      path: `/roles/${options.roleName}/scope/room`,
+      path: `/roles/${options.name}/scope/room`,
       jwt: this.getServerToken(),
     }).then(() => {})
   }

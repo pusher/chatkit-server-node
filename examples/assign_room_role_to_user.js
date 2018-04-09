@@ -15,7 +15,11 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.assignRoomRoleToUser('ham', 'admin', 123)
+chatkit.assignGlobalRoleToUser({
+  userId: 'ham',
+  roleName: 'admin',
+  roomId: 124
+})
   .then(() => {
     console.log('Success');
   }).catch((err) => {

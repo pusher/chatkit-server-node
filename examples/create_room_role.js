@@ -15,11 +15,12 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.createRoomRole(
-  'admin-another',
-  ['message:create', 'room:leave', 'room:members:add']
-).then(() => {
-  console.log('Success');
-}).catch((err) => {
-  console.log(err);
-});
+chatkit.createRoomRole({
+  name: 'admin2',
+  permissions: ['message:create', 'room:leave', 'room:members:add']
+})
+  .then(() => {
+    console.log('Success');
+  }).catch((err) => {
+    console.log(err);
+  });

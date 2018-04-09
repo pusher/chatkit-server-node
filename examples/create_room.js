@@ -15,12 +15,12 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.createRoom(
-  'usersendpoint',
-  { name: 'my room' }
-)
-  .then(() => {
-    console.log('Success');
+chatkit.createRoom({
+  creatorId: 'ham',
+  name: 'a new room'
+})
+  .then((res) => {
+    console.log('Success', res);
   }).catch((err) => {
     console.log(err);
   });

@@ -15,7 +15,10 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.removeRoomRoleForUser('ham', 123)
+chatkit.removeRoomRoleForUser({
+  userId: 'ham',
+  roomId: 124
+})
   .then(() => {
     console.log('Success');
   }).catch((err) => {

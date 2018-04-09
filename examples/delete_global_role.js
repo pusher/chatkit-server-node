@@ -15,7 +15,7 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.deleteGlobalRole('alan')
+chatkit.deleteGlobalRole('testing')
   .then(() => {
     console.log('Success');
   }).catch((err) => {

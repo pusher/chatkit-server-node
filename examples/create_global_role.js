@@ -15,9 +15,9 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.createGlobalRole(
-  'default',
-  [
+chatkit.createGlobalRole({
+  name: 'testing',
+  permissions: [
     'message:create',
     'room:join',
     'room:leave',
@@ -35,8 +35,9 @@ chatkit.createGlobalRole(
     'file:create',
     'file:get'
   ]
-).then(() => {
-  console.log('Success');
-}).catch((err) => {
-  console.log(err);
-});
+})
+  .then(() => {
+    console.log('Success');
+  }).catch((err) => {
+    console.log(err);
+  });
