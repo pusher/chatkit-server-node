@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.11.0] 2018-04-09
+
+### Changes
+
+- All functions now take a single object as their only argument. Check the [documentation](https://docs.pusher.com/chatkit/reference/server-node) for specifics on how to make calls using the new format.
+
+Some examples:
+
+`authenticate` used to be called like this:
+
+```js
+chatkit.authenticate('my-user-id', { grant_type: 'client_credentials' });
+```
+
+and the new version is called like this:
+
+```js
+chatkit.authenticate({
+  userId: 'my-user-id',
+  authPayload: { grant_type: 'client_credentials' }
+});
+```
+
+`createUser` used to be called like this:
+
+```js
+chatkit.createRoom('ham', 'New room');
+```
+
+and the new version is called like this:
+
+```js
+chatkit.createRoom({
+  creatorId: 'ham',
+  name: 'New room'
+})
+```
+
+- `authenticate` no longer requires the `grant_type` to be specified. If no value for it is provided then it will take a default value of `client_credentials` (which was already the implicit default provided by clients)
+
 ## [0.10.0] 2018-03-12
 
 ### Changes
