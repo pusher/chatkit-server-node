@@ -15,7 +15,7 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.deleteUser('extender')
+chatkit.deleteUser({ userId: 'extender' })
   .then(() => {
     console.log('Success');
   }).catch((err) => {

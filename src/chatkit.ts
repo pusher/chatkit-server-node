@@ -1,27 +1,80 @@
 import {
-  Instance,
-  InstanceOptions,
   AuthenticationResponse,
   AuthenticateOptions,
+  AuthenticatePayload,
   BaseClient,
-  TokenWithExpiry
+  Instance,
+  InstanceOptions,
+  TokenWithExpiry,
 } from 'pusher-platform-node';
 
 import { getCurrentTimeInSeconds } from './utils';
 
+export interface AuthenticationOptions {
+  userId: string;
+  authPayload?: AuthenticatePayload;
+}
+
+export interface UserIdOptions {
+  userId: string;
+}
+
+export interface GetRoomOptions extends UserIdOptions {
+  roomId: number;
+}
+
+export interface DeleteUserOptions extends UserIdOptions {}
+export interface GetUserRoomOptions extends UserIdOptions {}
+export interface GetRoomsOptions extends UserIdOptions {}
+export interface GetUserJoinableRoomOptions extends UserIdOptions {}
+export interface GetUserRolesOptions extends UserIdOptions {}
+export interface RemoveGlobalRoleForUserOptions extends UserIdOptions {}
+
+export interface RemoveRoomRoleForUserOptions extends UserIdOptions {
+  roomId: number;
+}
+
+export interface BasicAssignRoleToUserOptions {
+  userId: string;
+  roleName: string;
+}
+
+export interface AssignGlobalRoleToUserOptions extends BasicAssignRoleToUserOptions {}
+
+export interface AssignRoleToUserOptions extends BasicAssignRoleToUserOptions {
+  roomId?: number;
+}
+
+export interface AssignRoomRoleToUserOptions extends BasicAssignRoleToUserOptions {
+  roomId: number;
+}
+
+export interface DeleteRoleOptions {
+  name: string;
+}
+
+export interface CreateRoleOptions {
+  name: string;
+  permissions: Array<string>;
+}
+
+export interface CreateScopedRoleOptions extends CreateRoleOptions {
+  scope: string;
+}
+
+export interface UpdatePermissionsOptions {
+  roleName: string;
+  permissionsToAdd?: Array<string>;
+  permissionsToRemove?: Array<string>;
+}
+
+export interface GetPermissionsOptions {
+  roleName: string;
+}
+
 export interface TokenWithExpiryAt {
   token: string;
   expiresAt: number;
-};
-
-export interface AuthenticatePayload {
-  grant_type?: string;
-  refresh_token?: string;
-};
-
-export interface AccessTokenOptions {
-  grant_type?: string;
-  refresh_token?: string;
 };
 
 export interface Options {
@@ -40,10 +93,11 @@ export interface GeneralRequestOptions {
   qs?: object;
 }
 
-export interface GetRoomMessagesOptions {
-  initialId?: string;
+export interface GetRoomMessagesOptions extends UserIdOptions {
   direction?: string;
+  initialId?: string;
   limit?: number;
+  roomId: number;
 }
 
 export interface GetRoomMessagesOptionsPayload {
@@ -52,7 +106,15 @@ export interface GetRoomMessagesOptionsPayload {
   limit?: number;
 }
 
+export interface CreateUserOptions {
+  id: string;
+  name: string;
+  avatarURL?: string;
+  customData?: any;
+}
+
 export interface CreateRoomOptions {
+  creatorId: string;
   name: string;
   isPrivate?: boolean;
   userIds?: Array<string>;
@@ -61,6 +123,14 @@ export interface CreateRoomOptions {
 export interface UpdateRolePermissionsOptions {
   add_permissions?: Array<string>;
   remove_permissions?: Array<string>;
+}
+
+export interface CreateUsersOptions {
+  users: Array<User>;
+}
+
+export interface GetUsersByIdsOptions {
+  userIds: Array<string>;
 }
 
 export interface User {
@@ -109,36 +179,36 @@ export default class Chatkit {
 
   // Token generation
 
-  authenticate(authPayload: AuthenticatePayload, userId: string): AuthenticationResponse {
-    return this.apiInstance.authenticate(authPayload, { userId });
+  authenticate(options: AuthenticationOptions): AuthenticationResponse {
+    const { userId, authPayload } = options;
+    return this.apiInstance.authenticate(
+      authPayload || { grant_type: 'client_credentials' },
+      { userId }
+    );
   }
 
-  generateAccessToken(authOptions: AuthenticateOptions): TokenWithExpiry {
-    return this.apiInstance.generateAccessToken(authOptions);
+  // Used internally - not designed to be used externally
+  generateAccessToken(options: AuthenticateOptions): TokenWithExpiry {
+    return this.apiInstance.generateAccessToken(options);
   }
 
   // User interactions
 
-  createUser(id: string, name: string, avatarURL?: string, customData?: any): Promise<any> {
+  createUser(options: CreateUserOptions): Promise<any> {
     return this.apiInstance.request({
       method: 'POST',
       path: `/users`,
       headers: {
         'Content-Type': 'application/json'
       },
-      body: {
-        id,
-        name,
-        avatar_url: avatarURL,
-        custom_data: customData,
-      },
+      body: options,
       jwt: this.getServerToken(),
     }).then((res) => {
       return JSON.parse(res.body);
     })
   }
 
-  createUsers(users: Array<User>): Promise<any> {
+  createUsers(options: CreateUsersOptions): Promise<any> {
     return this.apiInstance.request({
       method: 'POST',
       path: `/batch_users`,
@@ -146,7 +216,7 @@ export default class Chatkit {
         'Content-Type': 'application/json'
       },
       body: {
-        users
+        users: options.users
       },
       jwt: this.getServerToken(),
     }).then((res) => {
@@ -154,10 +224,10 @@ export default class Chatkit {
     })
   }
 
-  deleteUser(id: string): Promise<void> {
+  deleteUser(options: DeleteUserOptions): Promise<void> {
     return this.apiInstance.request({
       method: 'DELETE',
-      path: `/users/${id}`,
+      path: `/users/${options.userId}`,
       jwt: this.getServerToken(),
     }).then(() => {})
   }
@@ -172,12 +242,12 @@ export default class Chatkit {
     })
   }
 
-  getUsersByIds(userIds: Array<string>): Promise<any> {
+  getUsersByIds(options: GetUsersByIdsOptions): Promise<any> {
     return this.apiInstance.request({
       method: 'GET',
       path: `/users_by_ids`,
       qs: {
-        user_ids: userIds.join(','),
+        user_ids: options.userIds.join(','),
       },
       jwt: this.getServerToken(),
     }).then((res) => {
@@ -187,20 +257,25 @@ export default class Chatkit {
 
   // Room interactions
 
-  getRoom(roomId: number): Promise<any> {
+  getRoom(options: GetRoomOptions): Promise<any> {
+    const jwt = this.generateAccessToken({
+      su: true,
+      userId: options.userId,
+    });
+
     return this.apiInstance.request({
       method: 'GET',
-      path: `/rooms/${roomId}`,
-      jwt: this.getServerToken(),
+      path: `/rooms/${options.roomId}`,
+      jwt: jwt.token,
     }).then((res) => {
       return JSON.parse(res.body);
     })
   }
 
-  getRoomMessages(userId: string, roomId: number, options: GetRoomMessagesOptions = {}): Promise<any> {
+  getRoomMessages(options: GetRoomMessagesOptions): Promise<any> {
     const jwt = this.generateAccessToken({
-      userId: userId,
       su: true,
+      userId: options.userId,
     });
 
     const { initialId, ...optionsMinusInitialId } = options;
@@ -209,7 +284,7 @@ export default class Chatkit {
 
     return this.apiInstance.request({
       method: 'GET',
-      path: `/rooms/${roomId}/messages`,
+      path: `/rooms/${options.roomId}/messages`,
       jwt: jwt.token,
       qs: qs,
     }).then((res) => {
@@ -217,10 +292,10 @@ export default class Chatkit {
     })
   }
 
-  getRooms(userId: string): Promise<any> {
+  getRooms(options: GetRoomsOptions): Promise<any> {
     const jwt = this.generateAccessToken({
-      userId: userId,
       su: true,
+      userId: options.userId,
     });
 
     return this.apiInstance.request({
@@ -232,30 +307,30 @@ export default class Chatkit {
     })
   }
 
-  getUserRooms(userId: string): Promise<any> {
+  getUserRooms(options: GetUserRoomOptions): Promise<any> {
     const jwt = this.generateAccessToken({
-      userId: userId,
       su: true,
+      userId: options.userId,
     });
 
     return this.apiInstance.request({
       method: 'GET',
-      path: `/users/${userId}/rooms`,
+      path: `/users/${options.userId}/rooms`,
       jwt: jwt.token,
     }).then((res) => {
       return JSON.parse(res.body);
     })
   }
 
-  getUserJoinableRooms(userId: string): Promise<any> {
+  getUserJoinableRooms(options: GetUserJoinableRoomOptions): Promise<any> {
     const jwt = this.generateAccessToken({
-      userId: userId,
       su: true,
+      userId: options.userId,
     });
 
     return this.apiInstance.request({
       method: 'GET',
-      path: `/users/${userId}/rooms`,
+      path: `/users/${options.userId}/rooms`,
       qs: { joinable: true },
       jwt: jwt.token,
     }).then((res) => {
@@ -263,10 +338,10 @@ export default class Chatkit {
     })
   }
 
-  createRoom(userId: string, options: CreateRoomOptions): Promise<any> {
+  createRoom(options: CreateRoomOptions): Promise<any> {
     const jwt = this.generateAccessToken({
-      userId: userId,
       su: true,
+      userId: options.creatorId,
     });
 
     const { name, isPrivate, userIds } = options;
@@ -292,84 +367,82 @@ export default class Chatkit {
 
   // Authorizer interactions
 
-  createRoomRole(name: string, permissions: Array<string>): Promise<void> {
-    return this.createRole(name, 'room', permissions);
+  createRoomRole(options: CreateRoleOptions): Promise<void> {
+    return this.createRole({
+      ...options,
+      scope: 'room',
+    });
   }
 
-  createGlobalRole(name: string, permissions: Array<string>): Promise<void> {
-    return this.createRole(name, 'global', permissions);
+  createGlobalRole(options: CreateRoleOptions): Promise<void> {
+    return this.createRole({
+      ...options,
+      scope: 'global',
+    });
   }
 
-  private createRole(name: string, scope: string, permissions: Array<string>): Promise<void> {
+  private createRole(options: CreateScopedRoleOptions): Promise<void> {
     return this.authorizerInstance.request({
       method: 'POST',
       path: `/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
-      body: { scope, name, permissions },
+      body: options,
       jwt: this.getServerToken(),
     }).then(() => {})
   }
 
-  deleteGlobalRole(roleName: string): Promise<void> {
+  deleteGlobalRole(options: DeleteRoleOptions): Promise<void> {
     return this.authorizerInstance.request({
       method: 'DELETE',
-      path: `/roles/${roleName}/scope/global`,
+      path: `/roles/${options.name}/scope/global`,
       jwt: this.getServerToken(),
     }).then(() => {})
   }
 
-  deleteRoomRole(roleName: string): Promise<void> {
+  deleteRoomRole(options: DeleteRoleOptions): Promise<void> {
     return this.authorizerInstance.request({
       method: 'DELETE',
-      path: `/roles/${roleName}/scope/room`,
+      path: `/roles/${options.name}/scope/room`,
       jwt: this.getServerToken(),
     }).then(() => {})
   }
 
-  assignGlobalRoleToUser(userId: string, roleName: string): Promise<void> {
-    return this.assignRoleToUser(userId, roleName);
+  assignGlobalRoleToUser(options: AssignGlobalRoleToUserOptions): Promise<void> {
+    return this.assignRoleToUser(options);
   }
 
-  assignRoomRoleToUser(
-    userId: string,
-    roleName: string,
-    roomId: number,
-  ): Promise<void> {
-    return this.assignRoleToUser(userId, roleName, roomId);
+  assignRoomRoleToUser(options: AssignRoomRoleToUserOptions): Promise<void> {
+    return this.assignRoleToUser(options);
   }
 
-  private assignRoleToUser(
-    userId: string,
-    roleName: string,
-    roomId?: number,
-  ): Promise<void> {
+  private assignRoleToUser(options: AssignRoleToUserOptions): Promise<void> {
     return this.authorizerInstance.request({
       method: 'PUT',
-      path: `/users/${userId}/roles`,
+      path: `/users/${options.userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
-      body: { name: roleName, room_id: roomId },
+      body: { name: options.roleName, room_id: options.roomId },
       jwt: this.getServerToken(),
     }).then(() => {})
   }
 
-  getUserRoles(userId: string): Promise<any> {
+  getUserRoles(options: GetUserRolesOptions): Promise<any> {
     return this.authorizerInstance.request({
       method: 'GET',
-      path: `/users/${userId}/roles`,
+      path: `/users/${options.userId}/roles`,
       jwt: this.getServerToken(),
     }).then((res) => {
       return JSON.parse(res.body);
     })
   }
 
-  removeGlobalRoleForUser(userId: string): Promise<void> {
+  removeGlobalRoleForUser(options: RemoveGlobalRoleForUserOptions): Promise<void> {
     return this.authorizerInstance.request({
       method: 'DELETE',
-      path: `/users/${userId}/roles`,
+      path: `/users/${options.userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -377,52 +450,54 @@ export default class Chatkit {
     }).then(() => {})
   }
 
-  removeRoomRoleForUser(userId: string, roomId: number): Promise<void> {
+  removeRoomRoleForUser(options: RemoveRoomRoleForUserOptions): Promise<void> {
     return this.authorizerInstance.request({
       method: 'DELETE',
-      path: `/users/${userId}/roles`,
+      path: `/users/${options.userId}/roles`,
       headers: {
         'Content-Type': 'application/json'
       },
-      qs: { room_id: roomId },
+      qs: { room_id: options.roomId },
       jwt: this.getServerToken(),
     }).then(() => {})
   }
 
-  getPermissionsForGlobalRole(roleName: string): Promise<any> {
+  getPermissionsForGlobalRole(options: GetPermissionsOptions): Promise<any> {
     return this.authorizerInstance.request({
       method: 'GET',
-      path: `/roles/${roleName}/scope/global/permissions`,
+      path: `/roles/${options.roleName}/scope/global/permissions`,
       jwt: this.getServerToken(),
     }).then((res) => {
       return JSON.parse(res.body);
     })
   }
 
-  getPermissionsForRoomRole(roleName: string): Promise<any> {
+  getPermissionsForRoomRole(options: GetPermissionsOptions): Promise<any> {
     return this.authorizerInstance.request({
       method: 'GET',
-      path: `/roles/${roleName}/scope/room/permissions`,
+      path: `/roles/${options.roleName}/scope/room/permissions`,
       jwt: this.getServerToken(),
     }).then((res) => {
       return JSON.parse(res.body);
     })
   }
 
-  updatePermissionsForGlobalRole(
-    roleName: string,
-    permissionsToAdd: Array<string> = [],
-    permissionsToRemove: Array<string> = [],
-  ): Promise<any> {
-    return this.updatePermissionsForRole(roleName, 'global', permissionsToAdd, permissionsToRemove)
+  updatePermissionsForGlobalRole(options: UpdatePermissionsOptions): Promise<any> {
+    return this.updatePermissionsForRole(
+      options.roleName,
+      'global',
+      options.permissionsToAdd || [],
+      options.permissionsToRemove || []
+    )
   }
 
-  updatePermissionsForRoomRole(
-    roleName: string,
-    permissionsToAdd: Array<string> = [],
-    permissionsToRemove: Array<string> = [],
-  ): Promise<any> {
-    return this.updatePermissionsForRole(roleName, 'room', permissionsToAdd, permissionsToRemove)
+  updatePermissionsForRoomRole(options: UpdatePermissionsOptions): Promise<any> {
+    return this.updatePermissionsForRole(
+      options.roleName,
+      'room',
+      options.permissionsToAdd || [],
+      options.permissionsToRemove || []
+     )
   }
 
   getRoles(): Promise<any> {

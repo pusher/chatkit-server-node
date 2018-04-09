@@ -15,7 +15,7 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.getPermissionsForRoomRole('admin')
+chatkit.getPermissionsForRoomRole({ roleName: 'admin' })
   .then((res) => {
     console.log(res);
   }).catch((err) => {

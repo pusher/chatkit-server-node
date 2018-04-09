@@ -15,7 +15,7 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.getUserRoles('ham')
+chatkit.getUserRoles({ userId: 'ham' })
   .then((res) => {
     console.log(res);
   }).catch((err) => {

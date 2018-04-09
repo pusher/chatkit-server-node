@@ -1,5 +1,9 @@
-export {default as default} from './chatkit';
+export { default as default } from './chatkit';
 
 export {
-  UnsupportedGrantTypeError, InvalidGrantTypeError
+  AuthenticateOptions,
+  AuthenticatePayload,
+  AuthenticationResponse,
+  InvalidGrantTypeError,
+  UnsupportedGrantTypeError,
 } from 'pusher-platform-node';

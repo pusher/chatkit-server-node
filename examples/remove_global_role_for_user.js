@@ -15,7 +15,7 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.removeGlobalRoleForUser('ham')
+chatkit.removeGlobalRoleForUser({ userId: 'ham' })
   .then(() => {
     console.log('Success');
   }).catch((err) => {
