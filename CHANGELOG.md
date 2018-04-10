@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.11.1] 2018-04-10
+
+### Fixes
+
+- Fix `createUser` to work with `avatarURL` and `customData`
+
 ## [0.11.0] 2018-04-09
 
 ### Changes
