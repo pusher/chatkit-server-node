@@ -195,13 +195,19 @@ export default class Chatkit {
   // User interactions
 
   createUser(options: CreateUserOptions): Promise<any> {
+    const { id, name } = options;
     return this.apiInstance.request({
       method: 'POST',
       path: `/users`,
       headers: {
         'Content-Type': 'application/json'
       },
-      body: options,
+      body: {
+        id,
+        name,
+        avatar_url: options.avatarURL,
+        custom_data: options.customData,
+      },
       jwt: this.getServerToken(),
     }).then((res) => {
       return JSON.parse(res.body);
