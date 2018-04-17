@@ -113,6 +113,13 @@ export interface CreateUserOptions {
   customData?: any;
 }
 
+export interface UpdateUserOptions {
+  id: string;
+  name?: string;
+  avatarURL?: string;
+  customData?: any;
+}
+
 export interface CreateRoomOptions {
   creatorId: string;
   name: string;
@@ -228,6 +235,28 @@ export default class Chatkit {
     }).then((res) => {
       return JSON.parse(res.body);
     })
+  }
+
+  updateUser(options: UpdateUserOptions): Promise<any> {
+    const jwt = this.generateAccessToken({
+      su: true,
+      userId: options.id,
+    });
+
+    let updatePayload: any = {};
+    if (options.name) { updatePayload.name = options.name };
+    if (options.avatarURL) { updatePayload.avatar_url = options.avatarURL };
+    if (options.customData) { updatePayload.custom_data = options.customData };
+
+    return this.apiInstance.request({
+      method: 'PUT',
+      path: `/users/${options.id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: updatePayload,
+      jwt: jwt.token,
+    }).then(() => {})
   }
 
   deleteUser(options: DeleteUserOptions): Promise<void> {
