@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.11.2] 2018-04-17
+
+### Additions
+
+- Added `update_user` function and example
+
 ## [0.11.1] 2018-04-10
 
 ### Fixes
