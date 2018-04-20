@@ -1,18 +1,24 @@
 # Changelog
+All notable changes to this project will be documented in this file.
 
-## [0.11.2] 2018-04-17
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+
+## [Unreleased](https://github.com/pusher/chatkit-server-node/compare/0.11.2...HEAD)
+
+## [0.11.2](https://github.com/pusher/chatkit-server-node/compare/0.11.1...0.11.2) - 2018-04-17
 
 ### Additions
 
 - Added `update_user` function and example
 
-## [0.11.1] 2018-04-10
+## [0.11.1](https://github.com/pusher/chatkit-server-node/compare/0.11.0...0.11.1) - 2018-04-10
 
 ### Fixes
 
 - Fix `createUser` to work with `avatarURL` and `customData`
 
-## [0.11.0] 2018-04-09
+## [0.11.0](https://github.com/pusher/chatkit-server-node/compare/0.10.0...0.11.0) - 2018-04-09
 
 ### Changes
 
@@ -52,7 +58,7 @@ chatkit.createRoom({
 
 - `authenticate` no longer requires the `grant_type` to be specified. If no value for it is provided then it will take a default value of `client_credentials` (which was already the implicit default provided by clients)
 
-## [0.10.0] 2018-03-12
+## [0.10.0](https://github.com/pusher/chatkit-server-node/compare/0.9.2...0.10.0) - 2018-03-12
 
 ### Changes
 
@@ -64,7 +70,7 @@ chatkit.createRoom({
 - Added support for `getUserJoinableRooms`
 - Added support for `createUsers`
 
-## [0.9.2] 2018-02-08
+## [0.9.2](https://github.com/pusher/chatkit-server-node/compare/0.9.1...0.9.2) - 2018-02-08
 
 ### Changes
 
@@ -74,7 +80,7 @@ chatkit.createRoom({
 
 - `getRoomMessages` now generates a valid token when provided with an appropriate `userId` as the first parameter
 
-## [0.9.1] 2018-01-26
+## [0.9.1](https://github.com/pusher/chatkit-server-node/compare/0.9.0...0.9.1) - 2018-01-26
 
 ### Additions
 
@@ -86,7 +92,7 @@ chatkit.createRoom({
 - Updated `getRooms` example
 - Bumped pusher-platform-node dependency to 0.11.1
 
-## [0.9.0] 2018-01-16
+## [0.9.0](https://github.com/pusher/chatkit-server-node/compare/0.8.3...0.9.0) - 2018-01-16
 
 ### Additions
 
@@ -100,31 +106,31 @@ chatkit.createRoom({
 
 - Removed permissions constants and permissions checking from the SDK. The API will return a sensible error if you provide an invalid permission name
 
-## [0.8.3] 2018-01-04
+## [0.8.3](https://github.com/pusher/chatkit-server-node/compare/0.8.2...0.8.3) - 2018-01-04
 
 ### Additions
 
 - Support cursors permissions "cursors:read:get" and "cursors:read:set"
 
-## [0.8.0] 2017-12-19
+## [0.8.0](https://github.com/pusher/chatkit-server-node/compare/0.7.2...0.8.0) - 2017-12-19
 
 ### Changes
 
 - Don't parse response in apiRequest (since it isn't always JSON)
 
-## [0.7.2] 2017-12-11
+## [0.7.2](https://github.com/pusher/chatkit-server-node/compare/0.7.1...0.7.2) - 2017-12-11
 
 ### Changes
 
 - Add the `file:get` and `file:create` permissions to the list of supported permissions
 
-## [0.7.1] 2017-11-23
+## [0.7.1](https://github.com/pusher/chatkit-server-node/compare/0.7.0...0.7.1) - 2017-11-23
 
 ### Fixes
 
 - Correctly type the user id array in `getUsersByIds` as `Array<string>` instead of `Array<number>`
 
-## [0.7.0] 2017-11-20
+## [0.7.0](https://github.com/pusher/chatkit-server-node/compare/0.6.0...0.7.0) - 2017-11-20
 
 ### Changes
 
@@ -134,13 +140,13 @@ chatkit.createRoom({
 
 - `reassignRoomRoleForUser` and `reassignGlobalRoleForUser` were removed
 
-## [0.6.0] 2017-11-16
+## [0.6.0](https://github.com/pusher/chatkit-server-node/compare/0.5.2...0.6.0) - 2017-11-16
 
 ### Additions
 
 - Adds functionality to update permissions for existing roles by introducing two new functions: `updatePermissionsForRoomRole` and `updatePermissionsForGlobalRole`.
 
-## [0.5.2] 2017-11-10
+## [0.5.2](https://github.com/pusher/chatkit-server-node/compare/0.5.1...0.5.2) - 2017-11-10
 
 ### Fixes
 
@@ -150,7 +156,7 @@ chatkit.createRoom({
 
 - Make the response in the success case of room creation into an appropriate object from the body's JSON as opposed to an `IncomingMessage` object.
 
-## [0.5.1] 2017-11-10
+## [0.5.1](https://github.com/pusher/chatkit-server-node/compare/0.5.0...0.5.1) - 2017-11-10
 
 ### Changes
 
