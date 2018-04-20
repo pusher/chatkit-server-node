@@ -26,9 +26,9 @@ const usersToCreate = [
   }
 ];
 
-chatkit.createUsers(usersToCreate)
-  .then(() => {
-    console.log('Success');
+chatkit.createUsers({ users: usersToCreate })
+  .then((users) => {
+    console.log('Success', users);
   }).catch((err) => {
     console.log(err);
   });
