@@ -222,6 +222,16 @@ export default class Chatkit {
   }
 
   createUsers(options: CreateUsersOptions): Promise<any> {
+    const users = options.users.map(user => {
+      const { id, name } = user;
+      return {
+        id,
+        name,
+        avatar_url: user.avatarURL,
+        custom_data: user.customData,
+      }
+    });
+
     return this.apiInstance.request({
       method: 'POST',
       path: `/batch_users`,
@@ -229,7 +239,7 @@ export default class Chatkit {
         'Content-Type': 'application/json'
       },
       body: {
-        users: options.users
+        users
       },
       jwt: this.getServerToken(),
     }).then((res) => {
