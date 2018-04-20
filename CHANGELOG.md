@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/pusher/chatkit-server-node/compare/0.11.2...HEAD)
 
+### Changes
+
+- Bump pusher-platform-node dependency to 0.13.0
+
 ## [0.11.2](https://github.com/pusher/chatkit-server-node/compare/0.11.1...0.11.2) - 2018-04-17
 
 ### Additions
