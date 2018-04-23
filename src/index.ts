@@ -4,6 +4,5 @@ export {
   AuthenticateOptions,
   AuthenticatePayload,
   AuthenticationResponse,
-  InvalidGrantTypeError,
-  UnsupportedGrantTypeError,
+  ErrorResponse,
 } from 'pusher-platform-node';
