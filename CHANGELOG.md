@@ -9,6 +9,51 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changes
 
 - Bump pusher-platform-node dependency to 0.13.0
+- `authenticate` now returns an object like this:
+
+```js
+{
+    "status": 200,
+    "headers": {
+        "Some-Header": "some-value"
+    },
+    "body": {
+        "access_token": "an.access.token",
+        "token_type": "bearer",
+        "expires_in": 86400
+    }
+}
+```
+
+where:
+
+* `status` is the suggested HTTP response status code,
+* `headers` are the suggested response headers,
+* `body` holds the token payload.
+
+If there's an error with the authentication process then the return value will be the same but with a different `body`. For example:
+
+```js
+{
+    "status": 422,
+    "headers": {
+        "Some-Header": "some-value"
+    },
+    "body": {
+        "error": "token_provider/invalid_grant_type",
+        "error_description": "The grant_type provided, some-invalid-grant-type, is unsupported"
+    }
+}
+```
+
+- Authentication no longer returns refresh tokens.
+
+If your client devices are running the:
+
+* Swift SDK - (**breaking change**) you must be using version `>= 0.8.0` of [chatkit-swift](https://github.com/pusher/chatkit-swift).
+* Android SDK - you won't be affected regardless of which version you are running.
+* JS SDK - you won't be affected regardless of which version you are running.
+
 
 ## [0.11.2](https://github.com/pusher/chatkit-server-node/compare/0.11.1...0.11.2) - 2018-04-17
 
