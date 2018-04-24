@@ -1,0 +1,16 @@
+{
+  "name": "chatkit-server-node-example",
+  "version": "0.0.1",
+  "main": "./auth_server.js",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3"
+  },
+  "scripts": {
+    "start": "node auth_server.js"
+  },
+  "author": "Pusher <support@pusher.com>",
+  "description": "Chatkit Server Node SDK",
+  "license": "MIT",
+  "repository": "git://github.com/pusher/chatkit-server-node"
+}
