@@ -7,13 +7,13 @@ The Node.js server SDK for Pusher Chatkit.
 [yarn](https://yarnpkg.com/):
 
 ```sh
-$ yarn add pusher-chatkit-server
+$ yarn add @pusher/chatkit-server
 ```
 
 [npm](https://www.npmjs.com/):
 
 ```sh
-$ npm install pusher-chatkit-server --save
+$ npm install @pusher/chatkit-server --save
 ```
 
 # Development/Contribution
