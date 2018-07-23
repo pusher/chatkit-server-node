@@ -16,7 +16,7 @@
     "install-pkg": "if type yarn &> /dev/null; then yarn; else npm i; fi"
   },
   "dependencies": {
-    "jsonwebtoken": "^8.2.0",
+    "jsonwebtoken": "^8.3.0",
     "pusher-platform-node": "~0.13.0"
   },
   "devDependencies": {
