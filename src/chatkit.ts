@@ -166,7 +166,7 @@ export default class Chatkit {
       host,
       client,
       serviceName: 'chatkit',
-      serviceVersion: 'v1',
+      serviceVersion: 'v2',
     })
 
     const authorizerInstanceOptions = ({
