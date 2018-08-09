@@ -292,8 +292,9 @@ export default class Chatkit {
       method: 'GET',
       path: `/users_by_ids`,
       qs: {
-        user_ids: options.userIds.join(','),
+        id: options.userIds,
       },
+      useQuerystring: true,
       jwt: this.getServerToken(),
     }).then((res) => {
       return JSON.parse(res.body);
