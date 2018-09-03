@@ -1,0 +1,7 @@
+language: nodejs
+
+before_script:
+  - yarn
+
+script:
+  - yarn build
