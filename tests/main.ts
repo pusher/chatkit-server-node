@@ -9,6 +9,10 @@ import {
   ErrorResponse,
 } from "../src/index"
 
+// Since we're using random IDs for everything, we probably don't actually need
+// to do the delete resources after every test. Regardless, the option is here.
+const SKIP_DELETE_RESOURCES = true
+
 function test(
   msg: string,
   cb: (t: any, pass: () => void, fail: (err: string) => void) => void,
@@ -17,13 +21,17 @@ function test(
     cb(
       t,
       () =>
-        deleteResources()
-          .then(() => t.end())
-          .catch(err => t.fail(err)),
+        SKIP_DELETE_RESOURCES
+          ? t.end()
+          : deleteResources()
+              .then(() => t.end())
+              .catch(err => t.fail(err)),
       err =>
-        deleteResources()
-          .then(() => t.fail(err))
-          .catch(() => t.fail(err)),
+        SKIP_DELETE_RESOURCES
+          ? t.fail(err)
+          : deleteResources()
+              .then(() => t.fail(err))
+              .catch(() => t.fail(err)),
     )
   })
 }
@@ -67,6 +75,7 @@ test("createUsers", (t, pass, fail) => {
 test("uptadeUser", (t, pass, fail) => {
   const client = newClient()
   const user = randomUser()
+
   const updates = {
     id: user.id,
     name: randomString(),
@@ -80,6 +89,32 @@ test("uptadeUser", (t, pass, fail) => {
     // FIXME why do we get the user back from a create, but not an update?
     // TODO check updates with getUser
     .then(pass)
+    .catch(fail)
+})
+
+test("deleteUser", (t, pass, fail) => {
+  const client = newClient()
+  const user = randomUser()
+
+  client
+    .createUser(user)
+    .then(() => client.deleteUser({ userId: user.id })) // FIXME userId -> id
+    // TODO check that getUser errors
+    .then(pass)
+    .catch(fail)
+})
+
+test("getUser", (t, pass, fail) => {
+  const client = newClient()
+  const user = randomUser()
+
+  client
+    .createUser(user)
+    .then(() => client.getUser({ id: user.id }))
+    .then(res => {
+      resemblesUser(t, res, user)
+      pass()
+    })
     .catch(fail)
 })
 

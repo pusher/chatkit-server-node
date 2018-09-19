@@ -30,6 +30,10 @@ export interface GetUserJoinableRoomOptions extends UserIdOptions {}
 export interface GetUserRolesOptions extends UserIdOptions {}
 export interface RemoveGlobalRoleForUserOptions extends UserIdOptions {}
 
+export type GetUserOptions = {
+  id: string;
+}
+
 export interface RemoveRoomRoleForUserOptions extends UserIdOptions {
   roomId: number;
 }
@@ -275,6 +279,14 @@ export default class Chatkit {
       path: `/users/${options.userId}`,
       jwt: this.getServerToken(),
     }).then(() => {})
+  }
+
+  getUser(options: GetUserOptions): Promise<any> { // TODO return Promise<User>
+    return this.apiInstance.request({
+      method: 'GET',
+      path: `/users/${encodeURIComponent(options.id)}`,
+      jwt: this.getServerToken(),
+    }).then(({ body }) => JSON.parse(body))
   }
 
   getUsers(): Promise<any> {
