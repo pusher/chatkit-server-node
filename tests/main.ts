@@ -11,7 +11,7 @@ import {
 
 function test(
   msg: string,
-  cb: (t: any, pass: () => void, fail: (err: string) => void) => void,
+  cb: (t: any, end: () => void, fail: (err: string) => void) => void,
 ): void {
   tape(msg, { timeout: 10 * 1000 }, t => {
     cb(
@@ -37,19 +37,19 @@ function deleteResources(): Promise<void> {
   })
 }
 
-test("createUser", (t, pass, fail) => {
+test("createUser", (t, end, fail) => {
   const user = randomUser()
 
   newClient()
     .createUser(user)
     .then(res => {
       resemblesUser(t, res, user)
-      pass()
+      end()
     })
     .catch(fail)
 })
 
-test("createUsers", (t, pass, fail) => {
+test("createUsers", (t, end, fail) => {
   const alice = randomUser()
   const bob = randomUser()
 
@@ -59,12 +59,12 @@ test("createUsers", (t, pass, fail) => {
       t.is(res.length, 2)
       resemblesUser(t, res[0], alice)
       resemblesUser(t, res[1], bob)
-      pass()
+      end()
     })
     .catch(fail)
 })
 
-test("uptadeUser", (t, pass, fail) => {
+test("uptadeUser", (t, end, fail) => {
   const client = newClient()
   const user = randomUser()
 
@@ -82,12 +82,12 @@ test("uptadeUser", (t, pass, fail) => {
     .then(() => client.getUser({ id: user.id }))
     .then(res => {
       resemblesUser(t, res, updates)
-      pass()
+      end()
     })
     .catch(fail)
 })
 
-test("deleteUser", (t, pass, fail) => {
+test("deleteUser", (t, end, fail) => {
   const client = newClient()
   const user = randomUser()
 
@@ -101,13 +101,13 @@ test("deleteUser", (t, pass, fail) => {
         .catch(err => {
           t.is(err.status, 404)
           t.is(err.error, "services/chatkit/not_found/user_not_found")
-          pass()
+          end()
         })
     })
     .catch(fail)
 })
 
-test("getUser", (t, pass, fail) => {
+test("getUser", (t, end, fail) => {
   const client = newClient()
   const user = randomUser()
 
@@ -116,12 +116,12 @@ test("getUser", (t, pass, fail) => {
     .then(() => client.getUser({ id: user.id }))
     .then(res => {
       resemblesUser(t, res, user)
-      pass()
+      end()
     })
     .catch(fail)
 })
 
-test("getUsers", (t, pass, fail) => {
+test("getUsers", (t, end, fail) => {
   const client = newClient()
 
   const alice = randomUser()
@@ -140,7 +140,35 @@ test("getUsers", (t, pass, fail) => {
       for (let i = 0; i < 4; i++) {
         resemblesUser(t, res[i], users[i])
       }
-      pass()
+      end()
+    })
+    .catch(fail)
+})
+
+test("getUsersByIds", (t, end, fail) => {
+  // FIXME I think this should be getUsersById
+  const client = newClient()
+
+  const alice = randomUser()
+  const bob = randomUser()
+  const carol = randomUser()
+  const dave = randomUser()
+
+  Promise.all([alice, bob, carol, dave].map(user => client.createUser(user)))
+    .then(() => client.getUsersByIds({ userIds: [alice.id, carol.id] })) // FIXME userIds -> ids
+    .then(res => {
+      t.is(res.length, 2)
+
+      // FIXME users should be returned in the order they were asked for
+      if (res[0].id !== alice.id) {
+        resemblesUser(t, res[1], alice)
+        resemblesUser(t, res[0], carol)
+      } else {
+        resemblesUser(t, res[0], alice)
+        resemblesUser(t, res[1], carol)
+      }
+
+      end()
     })
     .catch(fail)
 })
