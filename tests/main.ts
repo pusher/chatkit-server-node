@@ -43,15 +43,34 @@ test("createUser", (t, pass, fail) => {
   newClient()
     .createUser(user)
     .then(res => {
-      t.is(res.id, user.id)
-      t.is(res.name, user.name)
-      t.is(res.avatar_url, user.avatarURL) // FIXME naming
-      t.is(res.custom_data, user.customData) // FIXME naming
-      // TODO timestamps
+      resemblesUser(t, res, user)
       pass()
     })
     .catch(fail)
 })
+
+test("createUsers", (t, pass, fail) => {
+  const alice = randomUser()
+  const bob = randomUser()
+
+  newClient()
+    .createUsers({ users: [alice, bob] })
+    .then(res => {
+      t.is(res.length, 2)
+      resemblesUser(t, res[0], alice)
+      resemblesUser(t, res[1], bob)
+      pass()
+    })
+    .catch(fail)
+})
+
+function resemblesUser(t: any, actual: any, expected: User): void {
+  t.is(actual.id, expected.id)
+  t.is(actual.name, expected.name)
+  t.is(actual.avatar_url, expected.avatarURL) // FIXME naming
+  t.deepEquals(actual.custom_data, expected.customData) // FIXME naming
+  // TODO timestamps
+}
 
 function newClient(): Client {
   return new Client({
@@ -64,6 +83,8 @@ function randomUser(): User {
   return {
     id: randomString(),
     name: randomString(),
+    avatarURL: `https://${randomString()}`,
+    customData: { foo: randomString() },
   }
 }
 
