@@ -87,8 +87,11 @@ test("uptadeUser", (t, pass, fail) => {
     .createUser(user)
     .then(() => client.updateUser(updates))
     // FIXME why do we get the user back from a create, but not an update?
-    // TODO check updates with getUser
-    .then(pass)
+    .then(() => client.getUser({ id: user.id }))
+    .then(res => {
+      resemblesUser(t, res, updates)
+      pass()
+    })
     .catch(fail)
 })
 
@@ -99,8 +102,16 @@ test("deleteUser", (t, pass, fail) => {
   client
     .createUser(user)
     .then(() => client.deleteUser({ userId: user.id })) // FIXME userId -> id
-    // TODO check that getUser errors
-    .then(pass)
+    .then(() => {
+      client
+        .getUser({ id: user.id })
+        .then(() => fail("expected getUser to fail"))
+        .catch(err => {
+          t.is(err.status, 404)
+          t.is(err.error, "services/chatkit/not_found/user_not_found")
+          pass()
+        })
+    })
     .catch(fail)
 })
 
