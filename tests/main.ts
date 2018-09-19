@@ -1,6 +1,8 @@
-import * as test from 'tape';
+// @format
 
-test('hello', t => {
-  t.is(1 + 1, 2);
-  t.end();
-});
+import * as test from "tape"
+
+test("hello", t => {
+  t.is(1 + 1, 2)
+  t.end()
+})
