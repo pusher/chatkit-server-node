@@ -16,8 +16,10 @@
   },
   "scripts": {
     "build": "rm -rf lib target && tsc",
-    "test": "yarn test:raw | faucet",
-    "test:raw": "ts-node tests/main.ts",
+    "test": "yarn test:build && yarn test:run | faucet; rm -r tests/target",
+    "test:raw": "yarn test:build && yarn test:run; rm -r tests/target",
+    "test:build": "tsc -p tests",
+    "test:run": "node tests/target/tests/main.js",
     "install-pkg": "if type yarn &> /dev/null; then yarn; else npm i; fi"
   },
   "dependencies": {
@@ -31,7 +33,6 @@
     "babel-preset-es2015": "^6.24.1",
     "dts-bundle": "^0.7.3",
     "tape": "^4.9.1",
-    "ts-node": "^7.0.1",
     "typescript": "^2.6.1"
   }
 }

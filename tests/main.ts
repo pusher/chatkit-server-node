@@ -9,34 +9,6 @@ import {
   ErrorResponse,
 } from "../src/index"
 
-function test(
-  msg: string,
-  cb: (t: any, end: () => void, fail: (err: string) => void) => void,
-): void {
-  tape(msg, { timeout: 10 * 1000 }, t => {
-    cb(
-      t,
-      () =>
-        deleteResources()
-          .then(() => t.end())
-          .catch(err => t.fail(err)),
-      err =>
-        deleteResources()
-          .then(() => t.fail(err))
-          .catch(() => t.fail(err)),
-    )
-  })
-}
-
-function deleteResources(): Promise<void> {
-  const client = newClient()
-  return client.apiRequest({
-    method: "DELETE",
-    path: "/resources",
-    jwt: client.generateAccessToken({ su: true }).token,
-  })
-}
-
 test("createUser", (t, end, fail) => {
   const user = randomUser()
 
@@ -145,8 +117,8 @@ test("getUsers", (t, end, fail) => {
     .catch(fail)
 })
 
+// FIXME I think this should be getUsersById
 test("getUsersByIds", (t, end, fail) => {
-  // FIXME I think this should be getUsersById
   const client = newClient()
 
   const alice = randomUser()
@@ -173,11 +145,99 @@ test("getUsersByIds", (t, end, fail) => {
     .catch(fail)
 })
 
+test("createRoom", (t, end, fail) => {
+  const client = newClient()
+
+  const alice = randomUser()
+  const bob = randomUser()
+  const carol = randomUser()
+
+  const createRoomOpts = {
+    creatorId: alice.id,
+    name: randomString(),
+    isPrivate: true,
+    userIds: [bob.id, carol.id],
+  }
+
+  Promise.all([alice, bob, carol].map(user => client.createUser(user)))
+    .then(() => client.createRoom(createRoomOpts))
+    .then(res => {
+      resemblesRoom(t, res, createRoomOpts)
+      end()
+    })
+    .catch(fail)
+})
+
+function test(
+  msg: string,
+  cb: (t: any, end: () => void, fail: (err: string) => void) => void,
+): void {
+  tape(msg, t => {
+    t.timeoutAfter(10 * 1000)
+    cb(
+      t,
+      () =>
+        deleteResources()
+          .then(() => t.end())
+          .catch(err => t.fail(JSON.stringify(err))),
+      err =>
+        deleteResources()
+          .then(() => t.fail(JSON.stringify(err)))
+          .catch(() => t.fail(JSON.stringify(err))),
+    )
+  })
+}
+
+function testOnly(
+  msg: string,
+  cb: (t: any, end: () => void, fail: (err: string) => void) => void,
+): void {
+  tape.only(msg, t => {
+    t.timeoutAfter(10 * 1000)
+    cb(
+      t,
+      () =>
+        deleteResources()
+          .then(() => t.end())
+          .catch(err => t.fail(JSON.stringify(err))),
+      err =>
+        deleteResources()
+          .then(() => t.fail(JSON.stringify(err)))
+          .catch(() => t.fail(JSON.stringify(err))),
+    )
+  })
+}
+
+function deleteResources(): Promise<void> {
+  const client = newClient()
+  return client.apiRequest({
+    method: "DELETE",
+    path: "/resources",
+    jwt: client.generateAccessToken({ su: true }).token,
+  })
+}
+
 function resemblesUser(t: any, actual: any, expected: User): void {
+  // FIXME the SDK should do these naming translations
+  // It would be nice if we exported User and Room types
   t.is(actual.id, expected.id)
   t.is(actual.name, expected.name)
-  t.is(actual.avatar_url, expected.avatarURL) // FIXME naming
-  t.deepEquals(actual.custom_data, expected.customData) // FIXME naming
+  t.is(actual.avatar_url, expected.avatarURL)
+  t.deepEquals(actual.custom_data, expected.customData)
+  // TODO timestamps
+}
+
+function resemblesRoom(t: any, actual: any, expected: any): void {
+  // FIXME the SDK should do these naming translations
+  // It would be nice if we exported User and Room types
+  t.is(typeof actual.id, "number")
+  t.is(actual.created_by_id, expected.creatorId)
+  t.is(actual.name, expected.name)
+  t.is(actual.private, expected.isPrivate)
+  t.deepEquals(
+    actual.member_user_ids.sort(),
+    [expected.creatorId, ...expected.userIds].sort(),
+  )
   // TODO timestamps
 }
 
@@ -206,8 +266,6 @@ function randomString(): string {
 function compare(x: any, y: any): number {
   return x > y ? 1 : x < y ? -1 : 0
 }
-
-// TYPES (these should probably live in the SDK proper)
 
 type User = {
   id: string
