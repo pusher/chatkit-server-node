@@ -66,3 +66,7 @@ target/
 
 
 # End of https://www.gitignore.io/api/node
+
+tests/config/development.ts
+tests/config/staging.ts
+tests/config/production.ts
