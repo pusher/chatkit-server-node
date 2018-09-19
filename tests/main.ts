@@ -64,6 +64,25 @@ test("createUsers", (t, pass, fail) => {
     .catch(fail)
 })
 
+test("uptadeUser", (t, pass, fail) => {
+  const client = newClient()
+  const user = randomUser()
+  const updates = {
+    id: user.id,
+    name: randomString(),
+    avatarURL: `https://${randomString()}`,
+    customData: { foo: randomString(), edited: true },
+  }
+
+  client
+    .createUser(user)
+    .then(() => client.updateUser(updates))
+    // FIXME why do we get the user back from a create, but not an update?
+    // TODO check updates with getUser
+    .then(pass)
+    .catch(fail)
+})
+
 function resemblesUser(t: any, actual: any, expected: User): void {
   t.is(actual.id, expected.id)
   t.is(actual.name, expected.name)
