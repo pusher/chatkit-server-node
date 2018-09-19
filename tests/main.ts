@@ -9,10 +9,6 @@ import {
   ErrorResponse,
 } from "../src/index"
 
-// Since we're using random IDs for everything, we probably don't actually need
-// to do the delete resources after every test. Regardless, the option is here.
-const SKIP_DELETE_RESOURCES = true
-
 function test(
   msg: string,
   cb: (t: any, pass: () => void, fail: (err: string) => void) => void,
@@ -21,17 +17,13 @@ function test(
     cb(
       t,
       () =>
-        SKIP_DELETE_RESOURCES
-          ? t.end()
-          : deleteResources()
-              .then(() => t.end())
-              .catch(err => t.fail(err)),
+        deleteResources()
+          .then(() => t.end())
+          .catch(err => t.fail(err)),
       err =>
-        SKIP_DELETE_RESOURCES
-          ? t.fail(err)
-          : deleteResources()
-              .then(() => t.fail(err))
-              .catch(() => t.fail(err)),
+        deleteResources()
+          .then(() => t.fail(err))
+          .catch(() => t.fail(err)),
     )
   })
 }
@@ -129,6 +121,30 @@ test("getUser", (t, pass, fail) => {
     .catch(fail)
 })
 
+test("getUsers", (t, pass, fail) => {
+  const client = newClient()
+
+  const alice = randomUser()
+  const bob = randomUser()
+  const carol = randomUser()
+  const dave = randomUser()
+
+  const users = [alice, bob, carol, dave].sort((x, y) => compare(x.id, y.id))
+
+  Promise.all(users.map(user => client.createUser(user)))
+    // FIXME getUsers should take the same pagination params as the API
+    .then(() => client.getUsers())
+    .then(res => {
+      t.is(res.length, 4)
+      res.sort((x: any, y: any) => compare(x.id, y.id))
+      for (let i = 0; i < 4; i++) {
+        resemblesUser(t, res[i], users[i])
+      }
+      pass()
+    })
+    .catch(fail)
+})
+
 function resemblesUser(t: any, actual: any, expected: User): void {
   t.is(actual.id, expected.id)
   t.is(actual.name, expected.name)
@@ -157,6 +173,10 @@ function randomString(): string {
   return Math.random()
     .toString(36)
     .substring(2)
+}
+
+function compare(x: any, y: any): number {
+  return x > y ? 1 : x < y ? -1 : 0
 }
 
 // TYPES (these should probably live in the SDK proper)
