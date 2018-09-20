@@ -485,6 +485,77 @@ test("sendMessage", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("getRoomMessages", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageTextA = randomString()
+  const messageTextB = randomString()
+  const messageTextC = randomString()
+  const messageTextD = randomString()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendMessage({
+          userId: user.id,
+          roomId: room.id,
+          text: messageTextA,
+        })
+        .then(() =>
+          client.sendMessage({
+            userId: user.id,
+            roomId: room.id,
+            text: messageTextB,
+          }),
+        )
+        .then(() =>
+          client.sendMessage({
+            userId: user.id,
+            roomId: room.id,
+            text: messageTextC,
+          }),
+        )
+        .then(() =>
+          client.sendMessage({
+            userId: user.id,
+            roomId: room.id,
+            text: messageTextD,
+          }),
+        )
+        .then(() =>
+          client.getRoomMessages({
+            userId: user.id, // FIXME remove
+            roomId: room.id,
+            limit: 2,
+          }),
+        )
+        .then(res => {
+          t.is(res.length, 2)
+          t.is(res[0].text, messageTextD)
+          t.is(res[1].text, messageTextC)
+
+          return client.getRoomMessages({
+            userId: user.id, // FIXME remove
+            roomId: room.id,
+            initialId: res[1].id,
+          })
+        })
+        .then(res => {
+          t.is(res.length, 2)
+          t.is(res[0].text, messageTextB)
+          t.is(res[1].text, messageTextA)
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
 function test(
   msg: string,
   cb: (
