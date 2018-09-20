@@ -448,6 +448,43 @@ test("removeUsersFromRoom", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("sendMessage", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageText = randomString()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendMessage({
+          userId: user.id,
+          roomId: room.id,
+          text: messageText,
+        })
+        .then(({ message_id: messageId }) =>
+          client
+            .getRoomMessages({
+              userId: user.id, // FIXME remove
+              roomId: room.id,
+            })
+            .then(res => {
+              t.is(res.length, 1)
+              t.is(res[0].id, messageId)
+              t.is(res[0].room_id, room.id)
+              t.is(res[0].text, messageText)
+              end()
+            }),
+        ),
+    )
+    .catch(fail)
+})
+
 function test(
   msg: string,
   cb: (

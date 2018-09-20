@@ -23,6 +23,11 @@ export interface GetRoomOptions extends UserIdOptions {
   roomId: number;
 }
 
+export interface SendMessageOptions extends UserIdOptions {
+  roomId: number;
+  text: string;
+}
+
 export interface DeleteUserOptions extends UserIdOptions {}
 export interface GetUserRoomOptions extends UserIdOptions {}
 export interface GetRoomsOptions extends UserIdOptions {}
@@ -348,6 +353,18 @@ export default class Chatkit {
     }).then((res) => {
       return JSON.parse(res.body);
     })
+  }
+
+  sendMessage(options: SendMessageOptions): Promise<any> {
+    return this.apiInstance.request({
+      method: 'POST',
+      path: `/rooms/${options.roomId}/messages`,
+      jwt: this.generateAccessToken({
+        su: true,
+        userId: options.userId,
+      }).token,
+      body: { text: options.text },
+    }).then(({ body }) => JSON.parse(body))
   }
 
   getRoomMessages(options: GetRoomMessagesOptions): Promise<any> {
