@@ -344,6 +344,44 @@ test("getUserRooms", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("getUserJoinableRooms", (t, client, end, fail) => {
+  const alice = randomUser()
+  const bob = randomUser()
+
+  Promise.all([alice, bob].map(user => client.createUser(user)))
+    .then(() =>
+      Promise.all([
+        client.createRoom({
+          creatorId: alice.id,
+          name: randomString(),
+          userIds: [bob.id],
+        }),
+        client.createRoom({
+          creatorId: alice.id,
+          name: randomString(),
+        }),
+        client.createRoom({
+          creatorId: alice.id,
+          name: randomString(),
+          isPrivate: true,
+        }),
+      ]),
+    )
+    .then(([roomA, roomB, roomC]) =>
+      client.getUserJoinableRooms({ userId: bob.id }).then(res => {
+        // roomB is the only room that bob can join
+        t.is(res.length, 1)
+        resemblesRoom(t, res[0], {
+          id: roomB.id,
+          creatorId: roomB.created_by_id,
+          name: roomB.name,
+        })
+        end()
+      }),
+    )
+    .catch(fail)
+})
+
 function test(
   msg: string,
   cb: (
