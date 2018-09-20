@@ -261,7 +261,6 @@ test("getRoom", (t, client, end, fail) => {
             id: room.id,
             creatorId: user.id,
             name: roomOpts.name,
-            isPrivate: false,
             memberIds: [user.id],
           })
           end()
@@ -294,12 +293,53 @@ test("getRooms", (t, client, end, fail) => {
               id: rooms[i].id,
               creatorId: user.id,
               name: roomOpts[i].name,
-              isPrivate: false,
             })
           }
           end()
         }),
       ),
+    )
+    .catch(fail)
+})
+
+test("getUserRooms", (t, client, end, fail) => {
+  const alice = randomUser()
+  const bob = randomUser()
+
+  Promise.all([alice, bob].map(user => client.createUser(user)))
+    .then(() =>
+      Promise.all([
+        client.createRoom({
+          creatorId: bob.id,
+          name: randomString(),
+        }),
+        client.createRoom({
+          creatorId: alice.id,
+          name: randomString(),
+          userIds: [bob.id],
+        }),
+        client.createRoom({
+          creatorId: alice.id,
+          name: randomString(),
+        }),
+      ]),
+    )
+    .then(([roomA, roomB, roomC]) =>
+      client.getUserRooms({ userId: bob.id }).then(res => {
+        // bob is only a member of the first two rooms
+        const expectedRooms = [roomA, roomB].sort(compareBy("id"))
+        res.sort(compareBy("id"))
+
+        t.is(res.length, 2)
+        for (let i = 0; i < 2; i++) {
+          resemblesRoom(t, res[i], {
+            id: expectedRooms[i].id,
+            creatorId: expectedRooms[i].created_by_id,
+            name: expectedRooms[i].name,
+          })
+        }
+        end()
+      }),
     )
     .catch(fail)
 })
@@ -394,7 +434,7 @@ function resemblesRoom(t: any, actual: any, expected: any): void {
   }
   t.is(actual.created_by_id, expected.creatorId)
   t.is(actual.name, expected.name)
-  t.is(actual.private, expected.isPrivate)
+  t.is(actual.private, !!expected.isPrivate)
   if (expected.memberIds) {
     t.deepEquals(actual.member_user_ids.sort(), expected.memberIds.sort())
   }
