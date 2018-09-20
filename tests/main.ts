@@ -109,19 +109,19 @@ test("getUser", (t, client, end, fail) => {
 })
 
 test("getUsers", (t, client, end, fail) => {
+  // FIXME getUsers should take the same pagination params as the API
   const alice = randomUser()
   const bob = randomUser()
   const carol = randomUser()
   const dave = randomUser()
 
-  const users = [alice, bob, carol, dave].sort((x, y) => compare(x.id, y.id))
+  const users = [alice, bob, carol, dave].sort(compareBy("id"))
 
   Promise.all(users.map(user => client.createUser(user)))
-    // FIXME getUsers should take the same pagination params as the API
     .then(() => client.getUsers())
     .then(res => {
       t.is(res.length, 4)
-      res.sort((x: any, y: any) => compare(x.id, y.id))
+      res.sort(compareBy("id"))
       for (let i = 0; i < 4; i++) {
         resemblesUser(t, res[i], users[i])
       }
@@ -130,8 +130,8 @@ test("getUsers", (t, client, end, fail) => {
     .catch(fail)
 })
 
-// FIXME I think this should be getUsersById
 test("getUsersByIds", (t, client, end, fail) => {
+  // FIXME I think this should be getUsersById
   const alice = randomUser()
   const bob = randomUser()
   const carol = randomUser()
@@ -171,7 +171,12 @@ test("createRoom", (t, client, end, fail) => {
   Promise.all([alice, bob, carol].map(user => client.createUser(user)))
     .then(() => client.createRoom(roomOpts))
     .then(res => {
-      resemblesRoom(t, res, roomOpts)
+      resemblesRoom(t, res, {
+        creatorId: alice.id,
+        name: roomOpts.name,
+        isPrivate: true,
+        memberIds: [alice.id, bob.id, carol.id],
+      })
       end()
     })
     .catch(fail)
@@ -180,10 +185,7 @@ test("createRoom", (t, client, end, fail) => {
 test("updateRoom", (t, client, end, fail) => {
   const user = randomUser()
 
-  const roomOpts = {
-    creatorId: user.id,
-    name: randomString(),
-  }
+  const roomOpts = { creatorId: user.id, name: randomString() }
 
   const updatedName = randomString()
 
@@ -198,27 +200,25 @@ test("updateRoom", (t, client, end, fail) => {
             userId: user.id, // FIXME unnecessary, remove
             roomId: room.id, // FIXME roomId -> id
           }),
-        ),
+        )
+        .then(res => {
+          resemblesRoom(t, res, {
+            id: room.id,
+            creatorId: user.id,
+            name: updatedName,
+            isPrivate: true,
+            memberIds: [user.id],
+          })
+          end()
+        }),
     )
-    .then(room => {
-      resemblesRoom(t, room, {
-        creatorId: user.id,
-        name: updatedName,
-        isPrivate: true,
-        userIds: [],
-      })
-      end()
-    })
     .catch(fail)
 })
 
 test("deleteRoom", (t, client, end, fail) => {
   const user = randomUser()
 
-  const roomOpts = {
-    creatorId: user.id,
-    name: randomString(),
-  }
+  const roomOpts = { creatorId: user.id, name: randomString() }
 
   client
     .createUser(user)
@@ -245,10 +245,7 @@ test("deleteRoom", (t, client, end, fail) => {
 test("getRoom", (t, client, end, fail) => {
   const user = randomUser()
 
-  const roomOpts = {
-    creatorId: user.id,
-    name: randomString(),
-  }
+  const roomOpts = { creatorId: user.id, name: randomString() }
 
   client
     .createUser(user)
@@ -260,13 +257,49 @@ test("getRoom", (t, client, end, fail) => {
           roomId: room.id, // FIXME roomId -> id
         })
         .then(res => {
-          console.log("roomOpts", roomOpts)
-          console.log("room", roomOpts)
-          console.log("res", res)
-          t.is(res.id, room.id)
-          resemblesRoom(t, res, roomOpts)
+          resemblesRoom(t, res, {
+            id: room.id,
+            creatorId: user.id,
+            name: roomOpts.name,
+            isPrivate: false,
+            memberIds: [user.id],
+          })
           end()
         }),
+    )
+    .catch(fail)
+})
+
+test("getRooms", (t, client, end, fail) => {
+  // FIXME getUsers should take the same pagination params as the API
+  const user = randomUser()
+
+  const roomOpts = [
+    { creatorId: user.id, name: randomString() },
+    { creatorId: user.id, name: randomString() },
+    { creatorId: user.id, name: randomString() },
+  ].sort(compareBy("name"))
+
+  client
+    .createUser(user)
+    .then(() =>
+      Promise.all(roomOpts.map(ro => client.createRoom(ro))).then(rooms =>
+        client.getRooms({ userId: user.id }).then(res => {
+          rooms.sort(compareBy("name"))
+          res.sort(compareBy("name"))
+
+          t.is(res.length, 3)
+          for (let i = 0; i < 3; i++) {
+            resemblesRoom(t, res[i], {
+              id: rooms[i].id,
+              creatorId: user.id,
+              name: roomOpts[i].name,
+              isPrivate: false,
+            })
+          }
+          end()
+        }),
+      ),
     )
     .catch(fail)
 })
@@ -349,21 +382,22 @@ function resemblesUser(t: any, actual: any, expected: User): void {
   t.is(actual.name, expected.name)
   t.is(actual.avatar_url, expected.avatarURL)
   t.deepEquals(actual.custom_data, expected.customData)
-  // TODO timestamps
 }
 
 function resemblesRoom(t: any, actual: any, expected: any): void {
   // FIXME the SDK should do these naming translations
   // It would be nice if we exported User and Room types
-  t.is(typeof actual.id, "number")
+  if (expected.id) {
+    t.is(actual.id, expected.id)
+  } else {
+    t.is(typeof actual.id, "number")
+  }
   t.is(actual.created_by_id, expected.creatorId)
   t.is(actual.name, expected.name)
-  t.is(actual.private, !!expected.isPrivate)
-  t.deepEquals(
-    actual.member_user_ids.sort(),
-    [expected.creatorId, ...(expected.userIds || [])].sort(),
-  )
-  // TODO timestamps
+  t.is(actual.private, expected.isPrivate)
+  if (expected.memberIds) {
+    t.deepEquals(actual.member_user_ids.sort(), expected.memberIds.sort())
+  }
 }
 
 function randomUser(): User {
@@ -381,8 +415,8 @@ function randomString(): string {
     .substring(2)
 }
 
-function compare(x: any, y: any): number {
-  return x > y ? 1 : x < y ? -1 : 0
+function compareBy(key: string) {
+  return (x: any, y: any) => (x[key] > y[key] ? 1 : x[key] < y[key] ? -1 : 0)
 }
 
 type User = {
