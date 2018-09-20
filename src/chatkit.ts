@@ -28,6 +28,10 @@ export interface SendMessageOptions extends UserIdOptions {
   text: string;
 }
 
+export interface DeleteMessageOptions {
+  id: string;
+}
+
 export interface DeleteUserOptions extends UserIdOptions {}
 export interface GetUserRoomOptions extends UserIdOptions {}
 export interface GetRoomsOptions extends UserIdOptions {}
@@ -365,6 +369,14 @@ export default class Chatkit {
       }).token,
       body: { text: options.text },
     }).then(({ body }) => JSON.parse(body))
+  }
+
+  deleteMessage(options: DeleteMessageOptions): Promise<void> {
+    return this.apiInstance.request({
+      method: 'DELETE',
+      path: `/messages/${options.id}`,
+      jwt: this.getServerToken(),
+    }).then(() => {})
   }
 
   getRoomMessages(options: GetRoomMessagesOptions): Promise<any> {
