@@ -30,7 +30,7 @@ export interface GetUserJoinableRoomOptions extends UserIdOptions {}
 export interface GetUserRolesOptions extends UserIdOptions {}
 export interface RemoveGlobalRoleForUserOptions extends UserIdOptions {}
 
-export type GetUserOptions = {
+export interface GetUserOptions {
   id: string;
 }
 
@@ -129,6 +129,16 @@ export interface CreateRoomOptions {
   name: string;
   isPrivate?: boolean;
   userIds?: Array<string>;
+}
+
+export interface UpdateRoomOptions {
+  id: number;
+  name?: string;
+  isPrivate?: boolean;
+}
+
+export interface DeleteRoomOptions {
+  id: number;
 }
 
 export interface UpdateRolePermissionsOptions {
@@ -421,6 +431,30 @@ export default class Chatkit {
     }).then((res) => {
       return JSON.parse(res.body);
     })
+  }
+
+  updateRoom(options: UpdateRoomOptions): Promise<void> {
+    const body: any = {}
+    if (options.name) {
+      body.name = options.name
+    }
+    if (options.isPrivate) {
+      body.private = options.isPrivate
+    }
+    return this.apiInstance.request({
+      method: 'PUT',
+      path: `/rooms/${options.id}`,
+      jwt: this.getServerToken(),
+      body,
+    }).then(() => {})
+  }
+
+  deleteRoom(options: DeleteRoomOptions): Promise<void> {
+    return this.apiInstance.request({
+      method: 'DELETE',
+      path: `/rooms/${options.id}`,
+      jwt: this.getServerToken(),
+    }).then(() => {})
   }
 
   // Authorizer interactions

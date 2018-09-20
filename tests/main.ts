@@ -152,7 +152,7 @@ test("createRoom", (t, end, fail) => {
   const bob = randomUser()
   const carol = randomUser()
 
-  const createRoomOpts = {
+  const roomOpts = {
     creatorId: alice.id,
     name: randomString(),
     isPrivate: true,
@@ -160,11 +160,80 @@ test("createRoom", (t, end, fail) => {
   }
 
   Promise.all([alice, bob, carol].map(user => client.createUser(user)))
-    .then(() => client.createRoom(createRoomOpts))
+    .then(() => client.createRoom(roomOpts))
     .then(res => {
-      resemblesRoom(t, res, createRoomOpts)
+      resemblesRoom(t, res, roomOpts)
       end()
     })
+    .catch(fail)
+})
+
+test("updateRoom", (t, end, fail) => {
+  const client = newClient()
+
+  const user = randomUser()
+
+  const roomOpts = {
+    creatorId: user.id,
+    name: randomString(),
+  }
+
+  const updatedName = randomString()
+
+  client
+    .createUser(user)
+    .then(() => client.createRoom(roomOpts))
+    .then(room =>
+      client
+        .updateRoom({ id: room.id, name: updatedName, isPrivate: true })
+        .then(() =>
+          client.getRoom({
+            userId: user.id, // FIXME unnecessary, remove
+            roomId: room.id, // FIXME roomId -> id
+          }),
+        ),
+    )
+    .then(room => {
+      resemblesRoom(t, room, {
+        creatorId: user.id,
+        name: updatedName,
+        isPrivate: true,
+        userIds: [],
+      })
+      end()
+    })
+    .catch(fail)
+})
+
+test("deleteRoom", (t, end, fail) => {
+  const client = newClient()
+
+  const user = randomUser()
+
+  const roomOpts = {
+    creatorId: user.id,
+    name: randomString(),
+  }
+
+  client
+    .createUser(user)
+    .then(() => client.createRoom(roomOpts))
+    .then(room =>
+      client
+        .deleteRoom({ id: room.id })
+        .then(() =>
+          client.getRoom({
+            userId: user.id, // FIXME unnecessary, remove
+            roomId: room.id, // FIXME roomId -> id
+          }),
+        )
+        .then(() => fail("expected getRoom to fail"))
+        .catch(err => {
+          t.is(err.status, 404)
+          t.is(err.error, "services/chatkit/not_found/room_not_found")
+          end()
+        }),
+    )
     .catch(fail)
 })
 
