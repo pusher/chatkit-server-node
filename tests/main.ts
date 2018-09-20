@@ -9,10 +9,10 @@ import {
   ErrorResponse,
 } from "../src/index"
 
-test("createUser", (t, end, fail) => {
+test("createUser", (t, client, end, fail) => {
   const user = randomUser()
 
-  newClient()
+  client
     .createUser(user)
     .then(res => {
       resemblesUser(t, res, user)
@@ -21,11 +21,11 @@ test("createUser", (t, end, fail) => {
     .catch(fail)
 })
 
-test("createUsers", (t, end, fail) => {
+test("createUsers", (t, client, end, fail) => {
   const alice = randomUser()
   const bob = randomUser()
 
-  newClient()
+  client
     .createUsers({ users: [alice, bob] })
     .then(res => {
       t.is(res.length, 2)
@@ -36,8 +36,7 @@ test("createUsers", (t, end, fail) => {
     .catch(fail)
 })
 
-test("uptadeUser", (t, end, fail) => {
-  const client = newClient()
+test("uptadeUser", (t, client, end, fail) => {
   const user = randomUser()
 
   const updates = {
@@ -59,8 +58,7 @@ test("uptadeUser", (t, end, fail) => {
     .catch(fail)
 })
 
-test("deleteUser", (t, end, fail) => {
-  const client = newClient()
+test("deleteUser", (t, client, end, fail) => {
   const user = randomUser()
 
   client
@@ -79,8 +77,7 @@ test("deleteUser", (t, end, fail) => {
     .catch(fail)
 })
 
-test("getUser", (t, end, fail) => {
-  const client = newClient()
+test("getUser", (t, client, end, fail) => {
   const user = randomUser()
 
   client
@@ -93,9 +90,7 @@ test("getUser", (t, end, fail) => {
     .catch(fail)
 })
 
-test("getUsers", (t, end, fail) => {
-  const client = newClient()
-
+test("getUsers", (t, client, end, fail) => {
   const alice = randomUser()
   const bob = randomUser()
   const carol = randomUser()
@@ -118,9 +113,7 @@ test("getUsers", (t, end, fail) => {
 })
 
 // FIXME I think this should be getUsersById
-test("getUsersByIds", (t, end, fail) => {
-  const client = newClient()
-
+test("getUsersByIds", (t, client, end, fail) => {
   const alice = randomUser()
   const bob = randomUser()
   const carol = randomUser()
@@ -145,9 +138,7 @@ test("getUsersByIds", (t, end, fail) => {
     .catch(fail)
 })
 
-test("createRoom", (t, end, fail) => {
-  const client = newClient()
-
+test("createRoom", (t, client, end, fail) => {
   const alice = randomUser()
   const bob = randomUser()
   const carol = randomUser()
@@ -168,9 +159,7 @@ test("createRoom", (t, end, fail) => {
     .catch(fail)
 })
 
-test("updateRoom", (t, end, fail) => {
-  const client = newClient()
-
+test("updateRoom", (t, client, end, fail) => {
   const user = randomUser()
 
   const roomOpts = {
@@ -205,9 +194,7 @@ test("updateRoom", (t, end, fail) => {
     .catch(fail)
 })
 
-test("deleteRoom", (t, end, fail) => {
-  const client = newClient()
-
+test("deleteRoom", (t, client, end, fail) => {
   const user = randomUser()
 
   const roomOpts = {
@@ -239,18 +226,29 @@ test("deleteRoom", (t, end, fail) => {
 
 function test(
   msg: string,
-  cb: (t: any, end: () => void, fail: (err: string) => void) => void,
+  cb: (
+    t: any,
+    client: Client,
+    end: () => void,
+    fail: (err: string) => void,
+  ) => void,
 ): void {
+  const client = new Client({
+    instanceLocator: config.INSTANCE_LOCATOR,
+    key: config.INSTANCE_KEY,
+  })
+
   tape(msg, t => {
     t.timeoutAfter(10 * 1000)
     cb(
       t,
+      client,
       () =>
-        deleteResources()
+        deleteResources(client)
           .then(() => t.end())
           .catch(err => t.fail(JSON.stringify(err))),
       err =>
-        deleteResources()
+        deleteResources(client)
           .then(() => t.fail(JSON.stringify(err)))
           .catch(() => t.fail(JSON.stringify(err))),
     )
@@ -259,26 +257,36 @@ function test(
 
 function testOnly(
   msg: string,
-  cb: (t: any, end: () => void, fail: (err: string) => void) => void,
+  cb: (
+    t: any,
+    client: Client,
+    end: () => void,
+    fail: (err: string) => void,
+  ) => void,
 ): void {
+  const client = new Client({
+    instanceLocator: config.INSTANCE_LOCATOR,
+    key: config.INSTANCE_KEY,
+  })
+
   tape.only(msg, t => {
     t.timeoutAfter(10 * 1000)
     cb(
       t,
+      client,
       () =>
-        deleteResources()
+        deleteResources(client)
           .then(() => t.end())
           .catch(err => t.fail(JSON.stringify(err))),
       err =>
-        deleteResources()
+        deleteResources(client)
           .then(() => t.fail(JSON.stringify(err)))
           .catch(() => t.fail(JSON.stringify(err))),
     )
   })
 }
 
-function deleteResources(): Promise<void> {
-  const client = newClient()
+function deleteResources(client: Client): Promise<void> {
   return client.apiRequest({
     method: "DELETE",
     path: "/resources",
@@ -308,13 +316,6 @@ function resemblesRoom(t: any, actual: any, expected: any): void {
     [expected.creatorId, ...expected.userIds].sort(),
   )
   // TODO timestamps
-}
-
-function newClient(): Client {
-  return new Client({
-    instanceLocator: config.INSTANCE_LOCATOR,
-    key: config.INSTANCE_KEY,
-  })
 }
 
 function randomUser(): User {
