@@ -382,6 +382,72 @@ test("getUserJoinableRooms", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("addUsersToRoom", (t, client, end, fail) => {
+  const alice = randomUser()
+  const bob = randomUser()
+
+  Promise.all([alice, bob].map(user => client.createUser(user)))
+    .then(() =>
+      client.createRoom({
+        creatorId: alice.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .addUsersToRoom({ roomId: room.id, userIds: [bob.id] })
+        .then(() =>
+          client.getRoom({
+            userId: alice.id, // FIXME unnecessary, remove
+            roomId: room.id, // FIXME roomId -> id
+          }),
+        )
+        .then(res => {
+          resemblesRoom(t, res, {
+            id: room.id,
+            creatorId: alice.id,
+            name: room.name,
+            memberIds: [alice.id, bob.id],
+          })
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
+test("removeUsersFromRoom", (t, client, end, fail) => {
+  const user = randomUser()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .removeUsersFromRoom({ roomId: room.id, userIds: [user.id] })
+        .then(() =>
+          client.getRoom({
+            userId: user.id, // FIXME unnecessary, remove
+            roomId: room.id, // FIXME roomId -> id
+          }),
+        )
+        .then(res => {
+          resemblesRoom(t, res, {
+            id: room.id,
+            creatorId: user.id,
+            name: room.name,
+            memberIds: [],
+          })
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
 function test(
   msg: string,
   cb: (

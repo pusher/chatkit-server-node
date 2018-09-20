@@ -141,6 +141,16 @@ export interface DeleteRoomOptions {
   id: number;
 }
 
+export interface AddUsersToRoomOptions {
+  roomId: number;
+  userIds: Array<string>;
+}
+
+export interface RemoveUsersFromRoomOptions {
+  roomId: number;
+  userIds: Array<string>;
+}
+
 export interface UpdateRolePermissionsOptions {
   add_permissions?: Array<string>;
   remove_permissions?: Array<string>;
@@ -456,6 +466,25 @@ export default class Chatkit {
       jwt: this.getServerToken(),
     }).then(() => {})
   }
+
+  addUsersToRoom(options: AddUsersToRoomOptions): Promise<void> {
+    return this.apiInstance.request({
+      method: 'PUT',
+      path: `/rooms/${options.roomId}/users/add`,
+      jwt: this.getServerToken(),
+      body: { user_ids: options.userIds },
+    }).then(() => {})
+  }
+
+  removeUsersFromRoom(options: RemoveUsersFromRoomOptions): Promise<void> {
+    return this.apiInstance.request({
+      method: 'PUT',
+      path: `/rooms/${options.roomId}/users/remove`,
+      jwt: this.getServerToken(),
+      body: { user_ids: options.userIds },
+    }).then(() => {})
+  }
+
 
   // Authorizer interactions
 
