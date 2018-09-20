@@ -9,6 +9,24 @@ import {
   ErrorResponse,
 } from "../src/index"
 
+// README
+//
+// To run the tests, `./config/production.ts` must be provided, see
+// `./config/example.ts`. To run any single test in isolation, replace
+// `test(...)` with `testOnly(...)`.
+//
+// Explanation of parameters passed in to each test:
+//
+// - `t` is the tape test handle, see https://github.com/substack/tape
+//
+// - `client` is an instantiated Chatkit server client (uhh...)
+//
+// - `end()` must be called at the end of the happy path of each test, failure
+//   to do so will result in a timeout.
+//
+// - `fail(err)` fails the test immediately with an error. It is an error to
+//   also call `end()`
+
 test("createUser", (t, client, end, fail) => {
   const user = randomUser()
 
@@ -224,13 +242,42 @@ test("deleteRoom", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("getRoom", (t, client, end, fail) => {
+  const user = randomUser()
+
+  const roomOpts = {
+    creatorId: user.id,
+    name: randomString(),
+  }
+
+  client
+    .createUser(user)
+    .then(() => client.createRoom(roomOpts))
+    .then(room =>
+      client
+        .getRoom({
+          userId: user.id, // FIXME unnecessary, remove
+          roomId: room.id, // FIXME roomId -> id
+        })
+        .then(res => {
+          console.log("roomOpts", roomOpts)
+          console.log("room", roomOpts)
+          console.log("res", res)
+          t.is(res.id, room.id)
+          resemblesRoom(t, res, roomOpts)
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
 function test(
   msg: string,
   cb: (
     t: any,
     client: Client,
     end: () => void,
-    fail: (err: string) => void,
+    fail: (err: any) => void,
   ) => void,
 ): void {
   const client = new Client({
@@ -246,22 +293,23 @@ function test(
       () =>
         deleteResources(client)
           .then(() => t.end())
-          .catch(err => t.fail(JSON.stringify(err))),
+          .catch(err => t.end(JSON.stringify(err))),
       err =>
         deleteResources(client)
-          .then(() => t.fail(JSON.stringify(err)))
-          .catch(() => t.fail(JSON.stringify(err))),
+          .then(() => t.end(JSON.stringify(err)))
+          .catch(() => t.end(JSON.stringify(err))),
     )
   })
 }
 
+// Only run this test, all others will be ignored.
 function testOnly(
   msg: string,
   cb: (
     t: any,
     client: Client,
     end: () => void,
-    fail: (err: string) => void,
+    fail: (err: any) => void,
   ) => void,
 ): void {
   const client = new Client({
@@ -277,11 +325,11 @@ function testOnly(
       () =>
         deleteResources(client)
           .then(() => t.end())
-          .catch(err => t.fail(JSON.stringify(err))),
+          .catch(err => t.end(JSON.stringify(err))),
       err =>
         deleteResources(client)
-          .then(() => t.fail(JSON.stringify(err)))
-          .catch(() => t.fail(JSON.stringify(err))),
+          .then(() => t.end(JSON.stringify(err)))
+          .catch(() => t.end(JSON.stringify(err))),
     )
   })
 }
@@ -310,10 +358,10 @@ function resemblesRoom(t: any, actual: any, expected: any): void {
   t.is(typeof actual.id, "number")
   t.is(actual.created_by_id, expected.creatorId)
   t.is(actual.name, expected.name)
-  t.is(actual.private, expected.isPrivate)
+  t.is(actual.private, !!expected.isPrivate)
   t.deepEquals(
     actual.member_user_ids.sort(),
-    [expected.creatorId, ...expected.userIds].sort(),
+    [expected.creatorId, ...(expected.userIds || [])].sort(),
   )
   // TODO timestamps
 }
