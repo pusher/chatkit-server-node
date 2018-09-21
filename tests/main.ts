@@ -9,6 +9,9 @@ import {
   ErrorResponse,
 } from "../src/index"
 
+const TEST_TIMEOUT = 15 * 1000
+const DELETE_RESOURCES_PAUSE = 0
+
 // README
 //
 // To run the tests, `./config/production.ts` must be provided, see
@@ -610,7 +613,7 @@ function test(
   })
 
   tape(msg, t => {
-    t.timeoutAfter(10 * 1000)
+    t.timeoutAfter(TEST_TIMEOUT)
     cb(
       t,
       client,
@@ -659,11 +662,21 @@ function testOnly(
 }
 
 function deleteResources(client: Client): Promise<void> {
-  return client.apiRequest({
-    method: "DELETE",
-    path: "/resources",
-    jwt: client.generateAccessToken({ su: true }).token,
-  })
+  return (
+    client
+      .apiRequest({
+        method: "DELETE",
+        path: "/resources",
+        jwt: client.generateAccessToken({ su: true }).token,
+      })
+      // FIXME DELETE /resources happens asynchronously, so pause for a moment
+      // to give it a chance to finish.
+      .then(() => resolveAfter(DELETE_RESOURCES_PAUSE))
+  )
+}
+
+function resolveAfter(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(() => resolve(), ms))
 }
 
 function resemblesUser(t: any, actual: any, expected: User): void {
