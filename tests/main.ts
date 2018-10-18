@@ -196,7 +196,6 @@ test("updateRoom", (t, client, end, fail) => {
         .updateRoom({ id: room.id, name: updatedName, isPrivate: true })
         .then(() =>
           client.getRoom({
-            userId: user.id, // FIXME unnecessary, remove
             roomId: room.id, // FIXME roomId -> id
           }),
         )
@@ -227,7 +226,6 @@ test("deleteRoom", (t, client, end, fail) => {
         .deleteRoom({ id: room.id })
         .then(() =>
           client.getRoom({
-            userId: user.id, // FIXME unnecessary, remove
             roomId: room.id, // FIXME roomId -> id
           }),
         )
@@ -252,7 +250,6 @@ test("getRoom", (t, client, end, fail) => {
     .then(room =>
       client
         .getRoom({
-          userId: user.id, // FIXME unnecessary, remove
           roomId: room.id, // FIXME roomId -> id
         })
         .then(res => {
@@ -396,7 +393,6 @@ test("addUsersToRoom", (t, client, end, fail) => {
         .addUsersToRoom({ roomId: room.id, userIds: [bob.id] })
         .then(() =>
           client.getRoom({
-            userId: alice.id, // FIXME unnecessary, remove
             roomId: room.id, // FIXME roomId -> id
           }),
         )
@@ -429,7 +425,6 @@ test("removeUsersFromRoom", (t, client, end, fail) => {
         .removeUsersFromRoom({ roomId: room.id, userIds: [user.id] })
         .then(() =>
           client.getRoom({
-            userId: user.id, // FIXME unnecessary, remove
             roomId: room.id, // FIXME roomId -> id
           }),
         )
@@ -468,7 +463,6 @@ test("sendMessage", (t, client, end, fail) => {
         .then(({ message_id: messageId }) =>
           client
             .getRoomMessages({
-              userId: user.id, // FIXME remove
               roomId: room.id,
             })
             .then(res => {
@@ -529,7 +523,6 @@ test("getRoomMessages", (t, client, end, fail) => {
         )
         .then(() =>
           client.getRoomMessages({
-            userId: user.id, // FIXME remove
             roomId: room.id,
             limit: 2,
           }),
@@ -540,7 +533,6 @@ test("getRoomMessages", (t, client, end, fail) => {
           t.is(res[1].text, messageTextC)
 
           return client.getRoomMessages({
-            userId: user.id, // FIXME remove
             roomId: room.id,
             initialId: res[1].id,
           })
@@ -578,7 +570,6 @@ test("deleteMessage", (t, client, end, fail) => {
         .then(() =>
           client
             .getRoomMessages({
-              userId: user.id, // FIXME remove
               roomId: room.id,
             })
             .then(res => {

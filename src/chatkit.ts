@@ -20,7 +20,7 @@ export interface UserIdOptions {
   userId: string;
 }
 
-export interface GetRoomOptions extends UserIdOptions {
+export interface GetRoomOptions {
   roomId: number;
 }
 
@@ -107,7 +107,7 @@ export interface GeneralRequestOptions {
   qs?: object;
 }
 
-export interface GetRoomMessagesOptions extends UserIdOptions {
+export interface GetRoomMessagesOptions {
   direction?: string;
   initialId?: string;
   limit?: number;
@@ -355,7 +355,6 @@ export default class Chatkit {
   getRoom(options: GetRoomOptions): Promise<any> {
     const jwt = this.generateAccessToken({
       su: true,
-      userId: options.userId,
     });
 
     return this.apiInstance.request({
@@ -390,7 +389,6 @@ export default class Chatkit {
   getRoomMessages(options: GetRoomMessagesOptions): Promise<any> {
     const jwt = this.generateAccessToken({
       su: true,
-      userId: options.userId,
     });
 
     const { initialId, ...optionsMinusInitialId } = options;
