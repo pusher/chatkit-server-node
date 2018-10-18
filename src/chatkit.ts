@@ -35,10 +35,14 @@ export interface DeleteMessageOptions {
 
 export interface DeleteUserOptions extends UserIdOptions {}
 export interface GetUserRoomOptions extends UserIdOptions {}
-export interface GetRoomsOptions extends UserIdOptions {}
 export interface GetUserJoinableRoomOptions extends UserIdOptions {}
 export interface GetUserRolesOptions extends UserIdOptions {}
 export interface RemoveGlobalRoleForUserOptions extends UserIdOptions {}
+
+export interface GetRoomsOptions {
+  fromId?: number;
+  includePrivate?: boolean
+}
 
 export interface GetUserOptions {
   id: string;
@@ -344,7 +348,7 @@ export default class Chatkit {
     }).then(() => {})
   }
 
-  getUser(options: GetUserOptions): Promise<any> { // TODO return Promise<User>
+  getUser(options: GetUserOptions): Promise<any> {
     return this.apiInstance.request({
       method: 'GET',
       path: `/users/${encodeURIComponent(options.id)}`,
@@ -431,16 +435,15 @@ export default class Chatkit {
     })
   }
 
-  getRooms(options: GetRoomsOptions): Promise<any> {
-    const jwt = this.generateAccessToken({
-      su: true,
-      userId: options.userId,
-    });
-
+  getRooms(options: GetRoomsOptions = {}): Promise<any> {
     return this.apiInstance.request({
       method: 'GET',
       path: `/rooms`,
-      jwt: jwt.token,
+      jwt: this.getServerToken(),
+      qs: {
+        from_id: options.fromId,
+        include_private: options.includePrivate,
+      }
     }).then((res) => {
       return JSON.parse(res.body);
     })

@@ -268,31 +268,31 @@ test("getRoom", (t, client, end, fail) => {
 test("getRooms", (t, client, end, fail) => {
   const user = randomUser()
 
-  const roomOpts = [
-    { creatorId: user.id, name: randomString() },
-    { creatorId: user.id, name: randomString() },
-    { creatorId: user.id, name: randomString() },
-  ].sort(compareBy("name"))
+  const roomNames: Array<string> = []
+  for (let i = 0; i < 10; i++) {
+    roomNames.push(randomString())
+  }
 
   client
     .createUser(user)
     .then(() =>
-      Promise.all(roomOpts.map(ro => client.createRoom(ro))).then(rooms =>
-        client.getRooms({ userId: user.id }).then(res => {
-          rooms.sort(compareBy("name"))
-          res.sort(compareBy("name"))
-
-          t.is(res.length, 3)
-          for (let i = 0; i < 3; i++) {
-            resemblesRoom(t, res[i], {
-              id: rooms[i].id,
-              creatorId: user.id,
-              name: roomOpts[i].name,
-            })
-          }
-          end()
-        }),
-      ),
+      Promise.all(
+        roomNames.map(name =>
+          client.createRoom({ creatorId: user.id, name, isPrivate: true }),
+        ),
+      ).then(rooms => {
+        const roomIds = rooms.map(r => r.id).sort(compareNumbers)
+        return client
+          .getRooms()
+          .then(res => {
+            t.is(res.length, 0)
+          })
+          .then(() => client.getRooms({ includePrivate: true }))
+          .then(res => {
+            t.deepEqual(res.map((r: any) => r.id).sort(compareNumbers), roomIds)
+            end()
+          })
+      }),
     )
     .catch(fail)
 })
@@ -842,6 +842,10 @@ function randomString(): string {
 
 function compareBy(key: string) {
   return (x: any, y: any) => (x[key] > y[key] ? 1 : x[key] < y[key] ? -1 : 0)
+}
+
+function compareNumbers(x: number, y: number): number {
+  return x > y ? 1 : x < y ? -1 : 0
 }
 
 type User = {
