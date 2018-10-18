@@ -122,7 +122,7 @@ export interface GetReadCursorsForUserOptions {
   userId: string;
 }
 
-export interface GetReadCursorsForRoomOptions {
+  export interface GetReadCursorsForRoomOptions {
   roomId: string;
 }
 
@@ -736,9 +736,12 @@ export default class Chatkit {
 
   authorizerRequest(options: GeneralRequestOptions): Promise<any> {
     options.jwt = options.jwt || this.getServerToken();
-    return this.authorizerInstance.request(options).then((res) => {
-      return JSON.parse(res.body);
-    });
+    return this.authorizerInstance.request(options);
+  }
+
+  cursorsRequest(options: GeneralRequestOptions): Promise<any> {
+    options.jwt = options.jwt || this.getServerToken();
+    return this.cursorsInstance.request(options);
   }
 
   private updatePermissionsForRole(
