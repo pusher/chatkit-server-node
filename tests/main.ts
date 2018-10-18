@@ -2,7 +2,6 @@
 
 import * as tape from "tape"
 
-import * as config from "./config/production"
 import {
   default as Client,
   AuthenticationResponse,
@@ -12,11 +11,27 @@ import {
 const TEST_TIMEOUT = 15 * 1000
 const DELETE_RESOURCES_PAUSE = 0
 
+let instanceLocator: string
+let key: string
+
+if (process.env.INSTANCE_LOCATOR) {
+  instanceLocator = process.env.INSTANCE_LOCATOR
+} else {
+  throw Error("missing config INSTANCE_LOCATOR")
+}
+
+if (process.env.INSTANCE_KEY) {
+  key = process.env.INSTANCE_KEY
+} else {
+  throw Error("missing config INSTANCE_KEY")
+}
+
+let clientConfig = {
+  instanceLocator,
+  key,
+}
+
 // README
-//
-// To run the tests, `./config/production.ts` must be provided, see
-// `./config/example.ts`. To run any single test in isolation, replace
-// `test(...)` with `testOnly(...)`.
 //
 // Explanation of parameters passed in to each test:
 //
@@ -732,10 +747,7 @@ function test(
     fail: (err: any) => void,
   ) => void,
 ): void {
-  const client = new Client({
-    instanceLocator: config.INSTANCE_LOCATOR,
-    key: config.INSTANCE_KEY,
-  })
+  const client = new Client(clientConfig)
 
   tape(msg, t => {
     t.timeoutAfter(TEST_TIMEOUT)
@@ -764,10 +776,7 @@ function testOnly(
     fail: (err: any) => void,
   ) => void,
 ): void {
-  const client = new Client({
-    instanceLocator: config.INSTANCE_LOCATOR,
-    key: config.INSTANCE_KEY,
-  })
+  const client = new Client(clientConfig)
 
   tape.only(msg, t => {
     t.timeoutAfter(10 * 1000)
