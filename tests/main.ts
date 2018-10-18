@@ -141,11 +141,10 @@ test("getUsersByIds", (t, client, end, fail) => {
   const dave = randomUser()
 
   Promise.all([alice, bob, carol, dave].map(user => client.createUser(user)))
-    .then(() => client.getUsersByIds({ userIds: [alice.id, carol.id] })) // FIXME userIds -> ids
+    .then(() => client.getUsersByIds({ userIds: [alice.id, carol.id] }))
     .then(res => {
       t.is(res.length, 2)
 
-      // FIXME users should be returned in the order they were asked for
       if (res[0].id !== alice.id) {
         resemblesUser(t, res[1], alice)
         resemblesUser(t, res[0], carol)
@@ -273,7 +272,6 @@ test("getRoom", (t, client, end, fail) => {
 })
 
 test("getRooms", (t, client, end, fail) => {
-  // FIXME getUsers should take the same pagination params as the API
   const user = randomUser()
 
   const roomOpts = [
@@ -680,8 +678,6 @@ function resolveAfter(ms: number): Promise<void> {
 }
 
 function resemblesUser(t: any, actual: any, expected: User): void {
-  // FIXME the SDK should do these naming translations
-  // It would be nice if we exported User and Room types
   t.is(actual.id, expected.id)
   t.is(actual.name, expected.name)
   t.is(actual.avatar_url, expected.avatarURL)
@@ -689,8 +685,6 @@ function resemblesUser(t: any, actual: any, expected: User): void {
 }
 
 function resemblesRoom(t: any, actual: any, expected: any): void {
-  // FIXME the SDK should do these naming translations
-  // It would be nice if we exported User and Room types
   if (expected.id) {
     t.is(actual.id, expected.id)
   } else {

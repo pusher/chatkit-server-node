@@ -1,10 +1,11 @@
 import {
-  AuthenticationResponse,
   AuthenticateOptions,
   AuthenticatePayload,
+  AuthenticationResponse,
   BaseClient,
   Instance,
   InstanceOptions,
+  SDKInfo,
   TokenWithExpiry,
 } from 'pusher-platform-node';
 
@@ -192,6 +193,11 @@ export default class Chatkit {
   constructor(options: Options) {
     const { instanceLocator, key, port, host, client } = options;
 
+    const sdkInfo = new SDKInfo({
+      productName: 'chatkit',
+      version: '0.13.0', // TODO extract from package.json
+    });
+
     const apiInstanceOptions = ({
       locator: instanceLocator,
       key,
@@ -200,6 +206,7 @@ export default class Chatkit {
       client,
       serviceName: 'chatkit',
       serviceVersion: 'v2',
+      sdkInfo,
     })
 
     const authorizerInstanceOptions = ({
@@ -210,6 +217,7 @@ export default class Chatkit {
       client,
       serviceName: 'chatkit_authorizer',
       serviceVersion: 'v1',
+      sdkInfo,
     })
 
     this.instanceLocator = instanceLocator;
