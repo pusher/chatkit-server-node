@@ -196,7 +196,7 @@ test("updateRoom", (t, client, end, fail) => {
         .updateRoom({ id: room.id, name: updatedName, isPrivate: true })
         .then(() =>
           client.getRoom({
-            roomId: room.id, // FIXME roomId -> id
+            roomId: room.id,
           }),
         )
         .then(res => {
@@ -226,7 +226,7 @@ test("deleteRoom", (t, client, end, fail) => {
         .deleteRoom({ id: room.id })
         .then(() =>
           client.getRoom({
-            roomId: room.id, // FIXME roomId -> id
+            roomId: room.id,
           }),
         )
         .then(() => fail("expected getRoom to fail"))
@@ -250,7 +250,7 @@ test("getRoom", (t, client, end, fail) => {
     .then(room =>
       client
         .getRoom({
-          roomId: room.id, // FIXME roomId -> id
+          roomId: room.id,
         })
         .then(res => {
           resemblesRoom(t, res, {
@@ -393,7 +393,7 @@ test("addUsersToRoom", (t, client, end, fail) => {
         .addUsersToRoom({ roomId: room.id, userIds: [bob.id] })
         .then(() =>
           client.getRoom({
-            roomId: room.id, // FIXME roomId -> id
+            roomId: room.id,
           }),
         )
         .then(res => {
@@ -425,7 +425,7 @@ test("removeUsersFromRoom", (t, client, end, fail) => {
         .removeUsersFromRoom({ roomId: room.id, userIds: [user.id] })
         .then(() =>
           client.getRoom({
-            roomId: room.id, // FIXME roomId -> id
+            roomId: room.id,
           }),
         )
         .then(res => {
@@ -655,8 +655,8 @@ function deleteResources(client: Client): Promise<void> {
         path: "/resources",
         jwt: client.generateAccessToken({ su: true }).token,
       })
-      // FIXME DELETE /resources happens asynchronously, so pause for a moment
-      // to give it a chance to finish.
+      // DELETE /resources happens asynchronously, so pause for a moment to
+      // give it a chance to finish.
       .then(() => resolveAfter(DELETE_RESOURCES_PAUSE))
   )
 }
