@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "rm -rf lib target && tsc",
-    "test": "yarn test:build && yarn test:run | tap-colorize; rm -r tests/target",
+    "test": "bash -c 'set -o pipefail; yarn test:build && yarn test:run | tap-colorize'",
     "test:build": "tsc -p tests",
     "test:run": "node tests/target/tests/main.js",
     "install-pkg": "if type yarn &> /dev/null; then yarn; else npm i; fi"
