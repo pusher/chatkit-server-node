@@ -16,16 +16,15 @@
   },
   "scripts": {
     "build": "rm -rf lib target && tsc",
-    "test": "yarn test:build && yarn test:run | faucet; rm -r tests/target",
-    "test:raw": "yarn test:build && yarn test:run; rm -r tests/target",
+    "test": "yarn test:build && yarn test:run | tap-colorize; rm -r tests/target",
     "test:build": "tsc -p tests",
     "test:run": "node tests/target/tests/main.js",
     "install-pkg": "if type yarn &> /dev/null; then yarn; else npm i; fi"
   },
   "dependencies": {
-    "faucet": "^0.0.1",
     "jsonwebtoken": "^8.3.0",
-    "pusher-platform-node": "~0.14.1"
+    "pusher-platform-node": "~0.14.1",
+    "tap-colorize": "^1.2.0"
   },
   "devDependencies": {
     "@types/tape": "^4.2.32",
