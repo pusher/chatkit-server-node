@@ -584,6 +584,41 @@ test("deleteMessage", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("setReadCursor & getReadCursor", (t, client, end, fail) => {
+  const user = randomUser()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .setReadCursor({
+          userId: user.id,
+          roomId: room.id,
+          position: 42,
+        })
+        .then(() =>
+          client.getReadCursor({
+            userId: user.id,
+            roomId: room.id,
+          }),
+        )
+        .then(res => {
+          t.is(res.position, 42)
+          t.is(res.room_id, room.id)
+          t.is(res.cursor_type, 0)
+          t.is(res.user_id, user.id)
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
 function test(
   msg: string,
   cb: (

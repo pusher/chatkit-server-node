@@ -107,6 +107,17 @@ export interface GeneralRequestOptions {
   qs?: object;
 }
 
+export interface SetReadCursorOptions {
+  userId: string;
+  roomId: number;
+  position: number;
+}
+
+export interface GetReadCursorOptions {
+  userId: string;
+  roomId: number;
+}
+
 export interface GetRoomMessagesOptions {
   direction?: string;
   initialId?: string;
@@ -186,6 +197,7 @@ const TOKEN_EXPIRY_LEEWAY = 30;
 export default class Chatkit {
   apiInstance: Instance;
   authorizerInstance: Instance;
+  cursorsInstance: Instance;
   instanceLocator: string;
 
   private tokenWithExpiry?: TokenWithExpiryAt;
@@ -198,31 +210,37 @@ export default class Chatkit {
       version: '0.13.0', // TODO extract from package.json
     });
 
-    const apiInstanceOptions = ({
+    const instanceOptions = {
       locator: instanceLocator,
       key,
       port,
       host,
       client,
+      sdkInfo,
+    }
+
+    const apiInstanceOptions = {
+      ...instanceOptions,
       serviceName: 'chatkit',
       serviceVersion: 'v2',
-      sdkInfo,
-    })
+    }
 
-    const authorizerInstanceOptions = ({
-      locator: instanceLocator,
-      key,
-      port,
-      host,
-      client,
+    const authorizerInstanceOptions = {
+      ...instanceOptions,
       serviceName: 'chatkit_authorizer',
       serviceVersion: 'v1',
-      sdkInfo,
-    })
+    }
+
+    const cursorsInstanceOptions = {
+      ...instanceOptions,
+      serviceName: 'chatkit_cursors',
+      serviceVersion: 'v1',
+    }
 
     this.instanceLocator = instanceLocator;
     this.apiInstance = new Instance(apiInstanceOptions);
     this.authorizerInstance = new Instance(authorizerInstanceOptions);
+    this.cursorsInstance = new Instance(cursorsInstanceOptions);
   }
 
   // Token generation
@@ -664,6 +682,25 @@ export default class Chatkit {
     }).then((res) => {
       return JSON.parse(res.body);
     })
+  }
+
+  // Cursors
+
+  setReadCursor(options: SetReadCursorOptions): Promise<void> {
+    return this.cursorsInstance.request({
+      method: 'PUT',
+      path: `/cursors/0/rooms/${options.roomId}/users/${encodeURIComponent(options.userId)}`,
+      body: { position: options.position },
+      jwt: this.getServerToken(),
+    }).then(() => {})
+  }
+
+  getReadCursor(options: GetReadCursorOptions): Promise<any> {
+    return this.cursorsInstance.request({
+      method: 'GET',
+      path: `/cursors/0/rooms/${options.roomId}/users/${encodeURIComponent(options.userId)}`,
+      jwt: this.getServerToken(),
+    }).then(({ body }) => JSON.parse(body))
   }
 
 
