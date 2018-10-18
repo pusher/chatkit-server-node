@@ -70,7 +70,6 @@ test("uptadeUser", (t, client, end, fail) => {
   client
     .createUser(user)
     .then(() => client.updateUser(updates))
-    // FIXME why do we get the user back from a create, but not an update?
     .then(() => client.getUser({ id: user.id }))
     .then(res => {
       resemblesUser(t, res, updates)
@@ -84,7 +83,7 @@ test("deleteUser", (t, client, end, fail) => {
 
   client
     .createUser(user)
-    .then(() => client.deleteUser({ userId: user.id })) // FIXME userId -> id
+    .then(() => client.deleteUser({ userId: user.id }))
     .then(() => {
       client
         .getUser({ id: user.id })
@@ -112,7 +111,6 @@ test("getUser", (t, client, end, fail) => {
 })
 
 test("getUsers", (t, client, end, fail) => {
-  // FIXME getUsers should take the same pagination params as the API
   const alice = randomUser()
   const bob = randomUser()
   const carol = randomUser()
@@ -133,15 +131,14 @@ test("getUsers", (t, client, end, fail) => {
     .catch(fail)
 })
 
-test("getUsersByIds", (t, client, end, fail) => {
-  // FIXME I think this should be getUsersById
+test("getUsersById", (t, client, end, fail) => {
   const alice = randomUser()
   const bob = randomUser()
   const carol = randomUser()
   const dave = randomUser()
 
   Promise.all([alice, bob, carol, dave].map(user => client.createUser(user)))
-    .then(() => client.getUsersByIds({ userIds: [alice.id, carol.id] }))
+    .then(() => client.getUsersById({ userIds: [alice.id, carol.id] }))
     .then(res => {
       t.is(res.length, 2)
 

@@ -170,7 +170,7 @@ export interface CreateUsersOptions {
   users: Array<User>;
 }
 
-export interface GetUsersByIdsOptions {
+export interface GetUsersByIdOptions {
   userIds: Array<string>;
 }
 
@@ -336,7 +336,7 @@ export default class Chatkit {
     })
   }
 
-  getUsersByIds(options: GetUsersByIdsOptions): Promise<any> {
+  getUsersById(options: GetUsersByIdOptions): Promise<any> {
     return this.apiInstance.request({
       method: 'GET',
       path: `/users_by_ids`,
