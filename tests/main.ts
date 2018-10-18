@@ -619,6 +619,110 @@ test("setReadCursor & getReadCursor", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("getReadCursorsForUser", (t, client, end, fail) => {
+  const alice = randomUser()
+  const bob = randomUser()
+
+  Promise.all([alice, bob].map(u => client.createUser(u)))
+    .then(() =>
+      Promise.all(
+        [alice, bob].map(u =>
+          client.createRoom({
+            creatorId: u.id,
+            name: randomString(),
+            userIds: [alice.id, bob.id],
+          }),
+        ),
+      ),
+    )
+    .then(([room1, room2]) =>
+      Promise.all([
+        client.setReadCursor({
+          userId: alice.id,
+          roomId: room1.id,
+          position: 111,
+        }),
+        client.setReadCursor({
+          userId: alice.id,
+          roomId: room2.id,
+          position: 222,
+        }),
+        client.setReadCursor({
+          userId: bob.id,
+          roomId: room1.id,
+          position: 333,
+        }),
+        client.setReadCursor({
+          userId: bob.id,
+          roomId: room2.id,
+          position: 444,
+        }),
+      ])
+        .then(() =>
+          client.getReadCursorsForUser({
+            userId: alice.id,
+          }),
+        )
+        .then(res => {
+          t.deepEqual(res.map((c: any) => c.position).sort(), [111, 222])
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
+test("getReadCursorsForRoom", (t, client, end, fail) => {
+  const alice = randomUser()
+  const bob = randomUser()
+
+  Promise.all([alice, bob].map(u => client.createUser(u)))
+    .then(() =>
+      Promise.all(
+        [alice, bob].map(u =>
+          client.createRoom({
+            creatorId: u.id,
+            name: randomString(),
+            userIds: [alice.id, bob.id],
+          }),
+        ),
+      ),
+    )
+    .then(([room1, room2]) =>
+      Promise.all([
+        client.setReadCursor({
+          userId: alice.id,
+          roomId: room1.id,
+          position: 111,
+        }),
+        client.setReadCursor({
+          userId: alice.id,
+          roomId: room2.id,
+          position: 222,
+        }),
+        client.setReadCursor({
+          userId: bob.id,
+          roomId: room1.id,
+          position: 333,
+        }),
+        client.setReadCursor({
+          userId: bob.id,
+          roomId: room2.id,
+          position: 444,
+        }),
+      ])
+        .then(() =>
+          client.getReadCursorsForRoom({
+            roomId: room1.id,
+          }),
+        )
+        .then(res => {
+          t.deepEqual(res.map((c: any) => c.position).sort(), [111, 333])
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
 function test(
   msg: string,
   cb: (

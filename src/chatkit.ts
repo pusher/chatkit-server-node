@@ -118,6 +118,14 @@ export interface GetReadCursorOptions {
   roomId: number;
 }
 
+export interface GetReadCursorsForUserOptions {
+  userId: string;
+}
+
+export interface GetReadCursorsForRoomOptions {
+  roomId: string;
+}
+
 export interface GetRoomMessagesOptions {
   direction?: string;
   initialId?: string;
@@ -703,6 +711,21 @@ export default class Chatkit {
     }).then(({ body }) => JSON.parse(body))
   }
 
+  getReadCursorsForUser(options: GetReadCursorsForUserOptions): Promise<any> {
+    return this.cursorsInstance.request({
+      method: 'GET',
+      path: `/cursors/0/users/${encodeURIComponent(options.userId)}`,
+      jwt: this.getServerToken(),
+    }).then(({ body }) => JSON.parse(body))
+  }
+
+  getReadCursorsForRoom(options: GetReadCursorsForRoomOptions): Promise<any> {
+    return this.cursorsInstance.request({
+      method: 'GET',
+      path: `/cursors/0/rooms/${options.roomId}`,
+      jwt: this.getServerToken(),
+    }).then(({ body }) => JSON.parse(body))
+  }
 
   // General requests
 
