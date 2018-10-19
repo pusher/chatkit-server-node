@@ -241,13 +241,13 @@ export default class Chatkit {
     const authorizerInstanceOptions = {
       ...instanceOptions,
       serviceName: 'chatkit_authorizer',
-      serviceVersion: 'v1',
+      serviceVersion: 'v2',
     }
 
     const cursorsInstanceOptions = {
       ...instanceOptions,
       serviceName: 'chatkit_cursors',
-      serviceVersion: 'v1',
+      serviceVersion: 'v2',
     }
 
     this.instanceLocator = instanceLocator;
