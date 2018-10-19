@@ -1,14 +1,16 @@
 import {
-  AuthenticationResponse,
   AuthenticateOptions,
   AuthenticatePayload,
+  AuthenticationResponse,
   BaseClient,
   Instance,
   InstanceOptions,
+  SDKInfo,
   TokenWithExpiry,
 } from 'pusher-platform-node';
 
 import { getCurrentTimeInSeconds } from './utils';
+import packageJSON from '../package.json';
 
 export interface AuthenticationOptions {
   userId: string;
@@ -19,16 +21,33 @@ export interface UserIdOptions {
   userId: string;
 }
 
-export interface GetRoomOptions extends UserIdOptions {
+export interface GetRoomOptions {
   roomId: number;
+}
+
+export interface SendMessageOptions extends UserIdOptions {
+  roomId: number;
+  text: string;
+}
+
+export interface DeleteMessageOptions {
+  id: string;
 }
 
 export interface DeleteUserOptions extends UserIdOptions {}
 export interface GetUserRoomOptions extends UserIdOptions {}
-export interface GetRoomsOptions extends UserIdOptions {}
 export interface GetUserJoinableRoomOptions extends UserIdOptions {}
 export interface GetUserRolesOptions extends UserIdOptions {}
 export interface RemoveGlobalRoleForUserOptions extends UserIdOptions {}
+
+export interface GetRoomsOptions {
+  fromId?: number;
+  includePrivate?: boolean
+}
+
+export interface GetUserOptions {
+  id: string;
+}
 
 export interface RemoveRoomRoleForUserOptions extends UserIdOptions {
   roomId: number;
@@ -93,7 +112,26 @@ export interface GeneralRequestOptions {
   qs?: object;
 }
 
-export interface GetRoomMessagesOptions extends UserIdOptions {
+export interface SetReadCursorOptions {
+  userId: string;
+  roomId: number;
+  position: number;
+}
+
+export interface GetReadCursorOptions {
+  userId: string;
+  roomId: number;
+}
+
+export interface GetReadCursorsForUserOptions {
+  userId: string;
+}
+
+  export interface GetReadCursorsForRoomOptions {
+  roomId: string;
+}
+
+export interface GetRoomMessagesOptions {
   direction?: string;
   initialId?: string;
   limit?: number;
@@ -127,6 +165,26 @@ export interface CreateRoomOptions {
   userIds?: Array<string>;
 }
 
+export interface UpdateRoomOptions {
+  id: number;
+  name?: string;
+  isPrivate?: boolean;
+}
+
+export interface DeleteRoomOptions {
+  id: number;
+}
+
+export interface AddUsersToRoomOptions {
+  roomId: number;
+  userIds: Array<string>;
+}
+
+export interface RemoveUsersFromRoomOptions {
+  roomId: number;
+  userIds: Array<string>;
+}
+
 export interface UpdateRolePermissionsOptions {
   add_permissions?: Array<string>;
   remove_permissions?: Array<string>;
@@ -136,7 +194,7 @@ export interface CreateUsersOptions {
   users: Array<User>;
 }
 
-export interface GetUsersByIdsOptions {
+export interface GetUsersByIdOptions {
   userIds: Array<string>;
 }
 
@@ -152,6 +210,7 @@ const TOKEN_EXPIRY_LEEWAY = 30;
 export default class Chatkit {
   apiInstance: Instance;
   authorizerInstance: Instance;
+  cursorsInstance: Instance;
   instanceLocator: string;
 
   private tokenWithExpiry?: TokenWithExpiryAt;
@@ -159,29 +218,42 @@ export default class Chatkit {
   constructor(options: Options) {
     const { instanceLocator, key, port, host, client } = options;
 
-    const apiInstanceOptions = ({
+    const sdkInfo = new SDKInfo({
+      productName: 'chatkit',
+      version: packageJSON.version,
+    });
+
+    const instanceOptions = {
       locator: instanceLocator,
       key,
       port,
       host,
       client,
+      sdkInfo,
+    }
+
+    const apiInstanceOptions = {
+      ...instanceOptions,
       serviceName: 'chatkit',
       serviceVersion: 'v2',
-    })
+    }
 
-    const authorizerInstanceOptions = ({
-      locator: instanceLocator,
-      key,
-      port,
-      host,
-      client,
+    const authorizerInstanceOptions = {
+      ...instanceOptions,
       serviceName: 'chatkit_authorizer',
       serviceVersion: 'v1',
-    })
+    }
+
+    const cursorsInstanceOptions = {
+      ...instanceOptions,
+      serviceName: 'chatkit_cursors',
+      serviceVersion: 'v1',
+    }
 
     this.instanceLocator = instanceLocator;
     this.apiInstance = new Instance(apiInstanceOptions);
     this.authorizerInstance = new Instance(authorizerInstanceOptions);
+    this.cursorsInstance = new Instance(cursorsInstanceOptions);
   }
 
   // Token generation
@@ -277,6 +349,14 @@ export default class Chatkit {
     }).then(() => {})
   }
 
+  getUser(options: GetUserOptions): Promise<any> {
+    return this.apiInstance.request({
+      method: 'GET',
+      path: `/users/${encodeURIComponent(options.id)}`,
+      jwt: this.getServerToken(),
+    }).then(({ body }) => JSON.parse(body))
+  }
+
   getUsers(): Promise<any> {
     return this.apiInstance.request({
       method: 'GET',
@@ -287,7 +367,7 @@ export default class Chatkit {
     })
   }
 
-  getUsersByIds(options: GetUsersByIdsOptions): Promise<any> {
+  getUsersById(options: GetUsersByIdOptions): Promise<any> {
     return this.apiInstance.request({
       method: 'GET',
       path: `/users_by_ids`,
@@ -306,7 +386,6 @@ export default class Chatkit {
   getRoom(options: GetRoomOptions): Promise<any> {
     const jwt = this.generateAccessToken({
       su: true,
-      userId: options.userId,
     });
 
     return this.apiInstance.request({
@@ -318,10 +397,29 @@ export default class Chatkit {
     })
   }
 
+  sendMessage(options: SendMessageOptions): Promise<any> {
+    return this.apiInstance.request({
+      method: 'POST',
+      path: `/rooms/${options.roomId}/messages`,
+      jwt: this.generateAccessToken({
+        su: true,
+        userId: options.userId,
+      }).token,
+      body: { text: options.text },
+    }).then(({ body }) => JSON.parse(body))
+  }
+
+  deleteMessage(options: DeleteMessageOptions): Promise<void> {
+    return this.apiInstance.request({
+      method: 'DELETE',
+      path: `/messages/${options.id}`,
+      jwt: this.getServerToken(),
+    }).then(() => {})
+  }
+
   getRoomMessages(options: GetRoomMessagesOptions): Promise<any> {
     const jwt = this.generateAccessToken({
       su: true,
-      userId: options.userId,
     });
 
     const { initialId, ...optionsMinusInitialId } = options;
@@ -338,16 +436,15 @@ export default class Chatkit {
     })
   }
 
-  getRooms(options: GetRoomsOptions): Promise<any> {
-    const jwt = this.generateAccessToken({
-      su: true,
-      userId: options.userId,
-    });
-
+  getRooms(options: GetRoomsOptions = {}): Promise<any> {
     return this.apiInstance.request({
       method: 'GET',
       path: `/rooms`,
-      jwt: jwt.token,
+      jwt: this.getServerToken(),
+      qs: {
+        from_id: options.fromId,
+        include_private: options.includePrivate,
+      }
     }).then((res) => {
       return JSON.parse(res.body);
     })
@@ -410,6 +507,49 @@ export default class Chatkit {
       return JSON.parse(res.body);
     })
   }
+
+  updateRoom(options: UpdateRoomOptions): Promise<void> {
+    const body: any = {}
+    if (options.name) {
+      body.name = options.name
+    }
+    if (options.isPrivate) {
+      body.private = options.isPrivate
+    }
+    return this.apiInstance.request({
+      method: 'PUT',
+      path: `/rooms/${options.id}`,
+      jwt: this.getServerToken(),
+      body,
+    }).then(() => {})
+  }
+
+  deleteRoom(options: DeleteRoomOptions): Promise<void> {
+    return this.apiInstance.request({
+      method: 'DELETE',
+      path: `/rooms/${options.id}`,
+      jwt: this.getServerToken(),
+    }).then(() => {})
+  }
+
+  addUsersToRoom(options: AddUsersToRoomOptions): Promise<void> {
+    return this.apiInstance.request({
+      method: 'PUT',
+      path: `/rooms/${options.roomId}/users/add`,
+      jwt: this.getServerToken(),
+      body: { user_ids: options.userIds },
+    }).then(() => {})
+  }
+
+  removeUsersFromRoom(options: RemoveUsersFromRoomOptions): Promise<void> {
+    return this.apiInstance.request({
+      method: 'PUT',
+      path: `/rooms/${options.roomId}/users/remove`,
+      jwt: this.getServerToken(),
+      body: { user_ids: options.userIds },
+    }).then(() => {})
+  }
+
 
   // Authorizer interactions
 
@@ -556,6 +696,40 @@ export default class Chatkit {
     })
   }
 
+  // Cursors
+
+  setReadCursor(options: SetReadCursorOptions): Promise<void> {
+    return this.cursorsInstance.request({
+      method: 'PUT',
+      path: `/cursors/0/rooms/${options.roomId}/users/${encodeURIComponent(options.userId)}`,
+      body: { position: options.position },
+      jwt: this.getServerToken(),
+    }).then(() => {})
+  }
+
+  getReadCursor(options: GetReadCursorOptions): Promise<any> {
+    return this.cursorsInstance.request({
+      method: 'GET',
+      path: `/cursors/0/rooms/${options.roomId}/users/${encodeURIComponent(options.userId)}`,
+      jwt: this.getServerToken(),
+    }).then(({ body }) => JSON.parse(body))
+  }
+
+  getReadCursorsForUser(options: GetReadCursorsForUserOptions): Promise<any> {
+    return this.cursorsInstance.request({
+      method: 'GET',
+      path: `/cursors/0/users/${encodeURIComponent(options.userId)}`,
+      jwt: this.getServerToken(),
+    }).then(({ body }) => JSON.parse(body))
+  }
+
+  getReadCursorsForRoom(options: GetReadCursorsForRoomOptions): Promise<any> {
+    return this.cursorsInstance.request({
+      method: 'GET',
+      path: `/cursors/0/rooms/${options.roomId}`,
+      jwt: this.getServerToken(),
+    }).then(({ body }) => JSON.parse(body))
+  }
 
   // General requests
 
@@ -566,9 +740,12 @@ export default class Chatkit {
 
   authorizerRequest(options: GeneralRequestOptions): Promise<any> {
     options.jwt = options.jwt || this.getServerToken();
-    return this.authorizerInstance.request(options).then((res) => {
-      return JSON.parse(res.body);
-    });
+    return this.authorizerInstance.request(options);
+  }
+
+  cursorsRequest(options: GeneralRequestOptions): Promise<any> {
+    options.jwt = options.jwt || this.getServerToken();
+    return this.cursorsInstance.request(options);
   }
 
   private updatePermissionsForRole(

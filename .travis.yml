@@ -1,7 +1,3 @@
-language: nodejs
-
-before_script:
-  - yarn
-
-script:
-  - yarn build
+language: node_js
+node_js:
+  - "node"

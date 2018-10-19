@@ -15,7 +15,7 @@ const chatkit = new Chatkit.default({
   key: 'your:key'
 });
 
-chatkit.getUsersByIds({
+chatkit.getUsersById({
   userIds: ['ham']
 })
   .then((res) => {
