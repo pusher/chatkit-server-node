@@ -296,7 +296,7 @@ test("getRooms", (t, client, end, fail) => {
           client.createRoom({ creatorId: user.id, name, isPrivate: true }),
         ),
       ).then(rooms => {
-        const roomIds = rooms.map(r => r.id).sort(compareNumbers)
+        const roomIds = rooms.map(r => r.id).sort()
         return client
           .getRooms()
           .then(res => {
@@ -304,7 +304,7 @@ test("getRooms", (t, client, end, fail) => {
           })
           .then(() => client.getRooms({ includePrivate: true }))
           .then(res => {
-            t.deepEqual(res.map((r: any) => r.id).sort(compareNumbers), roomIds)
+            t.deepEqual(res.map((r: any) => r.id).sort(), roomIds)
             end()
           })
       }),
@@ -851,10 +851,6 @@ function randomString(): string {
 
 function compareBy(key: string) {
   return (x: any, y: any) => (x[key] > y[key] ? 1 : x[key] < y[key] ? -1 : 0)
-}
-
-function compareNumbers(x: number, y: number): number {
-  return x > y ? 1 : x < y ? -1 : 0
 }
 
 type User = {
