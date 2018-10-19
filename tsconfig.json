@@ -3,7 +3,9 @@
     "target": "ES6",
     "sourceMap": true,
     "module": "commonjs",
-    "declaration": true ,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "declaration": true,
     "outDir": "target",
     "strict": true
   },

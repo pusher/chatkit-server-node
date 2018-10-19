@@ -10,6 +10,7 @@ import {
 } from 'pusher-platform-node';
 
 import { getCurrentTimeInSeconds } from './utils';
+import packageJSON from '../package.json';
 
 export interface AuthenticationOptions {
   userId: string;
@@ -219,7 +220,7 @@ export default class Chatkit {
 
     const sdkInfo = new SDKInfo({
       productName: 'chatkit',
-      version: '0.13.0', // TODO extract from package.json
+      version: packageJSON.version,
     });
 
     const instanceOptions = {

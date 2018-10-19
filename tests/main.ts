@@ -1,6 +1,6 @@
 // @format
 
-import * as tape from "tape"
+import tape from "tape"
 
 import {
   default as Client,
