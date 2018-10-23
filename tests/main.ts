@@ -824,7 +824,7 @@ function resemblesRoom(t: any, actual: any, expected: any): void {
   if (expected.id) {
     t.is(actual.id, expected.id)
   } else {
-    t.is(typeof actual.id, "number")
+    t.is(typeof actual.id, "string")
   }
   t.is(actual.created_by_id, expected.creatorId)
   t.is(actual.name, expected.name)
