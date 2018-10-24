@@ -22,11 +22,11 @@ export interface UserIdOptions {
 }
 
 export interface GetRoomOptions {
-  roomId: number;
+  roomId: string;
 }
 
 export interface SendMessageOptions extends UserIdOptions {
-  roomId: number;
+  roomId: string;
   text: string;
 }
 
@@ -41,7 +41,7 @@ export interface GetUserRolesOptions extends UserIdOptions {}
 export interface RemoveGlobalRoleForUserOptions extends UserIdOptions {}
 
 export interface GetRoomsOptions {
-  fromId?: number;
+  fromId?: string;
   includePrivate?: boolean
 }
 
@@ -50,7 +50,7 @@ export interface GetUserOptions {
 }
 
 export interface RemoveRoomRoleForUserOptions extends UserIdOptions {
-  roomId: number;
+  roomId: string;
 }
 
 export interface BasicAssignRoleToUserOptions {
@@ -61,11 +61,11 @@ export interface BasicAssignRoleToUserOptions {
 export interface AssignGlobalRoleToUserOptions extends BasicAssignRoleToUserOptions {}
 
 export interface AssignRoleToUserOptions extends BasicAssignRoleToUserOptions {
-  roomId?: number;
+  roomId?: string;
 }
 
 export interface AssignRoomRoleToUserOptions extends BasicAssignRoleToUserOptions {
-  roomId: number;
+  roomId: string;
 }
 
 export interface DeleteRoleOptions {
@@ -114,13 +114,13 @@ export interface GeneralRequestOptions {
 
 export interface SetReadCursorOptions {
   userId: string;
-  roomId: number;
+  roomId: string;
   position: number;
 }
 
 export interface GetReadCursorOptions {
   userId: string;
-  roomId: number;
+  roomId: string;
 }
 
 export interface GetReadCursorsForUserOptions {
@@ -135,7 +135,7 @@ export interface GetRoomMessagesOptions {
   direction?: string;
   initialId?: string;
   limit?: number;
-  roomId: number;
+  roomId: string;
 }
 
 export interface GetRoomMessagesOptionsPayload {
@@ -166,22 +166,22 @@ export interface CreateRoomOptions {
 }
 
 export interface UpdateRoomOptions {
-  id: number;
+  id: string;
   name?: string;
   isPrivate?: boolean;
 }
 
 export interface DeleteRoomOptions {
-  id: number;
+  id: string;
 }
 
 export interface AddUsersToRoomOptions {
-  roomId: number;
+  roomId: string;
   userIds: Array<string>;
 }
 
 export interface RemoveUsersFromRoomOptions {
-  roomId: number;
+  roomId: string;
   userIds: Array<string>;
 }
 
@@ -241,13 +241,13 @@ export default class Chatkit {
     const authorizerInstanceOptions = {
       ...instanceOptions,
       serviceName: 'chatkit_authorizer',
-      serviceVersion: 'v1',
+      serviceVersion: 'v2',
     }
 
     const cursorsInstanceOptions = {
       ...instanceOptions,
       serviceName: 'chatkit_cursors',
-      serviceVersion: 'v1',
+      serviceVersion: 'v2',
     }
 
     this.instanceLocator = instanceLocator;
@@ -390,7 +390,7 @@ export default class Chatkit {
 
     return this.apiInstance.request({
       method: 'GET',
-      path: `/rooms/${options.roomId}`,
+      path: `/rooms/${encodeURIComponent(options.roomId)}`,
       jwt: jwt.token,
     }).then((res) => {
       return JSON.parse(res.body);
@@ -400,7 +400,7 @@ export default class Chatkit {
   sendMessage(options: SendMessageOptions): Promise<any> {
     return this.apiInstance.request({
       method: 'POST',
-      path: `/rooms/${options.roomId}/messages`,
+      path: `/rooms/${encodeURIComponent(options.roomId)}/messages`,
       jwt: this.generateAccessToken({
         su: true,
         userId: options.userId,
@@ -428,7 +428,7 @@ export default class Chatkit {
 
     return this.apiInstance.request({
       method: 'GET',
-      path: `/rooms/${options.roomId}/messages`,
+      path: `/rooms/${encodeURIComponent(options.roomId)}/messages`,
       jwt: jwt.token,
       qs: qs,
     }).then((res) => {
@@ -535,7 +535,7 @@ export default class Chatkit {
   addUsersToRoom(options: AddUsersToRoomOptions): Promise<void> {
     return this.apiInstance.request({
       method: 'PUT',
-      path: `/rooms/${options.roomId}/users/add`,
+      path: `/rooms/${encodeURIComponent(options.roomId)}/users/add`,
       jwt: this.getServerToken(),
       body: { user_ids: options.userIds },
     }).then(() => {})
@@ -544,7 +544,7 @@ export default class Chatkit {
   removeUsersFromRoom(options: RemoveUsersFromRoomOptions): Promise<void> {
     return this.apiInstance.request({
       method: 'PUT',
-      path: `/rooms/${options.roomId}/users/remove`,
+      path: `/rooms/${encodeURIComponent(options.roomId)}/users/remove`,
       jwt: this.getServerToken(),
       body: { user_ids: options.userIds },
     }).then(() => {})
@@ -701,7 +701,7 @@ export default class Chatkit {
   setReadCursor(options: SetReadCursorOptions): Promise<void> {
     return this.cursorsInstance.request({
       method: 'PUT',
-      path: `/cursors/0/rooms/${options.roomId}/users/${encodeURIComponent(options.userId)}`,
+      path: `/cursors/0/rooms/${encodeURIComponent(options.roomId)}/users/${encodeURIComponent(options.userId)}`,
       body: { position: options.position },
       jwt: this.getServerToken(),
     }).then(() => {})
@@ -710,7 +710,7 @@ export default class Chatkit {
   getReadCursor(options: GetReadCursorOptions): Promise<any> {
     return this.cursorsInstance.request({
       method: 'GET',
-      path: `/cursors/0/rooms/${options.roomId}/users/${encodeURIComponent(options.userId)}`,
+      path: `/cursors/0/rooms/${encodeURIComponent(options.roomId)}/users/${encodeURIComponent(options.userId)}`,
       jwt: this.getServerToken(),
     }).then(({ body }) => JSON.parse(body))
   }
@@ -726,7 +726,7 @@ export default class Chatkit {
   getReadCursorsForRoom(options: GetReadCursorsForRoomOptions): Promise<any> {
     return this.cursorsInstance.request({
       method: 'GET',
-      path: `/cursors/0/rooms/${options.roomId}`,
+      path: `/cursors/0/rooms/${encodeURIComponent(options.roomId)}`,
       jwt: this.getServerToken(),
     }).then(({ body }) => JSON.parse(body))
   }
