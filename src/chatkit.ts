@@ -49,6 +49,11 @@ export interface GetUserOptions {
   id: string;
 }
 
+export interface GetUsersOptions {
+  fromTimestamp?: string;
+  limit?: number;
+}
+
 export interface RemoveRoomRoleForUserOptions extends UserIdOptions {
   roomId: string;
 }
@@ -357,10 +362,14 @@ export default class Chatkit {
     }).then(({ body }) => JSON.parse(body))
   }
 
-  getUsers(): Promise<any> {
+  getUsers(options: GetUsersOptions = {}): Promise<any> {
     return this.apiInstance.request({
       method: 'GET',
       path: `/users`,
+      qs: {
+        from_ts: options.fromTimestamp,
+        limit: options.limit,
+      },
       jwt: this.getServerToken(),
     }).then((res) => {
       return JSON.parse(res.body);

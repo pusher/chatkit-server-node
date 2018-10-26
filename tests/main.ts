@@ -125,24 +125,33 @@ test("getUser", (t, client, end, fail) => {
     .catch(fail)
 })
 
-test("getUsers", (t, client, end, fail) => {
-  const alice = randomUser()
-  const bob = randomUser()
-  const carol = randomUser()
-  const dave = randomUser()
+testOnly("getUsers", (t, client, end, fail) => {
+  const pair1 = [randomUser(), randomUser()].sort(compareBy("id"))
+  const pair2 = [randomUser(), randomUser()].sort(compareBy("id"))
 
-  const users = [alice, bob, carol, dave].sort(compareBy("id"))
-
-  Promise.all(users.map(user => client.createUser(user)))
-    .then(() => client.getUsers())
-    .then(res => {
-      t.is(res.length, 4)
-      res.sort(compareBy("id"))
-      for (let i = 0; i < 4; i++) {
-        resemblesUser(t, res[i], users[i])
-      }
-      end()
-    })
+  Promise.all(pair1.map(user => client.createUser(user)))
+    .then(() => resolveAfter(1000))
+    .then(() => Promise.all(pair2.map(user => client.createUser(user))))
+    .then(([{ created_at }]) =>
+      client
+        .getUsers({ limit: 2 })
+        .then(res => {
+          t.is(res.length, 2)
+          res.sort(compareBy("id"))
+          for (let i = 0; i < 2; i++) {
+            resemblesUser(t, res[i], pair1[i])
+          }
+          return client.getUsers({ fromTimestamp: created_at })
+        })
+        .then(res => {
+          t.is(res.length, 2)
+          res.sort(compareBy("id"))
+          for (let i = 0; i < 2; i++) {
+            resemblesUser(t, res[i], pair2[i])
+          }
+          end()
+        }),
+    )
     .catch(fail)
 })
 
