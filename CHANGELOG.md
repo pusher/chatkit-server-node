@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Breaking Changes
 
+- room IDs are now strings
 - `getUsersByIds` is now `getUsersById`
 - `GetUsersByIdsOptions` is now `GetUsersByIdOptions`
 - Every mention of `roleName` is now just `name`
