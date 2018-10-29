@@ -125,7 +125,7 @@ test("getUser", (t, client, end, fail) => {
     .catch(fail)
 })
 
-testOnly("getUsers", (t, client, end, fail) => {
+test("getUsers", (t, client, end, fail) => {
   const pair1 = [randomUser(), randomUser()].sort(compareBy("id"))
   const pair2 = [randomUser(), randomUser()].sort(compareBy("id"))
 
