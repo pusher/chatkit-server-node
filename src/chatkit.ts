@@ -28,6 +28,12 @@ export interface GetRoomOptions {
 export interface SendMessageOptions extends UserIdOptions {
   roomId: string;
   text: string;
+  attachment?: AttachmentOptions;
+}
+
+export interface AttachmentOptions {
+  resourceLink: string;
+  type: string;
 }
 
 export interface DeleteMessageOptions {
@@ -407,6 +413,15 @@ export default class Chatkit {
   }
 
   sendMessage(options: SendMessageOptions): Promise<any> {
+    let messagePayload: any = { text: options.text };
+
+    if (options.attachment) {
+      messagePayload.attachment = {
+        resource_link: options.attachment.resourceLink,
+        type: options.attachment.type,
+      }
+    }
+
     return this.apiInstance.request({
       method: 'POST',
       path: `/rooms/${encodeURIComponent(options.roomId)}/messages`,
@@ -414,7 +429,7 @@ export default class Chatkit {
         su: true,
         userId: options.userId,
       }).token,
-      body: { text: options.text },
+      body: messagePayload,
     }).then(({ body }) => JSON.parse(body))
   }
 
