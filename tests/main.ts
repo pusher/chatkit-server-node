@@ -125,7 +125,7 @@ test("getUser", (t, client, end, fail) => {
     .catch(fail)
 })
 
-testOnly("getUsers", (t, client, end, fail) => {
+test("getUsers", (t, client, end, fail) => {
   const pair1 = [randomUser(), randomUser()].sort(compareBy("id"))
   const pair2 = [randomUser(), randomUser()].sort(compareBy("id"))
 
@@ -495,6 +495,51 @@ test("sendMessage", (t, client, end, fail) => {
               t.is(res[0].user_id, user.id)
               t.is(res[0].room_id, room.id)
               t.is(res[0].text, messageText)
+              end()
+            }),
+        ),
+    )
+    .catch(fail)
+})
+
+test("sendMessage with attachment", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageText = randomString()
+  const attachmentLink = 'https://placekitten.com/200/300'
+  const attachmentType = 'image'
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendMessage({
+          userId: user.id,
+          roomId: room.id,
+          text: messageText,
+          attachment: {
+            resourceLink: attachmentLink,
+            type: attachmentType,
+          }
+        })
+        .then(({ message_id: messageId }) =>
+          client
+            .getRoomMessages({
+              roomId: room.id,
+            })
+            .then(res => {
+              t.is(res.length, 1)
+              t.is(res[0].id, messageId)
+              t.is(res[0].user_id, user.id)
+              t.is(res[0].room_id, room.id)
+              t.is(res[0].text, messageText)
+              t.is(res[0].attachment.resource_link, attachmentLink)
+              t.is(res[0].attachment.type, attachmentType)
               end()
             }),
         ),

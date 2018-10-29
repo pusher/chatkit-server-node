@@ -16,8 +16,8 @@ const chatkit = new Chatkit.default({
 });
 
 chatkit.assignGlobalRoleToUser({
+  name: 'admin'
   userId: 'ham',
-  roleName: 'admin'
 })
   .then(() => {
     console.log('Success');

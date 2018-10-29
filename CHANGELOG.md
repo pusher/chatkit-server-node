@@ -11,12 +11,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - `getUsersByIds` is now `getUsersById`
 - `GetUsersByIdsOptions` is now `GetUsersByIdOptions`
+- Every mention of `roleName` is now just `name`
 
 ### Nonbreaking Changes
 
 - `getRoom`, `getRooms` and `getRoomMessages` no longer require a `userId`
-- `getRooms` now takes `includePrivate` and `fromID` parameters for looking up
-  private rooms and paginating by ID
+- `getRooms` now takes `includePrivate` and `fromID` parameters for looking up private rooms and paginating by ID
 
 ### Additions
 

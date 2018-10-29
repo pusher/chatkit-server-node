@@ -28,6 +28,12 @@ export interface GetRoomOptions {
 export interface SendMessageOptions extends UserIdOptions {
   roomId: string;
   text: string;
+  attachment?: AttachmentOptions;
+}
+
+export interface AttachmentOptions {
+  resourceLink: string;
+  type: string;
 }
 
 export interface DeleteMessageOptions {
@@ -60,7 +66,7 @@ export interface RemoveRoomRoleForUserOptions extends UserIdOptions {
 
 export interface BasicAssignRoleToUserOptions {
   userId: string;
-  roleName: string;
+  name: string;
 }
 
 export interface AssignGlobalRoleToUserOptions extends BasicAssignRoleToUserOptions {}
@@ -87,13 +93,13 @@ export interface CreateScopedRoleOptions extends CreateRoleOptions {
 }
 
 export interface UpdatePermissionsOptions {
-  roleName: string;
+  name: string;
   permissionsToAdd?: Array<string>;
   permissionsToRemove?: Array<string>;
 }
 
 export interface GetPermissionsOptions {
-  roleName: string;
+  name: string;
 }
 
 export interface TokenWithExpiryAt {
@@ -407,6 +413,15 @@ export default class Chatkit {
   }
 
   sendMessage(options: SendMessageOptions): Promise<any> {
+    let messagePayload: any = { text: options.text };
+
+    if (options.attachment) {
+      messagePayload.attachment = {
+        resource_link: options.attachment.resourceLink,
+        type: options.attachment.type,
+      }
+    }
+
     return this.apiInstance.request({
       method: 'POST',
       path: `/rooms/${encodeURIComponent(options.roomId)}/messages`,
@@ -414,7 +429,7 @@ export default class Chatkit {
         su: true,
         userId: options.userId,
       }).token,
-      body: { text: options.text },
+      body: messagePayload,
     }).then(({ body }) => JSON.parse(body))
   }
 
@@ -619,7 +634,7 @@ export default class Chatkit {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: { name: options.roleName, room_id: options.roomId },
+      body: { name: options.name, room_id: options.roomId },
       jwt: this.getServerToken(),
     }).then(() => {})
   }
@@ -660,7 +675,7 @@ export default class Chatkit {
   getPermissionsForGlobalRole(options: GetPermissionsOptions): Promise<any> {
     return this.authorizerInstance.request({
       method: 'GET',
-      path: `/roles/${options.roleName}/scope/global/permissions`,
+      path: `/roles/${options.name}/scope/global/permissions`,
       jwt: this.getServerToken(),
     }).then((res) => {
       return JSON.parse(res.body);
@@ -670,7 +685,7 @@ export default class Chatkit {
   getPermissionsForRoomRole(options: GetPermissionsOptions): Promise<any> {
     return this.authorizerInstance.request({
       method: 'GET',
-      path: `/roles/${options.roleName}/scope/room/permissions`,
+      path: `/roles/${options.name}/scope/room/permissions`,
       jwt: this.getServerToken(),
     }).then((res) => {
       return JSON.parse(res.body);
@@ -679,7 +694,7 @@ export default class Chatkit {
 
   updatePermissionsForGlobalRole(options: UpdatePermissionsOptions): Promise<any> {
     return this.updatePermissionsForRole(
-      options.roleName,
+      options.name,
       'global',
       options.permissionsToAdd || [],
       options.permissionsToRemove || []
@@ -688,7 +703,7 @@ export default class Chatkit {
 
   updatePermissionsForRoomRole(options: UpdatePermissionsOptions): Promise<any> {
     return this.updatePermissionsForRole(
-      options.roleName,
+      options.name,
       'room',
       options.permissionsToAdd || [],
       options.permissionsToRemove || []
@@ -758,7 +773,7 @@ export default class Chatkit {
   }
 
   private updatePermissionsForRole(
-    roleName: string,
+    name: string,
     scope: string,
     permissionsToadd: Array<string> = [],
     permissionsToRemove: Array<string>  = [],
@@ -778,7 +793,7 @@ export default class Chatkit {
 
     return this.authorizerInstance.request({
       method: 'PUT',
-      path: `/roles/${roleName}/scope/${scope}/permissions`,
+      path: `/roles/${name}/scope/${scope}/permissions`,
       headers: {
         'Content-Type': 'application/json'
       },

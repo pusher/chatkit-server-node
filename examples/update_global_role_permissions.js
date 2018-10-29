@@ -16,7 +16,7 @@ const chatkit = new Chatkit.default({
 });
 
 chatkit.updatePermissionsForGlobalRole({
-  roleName: 'default',
+  name: 'default',
   permissionsToAdd: [
     'message:create',
     'room:join',
