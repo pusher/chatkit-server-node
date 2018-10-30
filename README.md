@@ -1,5 +1,9 @@
 # chatkit-server-node
 
+[![Twitter](https://img.shields.io/badge/twitter-@Pusher-blue.svg?style=flat)](http://twitter.com/Pusher)
+[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://github.com/pusher/chatkit-client-js/blob/master/LICENSE.md)
+[![npm version](https://badge.fury.io/js/%40pusher%2Fchatkit-server.svg)](https://badge.fury.io/js/%40pusher%2Fchatkit-server)
+
 The Node.js server SDK for Pusher Chatkit.
 
 ## Installation
