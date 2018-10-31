@@ -4,9 +4,6 @@
 *
 
 # And these are the files that are allowed.
-!/CHANGELOG.md
 !/LICENSE.md
-!/README.md
 !/package.json
-!/src/**/*
 !/target/**/*
