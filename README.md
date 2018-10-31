@@ -25,3 +25,7 @@ $ npm install @pusher/chatkit-server --save
 <strong>src/</strong> - library code</br>
 <strong>examples/</strong> - demonstration app. Also useful for testing during development</br>
 <strong>scripts/</strong> - scripts for tagging, building, test, releasing package
+
+# Publishing
+
+Running `npm publish` will walk you through the publishing steps
