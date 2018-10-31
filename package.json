@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "jsonwebtoken": "^8.3.0",
-    "pusher-platform-node": "~0.14.1"
+    "pusher-platform-node": "^0.15.0"
   },
   "devDependencies": {
     "@types/tape": "^4.2.32",
