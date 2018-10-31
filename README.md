@@ -20,12 +20,6 @@ $ yarn add @pusher/chatkit-server
 $ npm install @pusher/chatkit-server --save
 ```
 
-# Development/Contribution
+## Publishing
 
-<strong>src/</strong> - library code</br>
-<strong>examples/</strong> - demonstration app. Also useful for testing during development</br>
-<strong>scripts/</strong> - scripts for tagging, building, test, releasing package
-
-# Publishing
-
-Running `npm publish` will walk you through the publishing steps
+Running `npm run publish-please` will walk you through the publishing steps.
