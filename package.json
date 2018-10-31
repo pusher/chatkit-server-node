@@ -2,10 +2,10 @@
   "name": "@pusher/chatkit-server",
   "description": "Pusher Chatkit server library",
   "version": "1.0.1",
-  "main": "./target/index.js",
+  "main": "./target/src/index.js",
   "license": "MIT",
   "author": "Pusher",
-  "types": "target/index.d.ts",
+  "types": "target/src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pusher/chatkit-server-node.git"
@@ -16,9 +16,8 @@
   },
   "scripts": {
     "build": "rm -rf lib target && tsc",
-    "test": "bash -c 'set -o pipefail; yarn test:build && yarn test:run | tap-colorize'",
-    "test:build": "tsc -p tests",
-    "test:run": "node tests/target/tests/main.js",
+    "test": "bash -c 'set -o pipefail; yarn build && yarn test:run | tap-colorize'",
+    "test:run": "node target/tests/main.js",
     "install-pkg": "if type yarn &> /dev/null; then yarn; else npm i; fi"
   },
   "dependencies": {
