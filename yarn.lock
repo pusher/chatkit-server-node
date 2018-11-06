@@ -35,9 +35,9 @@
   integrity sha1-fyrX7FX5FEgvybHsS7GuYCjUYGY=
 
 "@types/node@*":
-  version "10.12.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.0.tgz#ea6dcbddbc5b584c83f06c60e82736d8fbb0c235"
-  integrity sha512-3TUHC3jsBAB7qVRGxT6lWyYo2v96BMmD2PTcl47H25Lu7UXtFH/2qqmKiVrnel6Ne//0TFYf6uvNX+HW2FRkLQ==
+  version "10.12.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.2.tgz#d77f9faa027cadad9c912cd47f4f8b07b0fb0864"
+  integrity sha512-53ElVDSnZeFUUFIYzI8WLQ25IhWzb6vbddNp8UHlXQyU0ET2RhV5zg0NfubzU7iNMh5bBXb0htCzfvrSVNgzaQ==
 
 "@types/node@8.0.0":
   version "8.0.0"
@@ -1930,9 +1930,9 @@ psl@^1.1.24:
   integrity sha512-AeUmQ0oLN02flVHXWh9sSJF7mcdFq0ppid/JkErufc3hGIV/AMa8Fo9VgDo/cT2jFdOWoFvHp90qqBH54W+gjQ==
 
 publish-please@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/publish-please/-/publish-please-5.1.1.tgz#c12b62d99b961c65fbeedc5182f90538352aad50"
-  integrity sha512-laTAuRi10Jqh04UPhBhBxCnxDdLKOIT4huYJkJ9cQ2E558IdozNSqnH7TffYXDmOXftQ4W6/Vy3rMhoqLQVCHA==
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/publish-please/-/publish-please-5.2.0.tgz#f948fc513d0ad15729c86a3cd6219c8f93a8e8a8"
+  integrity sha512-Ov8+rBeveKP966MdR6VSiA7Fim/7nfFqOAbaUFI3q7trLtWVBkBFQCWEi56NV/WYR41OvXxDmR+3BYtWwNfWCA==
   dependencies:
     chalk "2.4.1"
     cp-sugar "1.0.0"

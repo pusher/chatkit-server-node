@@ -7,7 +7,7 @@ import {
   InstanceOptions,
   SDKInfo,
   TokenWithExpiry,
-} from 'pusher-platform-node';
+} from '@pusher/platform-node';
 
 import { getCurrentTimeInSeconds } from './utils';
 import packageJSON from '../package.json';

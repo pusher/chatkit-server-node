@@ -5,4 +5,4 @@ export {
   AuthenticatePayload,
   AuthenticationResponse,
   ErrorResponse,
-} from 'pusher-platform-node';
+} from '@pusher/platform-node';
