@@ -1,3 +1,12 @@
 language: node_js
 node_js:
   - "node"
+
+before_script:
+  - yarn
+  - cp tests/config/example.ts tests/config/production.ts
+  - sed -i -e "s|your:instance:locator|$INSTANCE_LOCATOR|g" tests/config/production.ts
+  - sed -i -e "s|your:key|$INSTANCE_KEY|g" tests/config/production.ts
+
+script:
+  - yarn test

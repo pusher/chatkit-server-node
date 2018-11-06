@@ -8,27 +8,20 @@ import {
   ErrorResponse,
 } from "../src/index"
 
+import {
+  INSTANCE_LOCATOR,
+  INSTANCE_KEY,
+} from "./config/production"
+
 const TEST_TIMEOUT = 15 * 1000
 const DELETE_RESOURCES_PAUSE = 0
 
 let instanceLocator: string
 let key: string
 
-if (process.env.INSTANCE_LOCATOR) {
-  instanceLocator = process.env.INSTANCE_LOCATOR
-} else {
-  throw Error("missing config INSTANCE_LOCATOR")
-}
-
-if (process.env.INSTANCE_KEY) {
-  key = process.env.INSTANCE_KEY
-} else {
-  throw Error("missing config INSTANCE_KEY")
-}
-
 let clientConfig = {
-  instanceLocator,
-  key,
+  instanceLocator: INSTANCE_LOCATOR,
+  key: INSTANCE_KEY,
 }
 
 // README
