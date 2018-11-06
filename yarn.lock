@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@pusher/platform-node@^0.15.0":
+"@pusher/platform-node@^0.15.1":
   version "0.15.1"
   resolved "https://registry.yarnpkg.com/@pusher/platform-node/-/platform-node-0.15.1.tgz#19972e4a6c2df3daeff7d3edfed6ce52e732f7ca"
   integrity sha512-FZOx5p/RUiTu4iC1sXQJGJyU8rE7YTPraP9WBQqo8t7a66Ii2eFjRlldw3o/ecPzvZprkQh7/imjZeO9ayutEw==

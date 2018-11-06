@@ -25,8 +25,8 @@
     "prepublishOnly": "publish-please guard"
   },
   "dependencies": {
-    "jsonwebtoken": "^8.3.0",
-    "@pusher/platform-node": "^0.15.0"
+    "@pusher/platform-node": "^0.15.1",
+    "jsonwebtoken": "^8.3.0"
   },
   "devDependencies": {
     "@types/tape": "^4.2.32",
