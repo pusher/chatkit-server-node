@@ -1,7 +1,7 @@
 {
   "name": "@pusher/chatkit-server",
   "description": "Pusher Chatkit server SDK",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "target/src/index.js",
   "license": "MIT",
   "author": "Pusher",
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "jsonwebtoken": "^8.3.0",
-    "pusher-platform-node": "^0.15.0"
+    "@pusher/platform-node": "^0.15.0"
   },
   "devDependencies": {
     "@types/tape": "^4.2.32",

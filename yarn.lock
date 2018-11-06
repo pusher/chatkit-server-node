@@ -2,6 +2,15 @@
 # yarn lockfile v1
 
 
+"@pusher/platform-node@^0.15.0":
+  version "0.15.1"
+  resolved "https://registry.yarnpkg.com/@pusher/platform-node/-/platform-node-0.15.1.tgz#19972e4a6c2df3daeff7d3edfed6ce52e732f7ca"
+  integrity sha512-FZOx5p/RUiTu4iC1sXQJGJyU8rE7YTPraP9WBQqo8t7a66Ii2eFjRlldw3o/ecPzvZprkQh7/imjZeO9ayutEw==
+  dependencies:
+    extend "^2.0.1"
+    jsonwebtoken "^8.3.0"
+    request "^2.88.0"
+
 "@types/detect-indent@0.1.30":
   version "0.1.30"
   resolved "https://registry.yarnpkg.com/@types/detect-indent/-/detect-indent-0.1.30.tgz#dc682bb412b4e65ba098e70edad73b4833fb910d"
@@ -1940,15 +1949,6 @@ punycode@^1.4.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
   integrity sha1-wNWmOycYgArY4esPpSachN1BhF4=
 
-pusher-platform-node@^0.15.0:
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/pusher-platform-node/-/pusher-platform-node-0.15.0.tgz#d012aa52bfe92e5c47feacb07bd17c525fe34e35"
-  integrity sha512-rXipcmN6CbjOqzQY7uZsxVrdwuNwjDhn7Q0HV5dssnVC9ANIInOOdlfF391g2Yb8zYrmpTkdKuthRO0k+XlGnQ==
-  dependencies:
-    extend "^2.0.1"
-    jsonwebtoken "^8.3.0"
-    request "^2.81.0"
-
 qs@~6.5.2:
   version "6.5.2"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
@@ -2034,7 +2034,7 @@ repeating@^2.0.0:
   dependencies:
     is-finite "^1.0.0"
 
-request@^2.81.0:
+request@^2.88.0:
   version "2.88.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.0.tgz#9c2fca4f7d35b592efe57c7f0a55e81052124fef"
   integrity sha512-NAqBSrijGLZdM0WZNsInLJpkJokL72XYjUpnB0iwsRgxh7dB6COrHnTBNwN0E+lHDAJzu7kLAkDeY08z2/A0hg==
