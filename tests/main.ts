@@ -8,10 +8,7 @@ import {
   ErrorResponse,
 } from "../src/index"
 
-import {
-  INSTANCE_LOCATOR,
-  INSTANCE_KEY,
-} from "./config/production"
+import { INSTANCE_LOCATOR, INSTANCE_KEY } from "./config/production"
 
 const TEST_TIMEOUT = 15 * 1000
 const DELETE_RESOURCES_PAUSE = 0
@@ -182,6 +179,7 @@ test("createRoom", (t, client, end, fail) => {
     name: randomString(),
     isPrivate: true,
     userIds: [bob.id, carol.id],
+    customData: { foo: 42 },
   }
 
   Promise.all([alice, bob, carol].map(user => client.createUser(user)))
@@ -192,6 +190,7 @@ test("createRoom", (t, client, end, fail) => {
         name: roomOpts.name,
         isPrivate: true,
         memberIds: [alice.id, bob.id, carol.id],
+        customData: { foo: 42 },
       })
       end()
     })
@@ -210,7 +209,12 @@ test("updateRoom", (t, client, end, fail) => {
     .then(() => client.createRoom(roomOpts))
     .then(room =>
       client
-        .updateRoom({ id: room.id, name: updatedName, isPrivate: true })
+        .updateRoom({
+          id: room.id,
+          name: updatedName,
+          isPrivate: true,
+          customData: { bar: "baz" },
+        })
         .then(() =>
           client.getRoom({
             roomId: room.id,
@@ -223,6 +227,7 @@ test("updateRoom", (t, client, end, fail) => {
             name: updatedName,
             isPrivate: true,
             memberIds: [user.id],
+            customData: { bar: "baz" },
           })
           end()
         }),
@@ -498,8 +503,8 @@ test("sendMessage", (t, client, end, fail) => {
 test("sendMessage with attachment", (t, client, end, fail) => {
   const user = randomUser()
   const messageText = randomString()
-  const attachmentLink = 'https://placekitten.com/200/300'
-  const attachmentType = 'image'
+  const attachmentLink = "https://placekitten.com/200/300"
+  const attachmentType = "image"
 
   client
     .createUser(user)
@@ -518,7 +523,7 @@ test("sendMessage with attachment", (t, client, end, fail) => {
           attachment: {
             resourceLink: attachmentLink,
             type: attachmentType,
-          }
+          },
         })
         .then(({ message_id: messageId }) =>
           client
@@ -878,6 +883,9 @@ function resemblesRoom(t: any, actual: any, expected: any): void {
   t.is(actual.private, !!expected.isPrivate)
   if (expected.memberIds) {
     t.deepEquals(actual.member_user_ids.sort(), expected.memberIds.sort())
+  }
+  if (expected.customData) {
+    t.deepEquals(actual.custom_data, expected.customData)
   }
 }
 

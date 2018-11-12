@@ -174,12 +174,14 @@ export interface CreateRoomOptions {
   name: string;
   isPrivate?: boolean;
   userIds?: Array<string>;
+  customData?: object;
 }
 
 export interface UpdateRoomOptions {
   id: string;
   name?: string;
   isPrivate?: boolean;
+  customData?: object;
 }
 
 export interface DeleteRoomOptions {
@@ -511,7 +513,7 @@ export default class Chatkit {
       userId: options.creatorId,
     });
 
-    const { name, isPrivate, userIds } = options;
+    const { name, isPrivate, userIds, customData } = options;
 
     let roomPayload: any = {
       name,
@@ -520,6 +522,10 @@ export default class Chatkit {
 
     if (userIds && userIds.length !== 0) {
       roomPayload['user_ids'] = userIds;
+    }
+
+    if (customData) {
+      roomPayload.custom_data = customData;
     }
 
     return this.apiInstance.request({
@@ -539,6 +545,9 @@ export default class Chatkit {
     }
     if (options.isPrivate) {
       body.private = options.isPrivate
+    }
+    if (options.customData) {
+      body.custom_data = options.customData
     }
     return this.apiInstance.request({
       method: 'PUT',
