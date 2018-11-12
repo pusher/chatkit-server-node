@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/pusher/chatkit-server-node/compare/1.0.3...HEAD)
 
+## [1.0.4](https://github.com/pusher/chatkit-server-node/compare/1.0.3...1.0.4)
+
 - `CreateRoom` and `UpdateRoom` both now support the `customData` option.
 
 ## [1.0.3](https://github.com/pusher/chatkit-server-node/compare/1.0.2...1.0.3) - 2018-11-06
