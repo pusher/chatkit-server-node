@@ -1,4 +1,4 @@
-var Chatkit = require('../target/index');
+var Chatkit = require('../target/src/index');
 
 // var PusherPlatform = require('../node_modules/pusher-platform-node/target/index');
 

@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-var chatkitServer = require('../target/index');
+var chatkitServer = require('../target/src/index');
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 
