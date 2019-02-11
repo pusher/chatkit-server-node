@@ -251,10 +251,14 @@ test("deleteRoom", (t, client, end, fail) => {
             roomId: room.id,
           }),
         )
-        .then(() => fail("expected getRoom to fail"))
-        .catch(err => {
-          t.is(err.status, 404)
-          t.is(err.error, "services/chatkit/not_found/room_not_found")
+        .then(res => {
+          resemblesRoom(t, res, {
+            id: room.id,
+            creatorId: user.id,
+            name: roomOpts.name,
+            memberIds: [],
+          })
+          t.ok(res.deleted_at)
           end()
         }),
     )
