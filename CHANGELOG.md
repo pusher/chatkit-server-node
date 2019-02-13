@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/pusher/chatkit-server-node/compare/1.0.5...HEAD)
 
+## [1.0.6](https://github.com/pusher/chatkit-server-node/compare/1.0.5...1.0.6)
+
+- Keep HTTP connections alive.
+
 ## [1.0.5](https://github.com/pusher/chatkit-server-node/compare/1.0.4...1.0.5)
 
 - Upgrade dependencies to avoid vulnerabilities
