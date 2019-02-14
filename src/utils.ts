@@ -1,1 +1,2 @@
-export const getCurrentTimeInSeconds = (): number => Math.floor(Date.now() / 1000);
+export const getCurrentTimeInSeconds = (): number =>
+  Math.floor(Date.now() / 1000)

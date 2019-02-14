@@ -1,5 +1,3 @@
-// @format
-
 import tape from "tape"
 
 import {

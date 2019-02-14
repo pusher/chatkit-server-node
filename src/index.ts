@@ -1,8 +1,8 @@
-export { default as default } from './chatkit';
+export { default } from "./chatkit"
 
 export {
   AuthenticateOptions,
   AuthenticatePayload,
   AuthenticationResponse,
   ErrorResponse,
-} from '@pusher/platform-node';
+} from "@pusher/platform-node"
