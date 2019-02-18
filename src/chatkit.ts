@@ -171,14 +171,20 @@ export interface GetReadCursorsForRoomOptions {
   roomId: string
 }
 
-export interface GetRoomMessagesOptions {
+export type GetRoomMessagesOptions = FetchMultipartMessagesOptions
+
+export interface FetchMultipartMessagesOptions {
   direction?: string
   initialId?: string
   limit?: number
   roomId: string
 }
 
-export interface GetRoomMessagesOptionsPayload {
+interface FetchMessagesOptions extends FetchMultipartMessagesOptions {
+  serverInstance: Instance
+}
+
+interface FetchMessagesPayload {
   initial_id?: string
   direction?: string
   limit?: number
@@ -580,26 +586,38 @@ export default class Chatkit {
   }
 
   getRoomMessages(options: GetRoomMessagesOptions): Promise<any> {
+    return this.fetchMessages({
+      ...options,
+      serverInstance: this.serverInstanceV2,
+    })
+  }
+
+  fetchMultipartMessages(options: FetchMultipartMessagesOptions): Promise<any> {
+    return this.fetchMessages({
+      ...options,
+      serverInstance: this.serverInstanceV3,
+    })
+  }
+
+  private fetchMessages(options: FetchMessagesOptions): Promise<any> {
     const jwt = this.generateAccessToken({
       su: true,
     })
 
     const { initialId, ...optionsMinusInitialId } = options
-    let qs: GetRoomMessagesOptionsPayload = optionsMinusInitialId
+    let qs: FetchMessagesPayload = optionsMinusInitialId
     if (initialId) {
       qs["initial_id"] = initialId
     }
 
-    return this.serverInstanceV2
+    return options.serverInstance
       .request({
         method: "GET",
         path: `/rooms/${encodeURIComponent(options.roomId)}/messages`,
         jwt: jwt.token,
         qs: qs,
       })
-      .then(res => {
-        return JSON.parse(res.body)
-      })
+      .then(res => JSON.parse(res.body))
   }
 
   getRooms(options: GetRoomsOptions = {}): Promise<any> {

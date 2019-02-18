@@ -749,6 +749,83 @@ test("getRoomMessages", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("fetchMultipartMessages", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageTextA = randomString()
+  const messageTextB = randomString()
+  const messageTextC = randomString()
+  const messageTextD = randomString()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendSimpleMessage({
+          userId: user.id,
+          roomId: room.id,
+          text: messageTextA,
+        })
+        .then(() =>
+          client.sendSimpleMessage({
+            userId: user.id,
+            roomId: room.id,
+            text: messageTextB,
+          }),
+        )
+        .then(() =>
+          client.sendSimpleMessage({
+            userId: user.id,
+            roomId: room.id,
+            text: messageTextC,
+          }),
+        )
+        .then(() =>
+          client.sendSimpleMessage({
+            userId: user.id,
+            roomId: room.id,
+            text: messageTextD,
+          }),
+        )
+        .then(() =>
+          client.fetchMultipartMessages({
+            roomId: room.id,
+            limit: 2,
+          }),
+        )
+        .then(res => {
+          t.is(res.length, 2)
+          t.is(res[0].parts.length, 1)
+          t.is(res[0].parts[0].type, "text/plain")
+          t.is(res[0].parts[0].content, messageTextD)
+          t.is(res[1].parts.length, 1)
+          t.is(res[1].parts[0].type, "text/plain")
+          t.is(res[1].parts[0].content, messageTextC)
+
+          return client.fetchMultipartMessages({
+            roomId: room.id,
+            initialId: res[1].id,
+          })
+        })
+        .then(res => {
+          t.is(res.length, 2)
+          t.is(res[0].parts.length, 1)
+          t.is(res[0].parts[0].type, "text/plain")
+          t.is(res[0].parts[0].content, messageTextB)
+          t.is(res[1].parts.length, 1)
+          t.is(res[1].parts[0].type, "text/plain")
+          t.is(res[1].parts[0].content, messageTextA)
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
 test("deleteMessage", (t, client, end, fail) => {
   const user = randomUser()
   const messageText = randomString()
