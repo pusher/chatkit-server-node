@@ -1,3 +1,5 @@
+import { put } from "got"
+
 import {
   AuthenticateOptions,
   AuthenticatePayload,
@@ -34,21 +36,26 @@ export interface SendMessageOptions extends UserIdOptions {
 export interface SendMultipartMessageOptions {
   roomId: string
   userId: string
-  parts: Array<SendMessagePartOptions>
+  parts: Array<NewPart>
 }
 
-export type SendMessagePartOptions =
-  | InlineMessagePartOptions
-  | URLMessagePartOptions
+export type NewPart = NewInlinePart | NewURLPart | NewAttachmentPart
 
-export interface InlineMessagePartOptions {
+export interface NewInlinePart {
   type: string
   content: string
 }
 
-export interface URLMessagePartOptions {
+export interface NewURLPart {
   type: string
   url: string
+}
+
+export interface NewAttachmentPart {
+  type: string
+  file: Buffer
+  name?: string
+  customData?: any
 }
 
 export interface AttachmentOptions {
@@ -164,14 +171,20 @@ export interface GetReadCursorsForRoomOptions {
   roomId: string
 }
 
-export interface GetRoomMessagesOptions {
+export type GetRoomMessagesOptions = FetchMultipartMessagesOptions
+
+export interface FetchMultipartMessagesOptions {
   direction?: string
   initialId?: string
   limit?: number
   roomId: string
 }
 
-export interface GetRoomMessagesOptionsPayload {
+interface FetchMessagesOptions extends FetchMultipartMessagesOptions {
+  serverInstance: Instance
+}
+
+interface FetchMessagesPayload {
   initial_id?: string
   direction?: string
   limit?: number
@@ -498,23 +511,68 @@ export default class Chatkit {
       )
     }
 
+    return Promise.all(
+      options.parts.map(
+        (part: any) =>
+          part.file
+            ? this.uploadAttachment({
+                userId: options.userId,
+                roomId: options.roomId,
+                part,
+              })
+            : part,
+      ),
+    )
+      .then(parts =>
+        this.serverInstanceV3.request({
+          method: "POST",
+          path: `/rooms/${encodeURIComponent(options.roomId)}/messages`,
+          jwt: this.generateAccessToken({
+            su: true,
+            userId: options.userId,
+          }).token,
+          body: { parts },
+        }),
+      )
+      .then(({ body }) => JSON.parse(body))
+  }
+
+  private uploadAttachment({
+    userId,
+    roomId,
+    part: { type, name, customData, file },
+  }: {
+    userId: string
+    roomId: string
+    part: any
+  }): Promise<{ type: string; attachment: { id: string } }> {
     return this.serverInstanceV3
       .request({
         method: "POST",
-        path: `/rooms/${encodeURIComponent(options.roomId)}/messages`,
+        path: `/rooms/${encodeURIComponent(roomId)}/attachments`,
         jwt: this.generateAccessToken({
           su: true,
-          userId: options.userId,
+          userId,
         }).token,
         body: {
-          parts: options.parts.map((p: any) => ({
-            type: p.type,
-            content: p.content,
-            url: p.url,
-          })),
+          content_type: type,
+          content_length: file.length,
+          name,
+          custom_data: customData,
         },
       })
-      .then(({ body }) => JSON.parse(body))
+      .then(({ body }) => {
+        const {
+          attachment_id: attachmentId,
+          upload_url: uploadURL,
+        } = JSON.parse(body)
+        return put(uploadURL, {
+          body: file,
+          headers: {
+            "content-type": type,
+          },
+        }).then(() => ({ type, attachment: { id: attachmentId } }))
+      })
   }
 
   deleteMessage(options: DeleteMessageOptions): Promise<void> {
@@ -528,26 +586,38 @@ export default class Chatkit {
   }
 
   getRoomMessages(options: GetRoomMessagesOptions): Promise<any> {
+    return this.fetchMessages({
+      ...options,
+      serverInstance: this.serverInstanceV2,
+    })
+  }
+
+  fetchMultipartMessages(options: FetchMultipartMessagesOptions): Promise<any> {
+    return this.fetchMessages({
+      ...options,
+      serverInstance: this.serverInstanceV3,
+    })
+  }
+
+  private fetchMessages(options: FetchMessagesOptions): Promise<any> {
     const jwt = this.generateAccessToken({
       su: true,
     })
 
     const { initialId, ...optionsMinusInitialId } = options
-    let qs: GetRoomMessagesOptionsPayload = optionsMinusInitialId
+    let qs: FetchMessagesPayload = optionsMinusInitialId
     if (initialId) {
       qs["initial_id"] = initialId
     }
 
-    return this.serverInstanceV2
+    return options.serverInstance
       .request({
         method: "GET",
         path: `/rooms/${encodeURIComponent(options.roomId)}/messages`,
         jwt: jwt.token,
         qs: qs,
       })
-      .then(res => {
-        return JSON.parse(res.body)
-      })
+      .then(res => JSON.parse(res.body))
   }
 
   getRooms(options: GetRoomsOptions = {}): Promise<any> {
