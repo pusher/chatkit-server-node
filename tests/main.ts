@@ -1,4 +1,5 @@
 import tape from "tape"
+import { get } from "got"
 
 import {
   default as Client,
@@ -502,6 +503,138 @@ test("sendMessage", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("sendSimpleMessage", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageText = randomString()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendSimpleMessage({
+          userId: user.id,
+          roomId: room.id,
+          text: messageText,
+        })
+        .then(({ message_id: messageId }) =>
+          client
+            .getRoomMessages({
+              roomId: room.id,
+            })
+            .then(res => {
+              t.is(res.length, 1)
+              t.is(res[0].id, messageId)
+              t.is(res[0].user_id, user.id)
+              t.is(res[0].room_id, room.id)
+              t.is(res[0].text, messageText)
+              end()
+            }),
+        ),
+    )
+    .catch(fail)
+})
+
+test("sendMultipartMessage (url, v3 to v2)", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageText = randomString()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendMultipartMessage({
+          userId: user.id,
+          roomId: room.id,
+          parts: [
+            { type: "text/plain", content: messageText },
+            { type: "image/kitten", url: "https://placekitten.com/200/300" },
+          ],
+        })
+        .then(({ message_id: messageId }) =>
+          client
+            .getRoomMessages({
+              roomId: room.id,
+            })
+            .then(res => {
+              t.is(res.length, 1)
+              t.is(res[0].id, messageId)
+              t.is(res[0].user_id, user.id)
+              t.is(res[0].room_id, room.id)
+              t.is(res[0].text, messageText)
+              t.is(
+                res[0].attachment.resource_link,
+                "https://placekitten.com/200/300",
+              )
+              t.is(res[0].attachment.type, "image")
+              end()
+            }),
+        ),
+    )
+    .catch(fail)
+})
+
+test("sendMultipartMessage (attachment, v3 to v2)", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageText = randomString()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendMultipartMessage({
+          userId: user.id,
+          roomId: room.id,
+          parts: [
+            { type: "text/plain", content: messageText },
+            {
+              type: "application/json",
+              file: Buffer.from(JSON.stringify({ hello: "world" })),
+              name: "file:///with/slashes and spaces.json",
+              customData: { foo: "bar" },
+            },
+          ],
+        })
+        .then(({ message_id: messageId }) =>
+          client
+            .getRoomMessages({
+              roomId: room.id,
+            })
+            .then(res => {
+              t.is(res.length, 1)
+              t.is(res[0].id, messageId)
+              t.is(res[0].user_id, user.id)
+              t.is(res[0].room_id, room.id)
+              t.is(res[0].text, messageText)
+              t.is(res[0].attachment.type, "file")
+              t.ok(res[0].attachment.resource_link)
+              return get(res[0].attachment.resource_link).then(res => {
+                t.deepEqual(JSON.parse(res.body), { hello: "world" })
+                end()
+              })
+            }),
+        ),
+    )
+    .catch(fail)
+})
+
 test("sendMessage with attachment", (t, client, end, fail) => {
   const user = randomUser()
   const messageText = randomString()
@@ -610,6 +743,83 @@ test("getRoomMessages", (t, client, end, fail) => {
           t.is(res.length, 2)
           t.is(res[0].text, messageTextB)
           t.is(res[1].text, messageTextA)
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
+test("fetchMultipartMessages", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageTextA = randomString()
+  const messageTextB = randomString()
+  const messageTextC = randomString()
+  const messageTextD = randomString()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendSimpleMessage({
+          userId: user.id,
+          roomId: room.id,
+          text: messageTextA,
+        })
+        .then(() =>
+          client.sendSimpleMessage({
+            userId: user.id,
+            roomId: room.id,
+            text: messageTextB,
+          }),
+        )
+        .then(() =>
+          client.sendSimpleMessage({
+            userId: user.id,
+            roomId: room.id,
+            text: messageTextC,
+          }),
+        )
+        .then(() =>
+          client.sendSimpleMessage({
+            userId: user.id,
+            roomId: room.id,
+            text: messageTextD,
+          }),
+        )
+        .then(() =>
+          client.fetchMultipartMessages({
+            roomId: room.id,
+            limit: 2,
+          }),
+        )
+        .then(res => {
+          t.is(res.length, 2)
+          t.is(res[0].parts.length, 1)
+          t.is(res[0].parts[0].type, "text/plain")
+          t.is(res[0].parts[0].content, messageTextD)
+          t.is(res[1].parts.length, 1)
+          t.is(res[1].parts[0].type, "text/plain")
+          t.is(res[1].parts[0].content, messageTextC)
+
+          return client.fetchMultipartMessages({
+            roomId: room.id,
+            initialId: res[1].id,
+          })
+        })
+        .then(res => {
+          t.is(res.length, 2)
+          t.is(res[0].parts.length, 1)
+          t.is(res[0].parts[0].type, "text/plain")
+          t.is(res[0].parts[0].content, messageTextB)
+          t.is(res[1].parts.length, 1)
+          t.is(res[1].parts[0].type, "text/plain")
+          t.is(res[1].parts[0].content, messageTextA)
           end()
         }),
     )
@@ -811,11 +1021,11 @@ function test(
       () =>
         deleteResources(client)
           .then(() => t.end())
-          .catch(err => t.end(JSON.stringify(err))),
+          .catch(err => t.end(err)),
       err =>
         deleteResources(client)
-          .then(() => t.end(JSON.stringify(err)))
-          .catch(() => t.end(JSON.stringify(err))),
+          .then(() => t.end(err))
+          .catch(() => t.end(err)),
     )
   })
 }
@@ -840,11 +1050,11 @@ function testOnly(
       () =>
         deleteResources(client)
           .then(() => t.end())
-          .catch(err => t.end(JSON.stringify(err))),
+          .catch(err => t.end(err)),
       err =>
         deleteResources(client)
-          .then(() => t.end(JSON.stringify(err)))
-          .catch(() => t.end(JSON.stringify(err))),
+          .then(() => t.end(err))
+          .catch(() => t.end(err)),
     )
   })
 }

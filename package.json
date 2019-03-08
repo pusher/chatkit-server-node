@@ -26,6 +26,8 @@
   },
   "dependencies": {
     "@pusher/platform-node": "~0.15.0",
+    "@types/got": "^9.4.0",
+    "got": "^9.6.0",
     "jsonwebtoken": "^8.3.0"
   },
   "devDependencies": {
