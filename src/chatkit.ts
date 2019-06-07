@@ -246,6 +246,14 @@ export interface GetUsersByIdOptions {
   userIds: Array<string>
 }
 
+export interface AsyncDeleteRoomOptions {
+  roomId: string
+}
+
+export interface AsyncDeleteUserOptions {
+  userId: string
+}
+
 export interface User {
   id: string
   name: string
@@ -260,6 +268,7 @@ export default class Chatkit {
   serverInstanceV3: Instance
   authorizerInstance: Instance
   cursorsInstance: Instance
+  schedulerInstance: Instance
   instanceLocator: string
 
   private tokenWithExpiry?: TokenWithExpiryAt
@@ -299,11 +308,18 @@ export default class Chatkit {
       serviceVersion: "v2",
     }
 
+    const schedulerInstanceOptions = {
+      ...instanceOptions,
+      serviceName: "chatkit_scheduler",
+      serviceVersion: "v1",
+    }
+
     this.instanceLocator = instanceLocator
     this.serverInstanceV2 = new Instance(serverInstanceOptions("v2"))
     this.serverInstanceV3 = new Instance(serverInstanceOptions("v3"))
     this.authorizerInstance = new Instance(authorizerInstanceOptions)
     this.cursorsInstance = new Instance(cursorsInstanceOptions)
+    this.schedulerInstance = new Instance(schedulerInstanceOptions)
   }
 
   // Token generation
@@ -975,6 +991,46 @@ export default class Chatkit {
         jwt: this.getServerToken(),
       })
       .then(({ body }) => JSON.parse(body))
+  }
+
+  asyncDeleteRoom(options: AsyncDeleteRoomOptions): Promise<void> {
+    return this.schedulerInstance
+      .request({
+        method: "PUT",
+        path: `/rooms/${encodeURIComponent(options.roomId)}`,
+        jwt: this.getServerToken(),
+      })
+      .then(() => {})
+  }
+
+  getDeleteRoomStatus(options: AsyncDeleteRoomOptions): Promise<any> {
+    return this.schedulerInstance
+      .request({
+        method: "GET",
+        path: `/rooms/${encodeURIComponent(options.roomId)}`,
+        jwt: this.getServerToken(),
+      })
+      .then(res => JSON.parse(res.body))
+  }
+
+  asyncDeleteUser(options: AsyncDeleteUserOptions): Promise<void> {
+    return this.schedulerInstance
+      .request({
+        method: "PUT",
+        path: `/users/${encodeURIComponent(options.userId)}`,
+        jwt: this.getServerToken(),
+      })
+      .then(() => {})
+  }
+
+  getDeleteUserStatus(options: AsyncDeleteUserOptions): Promise<any> {
+    return this.schedulerInstance
+      .request({
+        method: "GET",
+        path: `/users/${encodeURIComponent(options.userId)}`,
+        jwt: this.getServerToken(),
+      })
+      .then(res => JSON.parse(res.body))
   }
 
   // General requests
