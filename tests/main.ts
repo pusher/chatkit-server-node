@@ -243,23 +243,18 @@ test("deleteRoom", (t, client, end, fail) => {
     .createUser(user)
     .then(() => client.createRoom(roomOpts))
     .then(room =>
-      client
-        .deleteRoom({ id: room.id })
-        .then(() =>
-          client.getRoom({
+      client.deleteRoom({ id: room.id }).then(() =>
+        client
+          .getRoom({
             roomId: room.id,
-          }),
-        )
-        .then(res => {
-          resemblesRoom(t, res, {
-            id: room.id,
-            creatorId: user.id,
-            name: roomOpts.name,
-            memberIds: [],
           })
-          t.ok(res.deleted_at)
-          end()
-        }),
+          .then(() => fail("expected getRoom to fail"))
+          .catch(err => {
+            t.is(err.status, 404)
+            t.is(err.error, "services/chatkit/not_found/room_not_found")
+            end()
+          }),
+      ),
     )
     .catch(fail)
 })
