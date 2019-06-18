@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/pusher/chatkit-server-node/compare/1.1.0...HEAD)
 
+## [1.2.0](https://github.com/pusher/chatkit-server-node/compare/1.1.0...1.2.0)
+
 ### Additions
 
 - Async deletion methods. `asyncDeleteUser`, `getDeleteUserStatus`,
-  `asyncDeleteRoom`, `getDeleteRoomStatus`. The `deleteRoom` and `deleteUser` methods should be considered deprecated, and will be removed in a future version.
+  `asyncDeleteRoom`, `getDeleteRoomStatus`. The `deleteRoom` and `deleteUser`
+  methods should be considered deprecated, and will be removed in a future
+  version.
 
 ## [1.1.0](https://github.com/pusher/chatkit-server-node/compare/1.0.6...1.1.0)
 
