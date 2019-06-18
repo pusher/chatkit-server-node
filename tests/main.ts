@@ -997,6 +997,61 @@ test("getReadCursorsForRoom", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("asyncDeleteRoom and getDeleteStatus", (t, client, end, fail) => {
+  const user = randomUser()
+
+  const roomOpts = { creatorId: user.id, name: randomString() }
+
+  client
+    .createUser(user)
+    .then(() => client.createRoom(roomOpts))
+    .then(room =>
+      client
+        .asyncDeleteRoom({ roomId: room.id })
+        .then(({ id: jobId }) =>
+          pollUntil(
+            1000,
+            res => res.status == "completed",
+            () => client.getDeleteStatus({ jobId }),
+          ),
+        )
+        .then(() => client.getRoom({ roomId: room.id }))
+        .then(() => fail("expected 404"))
+        .catch(err => {
+          t.is(err.status, 404)
+          t.is(err.error, "services/chatkit/not_found/room_not_found")
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
+test("asyncDeleteUser and getDeleteStatus", (t, client, end, fail) => {
+  const user = randomUser()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client
+        .asyncDeleteUser({ userId: user.id })
+        .then(({ id: jobId }) =>
+          pollUntil(
+            1000,
+            res => res.status == "completed",
+            () => client.getDeleteStatus({ jobId }),
+          ),
+        )
+        .then(() => client.getUser({ id: user.id }))
+        .then(() => fail("expected 404"))
+        .catch(err => {
+          t.is(err.status, 404)
+          t.is(err.error, "services/chatkit/not_found/user_not_found")
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
 function test(
   msg: string,
   cb: (
@@ -1070,6 +1125,16 @@ function deleteResources(client: Client): Promise<void> {
 
 function resolveAfter(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(() => resolve(), ms))
+}
+
+function pollUntil<T>(
+  ms: number,
+  p: (res: T) => boolean,
+  f: () => Promise<T>,
+): Promise<T> {
+  return f().then(
+    res => (p(res) ? res : resolveAfter(ms).then(() => pollUntil(ms, p, f))),
+  )
 }
 
 function resemblesUser(t: any, actual: any, expected: User): void {
