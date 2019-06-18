@@ -1008,11 +1008,11 @@ test("asyncDeleteRoom and getDeleteStatus", (t, client, end, fail) => {
     .then(room =>
       client
         .asyncDeleteRoom({ roomId: room.id })
-        .then(delete_res =>
+        .then(({ id: jobId }) =>
           pollUntil(
             1000,
             res => res.status == "completed",
-            () => client.getDeleteStatus({ jobId: delete_res.id }),
+            () => client.getDeleteStatus({ jobId }),
           ),
         )
         .then(() => client.getRoom({ roomId: room.id }))
@@ -1034,11 +1034,11 @@ test("asyncDeleteUser and getDeleteStatus", (t, client, end, fail) => {
     .then(() =>
       client
         .asyncDeleteUser({ userId: user.id })
-        .then(delete_res =>
+        .then(({ id: jobId }) =>
           pollUntil(
             1000,
             res => res.status == "completed",
-            () => client.getDeleteStatus({ jobId: delete_res.id }),
+            () => client.getDeleteStatus({ jobId }),
           ),
         )
         .then(() => client.getUser({ id: user.id }))
