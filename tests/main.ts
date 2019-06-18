@@ -997,7 +997,7 @@ test("getReadCursorsForRoom", (t, client, end, fail) => {
     .catch(fail)
 })
 
-test("asyncDeleteRoom and getDeleteRoomStatus", (t, client, end, fail) => {
+test("asyncDeleteRoom and getDeleteStatus", (t, client, end, fail) => {
   const user = randomUser()
 
   const roomOpts = { creatorId: user.id, name: randomString() }
@@ -1008,11 +1008,11 @@ test("asyncDeleteRoom and getDeleteRoomStatus", (t, client, end, fail) => {
     .then(room =>
       client
         .asyncDeleteRoom({ roomId: room.id })
-        .then(() =>
+        .then(delete_res =>
           pollUntil(
             1000,
             res => res.status == "completed",
-            () => client.getDeleteRoomStatus({ roomId: room.id }),
+            () => client.getDeleteStatus({ jobId: delete_res.id }),
           ),
         )
         .then(() => client.getRoom({ roomId: room.id }))
@@ -1026,7 +1026,7 @@ test("asyncDeleteRoom and getDeleteRoomStatus", (t, client, end, fail) => {
     .catch(fail)
 })
 
-test("asyncDeleteUser and getDeleteUserStatus", (t, client, end, fail) => {
+test("asyncDeleteUser and getDeleteStatus", (t, client, end, fail) => {
   const user = randomUser()
 
   client
@@ -1034,11 +1034,11 @@ test("asyncDeleteUser and getDeleteUserStatus", (t, client, end, fail) => {
     .then(() =>
       client
         .asyncDeleteUser({ userId: user.id })
-        .then(() =>
+        .then(delete_res =>
           pollUntil(
             1000,
             res => res.status == "completed",
-            () => client.getDeleteUserStatus({ userId: user.id }),
+            () => client.getDeleteStatus({ jobId: delete_res.id }),
           ),
         )
         .then(() => client.getUser({ id: user.id }))

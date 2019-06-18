@@ -254,6 +254,10 @@ export interface AsyncDeleteUserOptions {
   userId: string
 }
 
+export interface AsyncDeleteJobOptions {
+  jobId: string
+}
+
 export interface User {
   id: string
   name: string
@@ -993,41 +997,31 @@ export default class Chatkit {
       .then(({ body }) => JSON.parse(body))
   }
 
-  asyncDeleteRoom(options: AsyncDeleteRoomOptions): Promise<void> {
+  asyncDeleteRoom(options: AsyncDeleteRoomOptions): Promise<any> {
     return this.schedulerInstance
       .request({
         method: "PUT",
-        path: `/rooms/${encodeURIComponent(options.roomId)}`,
-        jwt: this.getServerToken(),
-      })
-      .then(() => {})
-  }
-
-  getDeleteRoomStatus(options: AsyncDeleteRoomOptions): Promise<any> {
-    return this.schedulerInstance
-      .request({
-        method: "GET",
         path: `/rooms/${encodeURIComponent(options.roomId)}`,
         jwt: this.getServerToken(),
       })
       .then(res => JSON.parse(res.body))
   }
 
-  asyncDeleteUser(options: AsyncDeleteUserOptions): Promise<void> {
+  asyncDeleteUser(options: AsyncDeleteUserOptions): Promise<any> {
     return this.schedulerInstance
       .request({
         method: "PUT",
         path: `/users/${encodeURIComponent(options.userId)}`,
         jwt: this.getServerToken(),
       })
-      .then(() => {})
+      .then(res => JSON.parse(res.body))
   }
 
-  getDeleteUserStatus(options: AsyncDeleteUserOptions): Promise<any> {
+  getDeleteStatus(options: AsyncDeleteJobOptions): Promise<any> {
     return this.schedulerInstance
       .request({
         method: "GET",
-        path: `/users/${encodeURIComponent(options.userId)}`,
+        path: `/status/${encodeURIComponent(options.jobId)}`,
         jwt: this.getServerToken(),
       })
       .then(res => JSON.parse(res.body))
