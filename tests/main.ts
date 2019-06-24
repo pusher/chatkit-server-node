@@ -1052,6 +1052,52 @@ test("asyncDeleteUser and getDeleteStatus", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("unreadCount and lastMessageAt", (t, client, end, fail) => {
+  const user = randomUser()
+  const roomOpts = { creatorId: user.id, name: randomString() }
+
+  client
+    .createUser(user)
+    .then(() => client.createRoom(roomOpts))
+    .then(room =>
+      client
+        .getUserRooms({ userId: user.id })
+        .then(user_rooms => {
+          t.is(user_rooms[0].unread_count, 0)
+        })
+        .then(() =>
+          client
+            .sendSimpleMessage({
+              userId: user.id,
+              roomId: room.id,
+              text: "hello",
+            })
+            .then(({ message_id: messageId }) =>
+              client
+                .getUserRooms({ userId: user.id })
+                .then(user_rooms => {
+                  t.is(user_rooms[0].unread_count, 1)
+		  t.ok(user_rooms[0].last_message_at)
+                })
+                .then(() =>
+                  client.setReadCursor({
+                    userId: user.id,
+                    roomId: room.id,
+                    position: messageId,
+                  }),
+                )
+                .then(() =>
+                  client.getUserRooms({ userId: user.id }).then(user_rooms => {
+                    t.is(user_rooms[0].unread_count, 0)
+		    t.ok(user_rooms[0].last_message_at)
+                    end()
+                  }),
+                ),
+            ),
+        ),
+    )
+})
+
 function test(
   msg: string,
   cb: (
