@@ -269,7 +269,7 @@ const TOKEN_EXPIRY_LEEWAY = 30
 
 export default class Chatkit {
   serverInstanceV2: Instance
-  serverInstanceV3: Instance
+  serverInstance: Instance
   authorizerInstance: Instance
   cursorsInstance: Instance
   schedulerInstance: Instance
@@ -320,7 +320,7 @@ export default class Chatkit {
 
     this.instanceLocator = instanceLocator
     this.serverInstanceV2 = new Instance(serverInstanceOptions("v2"))
-    this.serverInstanceV3 = new Instance(serverInstanceOptions("v3"))
+    this.serverInstance = new Instance(serverInstanceOptions("v4"))
     this.authorizerInstance = new Instance(authorizerInstanceOptions)
     this.cursorsInstance = new Instance(cursorsInstanceOptions)
     this.schedulerInstance = new Instance(schedulerInstanceOptions)
@@ -330,7 +330,7 @@ export default class Chatkit {
 
   authenticate(options: AuthenticationOptions): AuthenticationResponse {
     const { userId, authPayload } = options
-    return this.serverInstanceV3.authenticate(
+    return this.serverInstance.authenticate(
       authPayload || { grant_type: "client_credentials" },
       { userId },
     )
@@ -338,14 +338,14 @@ export default class Chatkit {
 
   // Used internally - not designed to be used externally
   generateAccessToken(options: AuthenticateOptions): TokenWithExpiry {
-    return this.serverInstanceV3.generateAccessToken(options)
+    return this.serverInstance.generateAccessToken(options)
   }
 
   // User interactions
 
   createUser(options: CreateUserOptions): Promise<any> {
     const { id, name } = options
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "POST",
         path: `/users`,
@@ -376,7 +376,7 @@ export default class Chatkit {
       }
     })
 
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "POST",
         path: `/batch_users`,
@@ -410,7 +410,7 @@ export default class Chatkit {
       updatePayload.custom_data = options.customData
     }
 
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "PUT",
         path: `/users/${options.id}`,
@@ -424,7 +424,7 @@ export default class Chatkit {
   }
 
   deleteUser(options: DeleteUserOptions): Promise<void> {
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "DELETE",
         path: `/users/${options.userId}`,
@@ -434,7 +434,7 @@ export default class Chatkit {
   }
 
   getUser(options: GetUserOptions): Promise<any> {
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "GET",
         path: `/users/${encodeURIComponent(options.id)}`,
@@ -444,7 +444,7 @@ export default class Chatkit {
   }
 
   getUsers(options: GetUsersOptions = {}): Promise<any> {
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "GET",
         path: `/users`,
@@ -460,7 +460,7 @@ export default class Chatkit {
   }
 
   getUsersById(options: GetUsersByIdOptions): Promise<any> {
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "GET",
         path: `/users_by_ids`,
@@ -482,7 +482,7 @@ export default class Chatkit {
       su: true,
     })
 
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "GET",
         path: `/rooms/${encodeURIComponent(options.roomId)}`,
@@ -532,19 +532,18 @@ export default class Chatkit {
     }
 
     return Promise.all(
-      options.parts.map(
-        (part: any) =>
-          part.file
-            ? this.uploadAttachment({
-                userId: options.userId,
-                roomId: options.roomId,
-                part,
-              })
-            : part,
+      options.parts.map((part: any) =>
+        part.file
+          ? this.uploadAttachment({
+              userId: options.userId,
+              roomId: options.roomId,
+              part,
+            })
+          : part,
       ),
     )
       .then(parts =>
-        this.serverInstanceV3.request({
+        this.serverInstance.request({
           method: "POST",
           path: `/rooms/${encodeURIComponent(options.roomId)}/messages`,
           jwt: this.generateAccessToken({
@@ -566,7 +565,7 @@ export default class Chatkit {
     roomId: string
     part: any
   }): Promise<{ type: string; attachment: { id: string } }> {
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "POST",
         path: `/rooms/${encodeURIComponent(roomId)}/attachments`,
@@ -596,7 +595,7 @@ export default class Chatkit {
   }
 
   deleteMessage(options: DeleteMessageOptions): Promise<void> {
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "DELETE",
         path: `/messages/${options.id}`,
@@ -615,7 +614,7 @@ export default class Chatkit {
   fetchMultipartMessages(options: FetchMultipartMessagesOptions): Promise<any> {
     return this.fetchMessages({
       ...options,
-      serverInstance: this.serverInstanceV3,
+      serverInstance: this.serverInstance,
     })
   }
 
@@ -641,7 +640,7 @@ export default class Chatkit {
   }
 
   getRooms(options: GetRoomsOptions = {}): Promise<any> {
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "GET",
         path: `/rooms`,
@@ -662,7 +661,7 @@ export default class Chatkit {
       userId: options.userId,
     })
 
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "GET",
         path: `/users/${options.userId}/rooms`,
@@ -679,7 +678,7 @@ export default class Chatkit {
       userId: options.userId,
     })
 
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "GET",
         path: `/users/${options.userId}/rooms`,
@@ -712,7 +711,7 @@ export default class Chatkit {
       roomPayload.custom_data = customData
     }
 
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "POST",
         path: "/rooms",
@@ -735,7 +734,7 @@ export default class Chatkit {
     if (options.customData) {
       body.custom_data = options.customData
     }
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "PUT",
         path: `/rooms/${options.id}`,
@@ -746,7 +745,7 @@ export default class Chatkit {
   }
 
   deleteRoom(options: DeleteRoomOptions): Promise<void> {
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "DELETE",
         path: `/rooms/${options.id}`,
@@ -756,7 +755,7 @@ export default class Chatkit {
   }
 
   addUsersToRoom(options: AddUsersToRoomOptions): Promise<void> {
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "PUT",
         path: `/rooms/${encodeURIComponent(options.roomId)}/users/add`,
@@ -767,7 +766,7 @@ export default class Chatkit {
   }
 
   removeUsersFromRoom(options: RemoveUsersFromRoomOptions): Promise<void> {
-    return this.serverInstanceV3
+    return this.serverInstance
       .request({
         method: "PUT",
         path: `/rooms/${encodeURIComponent(options.roomId)}/users/remove`,
@@ -1031,7 +1030,7 @@ export default class Chatkit {
 
   apiRequest(options: GeneralRequestOptions): Promise<any> {
     options.jwt = options.jwt || this.getServerToken()
-    return this.serverInstanceV3.request(options)
+    return this.serverInstance.request(options)
   }
 
   authorizerRequest(options: GeneralRequestOptions): Promise<any> {
@@ -1091,7 +1090,7 @@ export default class Chatkit {
     }
 
     // Otherwise generate new token and its expiration time
-    const tokenWithExpiresIn = this.serverInstanceV3.generateAccessToken({
+    const tokenWithExpiresIn = this.serverInstance.generateAccessToken({
       su: true,
     })
 
