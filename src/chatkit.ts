@@ -64,7 +64,8 @@ export interface AttachmentOptions {
 }
 
 export interface DeleteMessageOptions {
-  id: string
+  messageId: string
+  roomId: string
 }
 
 export interface DeleteUserOptions extends UserIdOptions {}
@@ -205,6 +206,7 @@ export interface UpdateUserOptions {
 }
 
 export interface CreateRoomOptions {
+  id?: string
   creatorId: string
   name: string
   isPrivate?: boolean
@@ -320,7 +322,7 @@ export default class Chatkit {
 
     this.instanceLocator = instanceLocator
     this.serverInstanceV2 = new Instance(serverInstanceOptions("v2"))
-    this.serverInstance = new Instance(serverInstanceOptions("v4"))
+    this.serverInstance = new Instance(serverInstanceOptions("v6"))
     this.authorizerInstance = new Instance(authorizerInstanceOptions)
     this.cursorsInstance = new Instance(cursorsInstanceOptions)
     this.schedulerInstance = new Instance(schedulerInstanceOptions)
@@ -532,14 +534,15 @@ export default class Chatkit {
     }
 
     return Promise.all(
-      options.parts.map((part: any) =>
-        part.file
-          ? this.uploadAttachment({
-              userId: options.userId,
-              roomId: options.roomId,
-              part,
-            })
-          : part,
+      options.parts.map(
+        (part: any) =>
+          part.file
+            ? this.uploadAttachment({
+                userId: options.userId,
+                roomId: options.roomId,
+                part,
+              })
+            : part,
       ),
     )
       .then(parts =>
@@ -598,7 +601,9 @@ export default class Chatkit {
     return this.serverInstance
       .request({
         method: "DELETE",
-        path: `/messages/${options.id}`,
+        path: `/rooms/${encodeURIComponent(
+          options.roomId,
+        )}/messages/${encodeURIComponent(options.messageId)}`,
         jwt: this.getServerToken(),
       })
       .then(() => {})
@@ -696,11 +701,15 @@ export default class Chatkit {
       userId: options.creatorId,
     })
 
-    const { name, isPrivate, userIds, customData } = options
+    const { id, name, isPrivate, userIds, customData } = options
 
     let roomPayload: any = {
       name,
       private: isPrivate || false,
+    }
+
+    if (id) {
+      roomPayload.id = id
     }
 
     if (userIds && userIds.length !== 0) {
