@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/pusher/chatkit-server-node/compare/1.3.0...HEAD)
 
+### Additions
+
+- Support for user specified room IDs. Provide an `id` parameter to the
+  `createRoom` method.
+
+### Changes
+
+- The `deleteMessage` method now *requires* a room ID parameter, `roomID`, and
+  the `id` parameter has been renamed to `messageId` to avoid ambiguity.
+
 [1.3.0](https://github.com/pusher/chatkit-server-ruby/compare/1.2.0...1.3.0) - 2019-06-24
 
 ### Changed

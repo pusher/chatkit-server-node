@@ -168,7 +168,38 @@ test("getUsersById", (t, client, end, fail) => {
     .catch(fail)
 })
 
-test("createRoom", (t, client, end, fail) => {
+test("createRoom with a provided ID", (t, client, end, fail) => {
+  const alice = randomUser()
+  const bob = randomUser()
+  const carol = randomUser()
+  const id = randomString()
+
+  const roomOpts = {
+    id,
+    creatorId: alice.id,
+    name: randomString(),
+    isPrivate: true,
+    userIds: [bob.id, carol.id],
+    customData: { foo: 42 },
+  }
+
+  Promise.all([alice, bob, carol].map(user => client.createUser(user)))
+    .then(() => client.createRoom(roomOpts))
+    .then(res => {
+      resemblesRoom(t, res, {
+        id,
+        creatorId: alice.id,
+        name: roomOpts.name,
+        isPrivate: true,
+        memberIds: [alice.id, bob.id, carol.id],
+        customData: { foo: 42 },
+      })
+      end()
+    })
+    .catch(fail)
+})
+
+test("createRoom without providing an ID", (t, client, end, fail) => {
   const alice = randomUser()
   const bob = randomUser()
   const carol = randomUser()
@@ -840,17 +871,16 @@ test("deleteMessage", (t, client, end, fail) => {
           roomId: room.id,
           text: messageText,
         })
-        .then(({ message_id: id }) => client.deleteMessage({ id }))
+        .then(({ message_id: messageId }) =>
+          client.deleteMessage({ messageId, roomId: room.id }),
+        )
         .then(() =>
           client
             .getRoomMessages({
               roomId: room.id,
             })
             .then(res => {
-              t.is(res.length, 1)
-              t.is(res[0].room_id, room.id)
-              t.is(res[0].user_id, user.id)
-              t.is(res[0].text, "DELETED")
+              t.is(res.length, 0)
               end()
             }),
         ),
@@ -1077,7 +1107,7 @@ test("unreadCount and lastMessageAt", (t, client, end, fail) => {
                 .getUserRooms({ userId: user.id })
                 .then(user_rooms => {
                   t.is(user_rooms[0].unread_count, 1)
-		  t.ok(user_rooms[0].last_message_at)
+                  t.ok(user_rooms[0].last_message_at)
                 })
                 .then(() =>
                   client.setReadCursor({
@@ -1089,7 +1119,7 @@ test("unreadCount and lastMessageAt", (t, client, end, fail) => {
                 .then(() =>
                   client.getUserRooms({ userId: user.id }).then(user_rooms => {
                     t.is(user_rooms[0].unread_count, 0)
-		    t.ok(user_rooms[0].last_message_at)
+                    t.ok(user_rooms[0].last_message_at)
                     end()
                   }),
                 ),
