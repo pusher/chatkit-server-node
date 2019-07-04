@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/pusher/chatkit-server-node/compare/2.0.0...HEAD)
 
+## [2.0.1](https://github.com/pusher/chatkit-server-node/compare/2.0.0...2.0.1)
+
+### Fixes
+
+- Don't send unnecessary query parameters in fetch messages methods
+
 ## [2.0.0](https://github.com/pusher/chatkit-server-node/compare/1.3.0...2.0.0)
 
 ### Additions
