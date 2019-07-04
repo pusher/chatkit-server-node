@@ -628,10 +628,10 @@ export default class Chatkit {
       su: true,
     })
 
-    const { initialId, ...optionsMinusInitialId } = options
-    let qs: FetchMessagesPayload = optionsMinusInitialId
-    if (initialId) {
-      qs["initial_id"] = initialId
+    let qs: FetchMessagesPayload = {
+      direction: options.direction,
+      limit: options.limit,
+      initial_id: options.initialId,
     }
 
     return options.serverInstance
