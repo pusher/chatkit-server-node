@@ -178,6 +178,7 @@ test("createRoom with a provided ID", (t, client, end, fail) => {
     id,
     creatorId: alice.id,
     name: randomString(),
+    pushNotificationTitleOverride: randomString(),
     isPrivate: true,
     userIds: [bob.id, carol.id],
     customData: { foo: 42 },
@@ -190,6 +191,7 @@ test("createRoom with a provided ID", (t, client, end, fail) => {
         id,
         creatorId: alice.id,
         name: roomOpts.name,
+        pushNotificationTitleOverride: roomOpts.pushNotificationTitleOverride,
         isPrivate: true,
         memberIds: [alice.id, bob.id, carol.id],
         customData: { foo: 42 },
@@ -207,6 +209,7 @@ test("createRoom without providing an ID", (t, client, end, fail) => {
   const roomOpts = {
     creatorId: alice.id,
     name: randomString(),
+    pushNotificationTitleOverride: randomString(),
     isPrivate: true,
     userIds: [bob.id, carol.id],
     customData: { foo: 42 },
@@ -218,6 +221,7 @@ test("createRoom without providing an ID", (t, client, end, fail) => {
       resemblesRoom(t, res, {
         creatorId: alice.id,
         name: roomOpts.name,
+        pushNotificationTitleOverride: roomOpts.pushNotificationTitleOverride,
         isPrivate: true,
         memberIds: [alice.id, bob.id, carol.id],
         customData: { foo: 42 },
@@ -230,9 +234,14 @@ test("createRoom without providing an ID", (t, client, end, fail) => {
 test("updateRoom", (t, client, end, fail) => {
   const user = randomUser()
 
-  const roomOpts = { creatorId: user.id, name: randomString() }
+  const roomOpts = {
+      creatorId: user.id,
+      name: randomString(),
+      pushNotificationTitleOverride: randomString(),
+  }
 
   const updatedName = randomString()
+  const updatedPNTitleOverride = randomString()
 
   client
     .createUser(user)
@@ -242,6 +251,7 @@ test("updateRoom", (t, client, end, fail) => {
         .updateRoom({
           id: room.id,
           name: updatedName,
+          pushNotificationTitleOverride: updatedPNTitleOverride,
           isPrivate: true,
           customData: { bar: "baz" },
         })
@@ -255,6 +265,7 @@ test("updateRoom", (t, client, end, fail) => {
             id: room.id,
             creatorId: user.id,
             name: updatedName,
+            pushNotificationTitleOverride: updatedPNTitleOverride,
             isPrivate: true,
             memberIds: [user.id],
             customData: { bar: "baz" },
@@ -263,6 +274,68 @@ test("updateRoom", (t, client, end, fail) => {
         }),
     )
     .catch(fail)
+})
+
+test("updateRoom with title override explicitly set to `null`", (t, client, end, fail) => {
+    const user = randomUser()
+
+    const roomOpts = {
+        creatorId: user.id,
+        name: randomString(),
+        pushNotificationTitleOverride: randomString(),
+    }
+
+    const updatedName = randomString()
+
+    client
+        .createUser(user)
+        .then(() => client.createRoom(roomOpts))
+        .then(room =>
+            client
+                .updateRoom({
+                    id: room.id,
+                    name: updatedName,
+                    // in this update, let's not change it to `null`
+                    // pushNotificationTitleOverride: null
+                    isPrivate: true,
+                    customData: { bar: "baz" },
+                })
+                .then(() =>
+                    client.getRoom({
+                        roomId: room.id,
+                    }),
+                )
+                .then(res => {
+                    resemblesRoom(t, res, {
+                        id: room.id,
+                        creatorId: user.id,
+                        name: updatedName,
+                        pushNotificationTitleOverride: roomOpts.pushNotificationTitleOverride,
+                        isPrivate: true,
+                        memberIds: [user.id],
+                        customData: { bar: "baz" },
+                    })
+
+                    client
+                        .updateRoom({
+                            id: room.id,
+                            pushNotificationTitleOverride: null,
+                        })
+                        .then(() =>
+                            client.getRoom({
+                                roomId: room.id,
+                            }),
+                        )
+                        .then(res => {
+                            resemblesRoom(t, res, {
+                                pushNotificationTitleOverride: undefined,
+                            })
+
+                            end()
+                        })
+                }),
+        )
+        .catch(fail)
 })
 
 test("deleteRoom", (t, client, end, fail) => {
@@ -1226,9 +1299,18 @@ function resemblesRoom(t: any, actual: any, expected: any): void {
   } else {
     t.is(typeof actual.id, "string")
   }
-  t.is(actual.created_by_id, expected.creatorId)
-  t.is(actual.name, expected.name)
-  t.is(actual.private, !!expected.isPrivate)
+  if (expected.creatorId) {
+    t.is(actual.created_by_id, expected.creatorId)
+  }
+  if (expected.name) {
+    t.is(actual.name, expected.name)
+  }
+  if (expected.pushNotificationTitleOverride) {
+    t.is(actual.push_notification_title_override, expected.pushNotificationTitleOverride)
+  }
+  if (expected.isPrivate) {
+    t.is(actual.private, expected.isPrivate)
+  }
   if (expected.memberIds) {
     t.deepEquals(actual.member_user_ids.sort(), expected.memberIds.sort())
   }
