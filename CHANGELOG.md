@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/pusher/chatkit-server-node/compare/2.0.0...HEAD)
 
+### Additions
+
+- Support for `PushNotificationTitleOverride` attribute in the Room model
+
 ## [2.0.1](https://github.com/pusher/chatkit-server-node/compare/2.0.0...2.0.1)
 
 ### Fixes
