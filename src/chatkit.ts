@@ -209,6 +209,7 @@ export interface CreateRoomOptions {
   id?: string
   creatorId: string
   name: string
+  pushNotificationTitleOverride?: string,
   isPrivate?: boolean
   userIds?: Array<string>
   customData?: object
@@ -217,6 +218,7 @@ export interface CreateRoomOptions {
 export interface UpdateRoomOptions {
   id: string
   name?: string
+  pushNotificationTitleOverride?: string | null,
   isPrivate?: boolean
   customData?: object
 }
@@ -701,10 +703,11 @@ export default class Chatkit {
       userId: options.creatorId,
     })
 
-    const { id, name, isPrivate, userIds, customData } = options
+    const { id, name, pushNotificationTitleOverride, isPrivate, userIds, customData } = options
 
     let roomPayload: any = {
       name,
+      push_notification_title_override: pushNotificationTitleOverride,
       private: isPrivate || false,
     }
 
@@ -736,6 +739,9 @@ export default class Chatkit {
     const body: any = {}
     if (options.name) {
       body.name = options.name
+    }
+    if (options.pushNotificationTitleOverride) {
+      body.push_notification_title_override = options.pushNotificationTitleOverride
     }
     if (options.isPrivate) {
       body.private = options.isPrivate
