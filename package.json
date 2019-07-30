@@ -30,6 +30,9 @@
     "got": "^9.6.0",
     "jsonwebtoken": "^8.3.0"
   },
+  "resolutions": {
+    "**/**/lodash": "^4.17.13"
+  },
   "devDependencies": {
     "@types/tape": "^4.2.32",
     "babel-core": "^6.25.0",
