@@ -743,7 +743,7 @@ export default class Chatkit {
     if (options.pushNotificationTitleOverride) {
       body.push_notification_title_override = options.pushNotificationTitleOverride
     }
-    if (options.isPrivate) {
+    if (options.isPrivate != null) {
       body.private = options.isPrivate
     }
     if (options.customData) {
