@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/pusher/chatkit-server-node/compare/2.1.0...HEAD)
 
-- Fix `updateRoom` privacy not updating when `isPrivacy` value is `false`
+- Fix `updateRoom` privacy not updating when `isPrivate` value is `false`
 
 ## [2.1.0](https://github.com/pusher/chatkit-server-node/compare/2.0.1...2.1.0)
 
