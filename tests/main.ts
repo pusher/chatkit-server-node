@@ -61,7 +61,7 @@ test("createUsers", (t, client, end, fail) => {
     .catch(fail)
 })
 
-test("uptadeUser", (t, client, end, fail) => {
+test("updateUser", (t, client, end, fail) => {
   const user = randomUser()
 
   const updates = {
@@ -269,6 +269,44 @@ test("updateRoom", (t, client, end, fail) => {
             isPrivate: true,
             memberIds: [user.id],
             customData: { bar: "baz" },
+          })
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
+test("updateRoom with isPrivate set to false", (t, client, end, fail) => {
+  const user = randomUser()
+  const roomName = randomString()
+
+  const roomOpts = {
+      creatorId: user.id,
+      name: roomName,
+      isPrivate: true,
+  }
+
+  client
+    .createUser(user)
+    .then(() => client.createRoom(roomOpts))
+    .then(room =>
+      client
+        .updateRoom({
+          id: room.id,
+          isPrivate: false,
+        })
+        .then(() =>
+          client.getRoom({
+            roomId: room.id,
+          }),
+        )
+        .then(res => {
+          resemblesRoom(t, res, {
+            id: room.id,
+            creatorId: user.id,
+            name: roomName,
+            isPrivate: false,
+            memberIds: [user.id],
           })
           end()
         }),
@@ -1308,7 +1346,7 @@ function resemblesRoom(t: any, actual: any, expected: any): void {
   if (expected.pushNotificationTitleOverride) {
     t.is(actual.push_notification_title_override, expected.pushNotificationTitleOverride)
   }
-  if (expected.isPrivate) {
+  if (expected.isPrivate != null) {
     t.is(actual.private, expected.isPrivate)
   }
   if (expected.memberIds) {
