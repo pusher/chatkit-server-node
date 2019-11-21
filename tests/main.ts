@@ -817,6 +817,194 @@ test("sendMessage with attachment", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("editMessage", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageText = randomString()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendMessage({
+          userId: user.id,
+          roomId: room.id,
+          text: messageText,
+        })
+        .then(({ message_id: messageId }) => {
+          client
+            .getRoomMessages({
+              roomId: room.id,
+            })
+            .then(res => {
+              t.is(res.length, 1)
+              t.is(res[0].id, messageId)
+              t.is(res[0].user_id, user.id)
+              t.is(res[0].room_id, room.id)
+              t.is(res[0].text, messageText)
+            })
+            .then( () =>
+              client
+                .editMessage({
+                  userId: user.id,
+                  roomId: room.id,
+                  messageId: messageId,
+                  text: "edited" + messageText,
+                })
+            )
+            .then( () =>
+              client
+              .getRoomMessages({
+                roomId: room.id,
+              })
+            )
+            .then(res => {
+                t.is(res.length, 1)
+                t.is(res[0].id, messageId)
+                t.is(res[0].user_id, user.id)
+                t.is(res[0].room_id, room.id)
+                t.is(res[0].text, "edited" + messageText)
+                end()
+            })
+          },
+        ),
+    )
+    .catch(fail)
+})
+
+test("editSimpleMessage", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageText = randomString()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendSimpleMessage({
+          userId: user.id,
+          roomId: room.id,
+          text: messageText,
+        })
+        .then(({ message_id: messageId }) => {
+          client
+            .getRoomMessages({
+              roomId: room.id,
+            })
+            .then(res => {
+              t.is(res.length, 1)
+              t.is(res[0].id, messageId)
+              t.is(res[0].user_id, user.id)
+              t.is(res[0].room_id, room.id)
+              t.is(res[0].text, messageText)
+            })
+            .then( () =>
+              client
+                .editSimpleMessage({
+                  userId: user.id,
+                  roomId: room.id,
+                  messageId: messageId,
+                  text: "edited" + messageText,
+                })
+            )
+            .then( () =>
+              client
+              .getRoomMessages({
+                roomId: room.id,
+              })
+            )
+            .then(res => {
+                t.is(res.length, 1)
+                t.is(res[0].id, messageId)
+                t.is(res[0].user_id, user.id)
+                t.is(res[0].room_id, room.id)
+                t.is(res[0].text, "edited" + messageText)
+                end()
+            })
+          },
+        ),
+    )
+    .catch(fail)
+})
+
+test("editMultipartMessage", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageText = randomString()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendMultipartMessage({
+          userId: user.id,
+          roomId: room.id,
+          parts: [
+            { type: "text/plain", content: messageText},
+            { type: "image/jpeg", url: "https://a.b.com/img.jpg"},
+          ],
+        })
+        .then(({ message_id: messageId }) => {
+          client
+            .getRoomMessages({
+              roomId: room.id,
+            })
+            .then(res => {
+              t.is(res.length, 1)
+              t.is(res[0].id, messageId)
+              t.is(res[0].user_id, user.id)
+              t.is(res[0].room_id, room.id)
+              t.is(res[0].text, messageText)
+              t.is(res[0].attachment.resource_link, "https://a.b.com/img.jpg")
+            })
+            .then( () =>
+              client
+                .editMultipartMessage({
+                  userId: user.id,
+                  roomId: room.id,
+                  messageId: messageId,
+                  parts: [
+                    { type: "text/plain", content: "edited" + messageText },
+                    { type: "image/jpeg", content: "https://a.b.com/edited-img.jpg" },
+                  ]
+                })
+            )
+            .then( () =>
+              client
+              .getRoomMessages({
+                roomId: room.id,
+              })
+            )
+            .then(res => {
+                t.is(res.length, 1)
+                t.is(res[0].id, messageId)
+                t.is(res[0].user_id, user.id)
+                t.is(res[0].room_id, room.id)
+                t.is(res[0].text, "edited" + messageText)
+                t.is(res[0].attachment.resource_link, "https://a.b.com/edited-img.jpg" )
+                end()
+            })
+          },
+        ),
+    )
+    .catch(fail)
+})
+
 test("getRoomMessages", (t, client, end, fail) => {
   const user = randomUser()
   const messageTextA = randomString()
