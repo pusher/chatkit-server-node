@@ -172,6 +172,11 @@ export interface GetReadCursorsForRoomOptions {
   roomId: string
 }
 
+export interface FetchMultipartMessageOptions {
+  roomId: string
+  messageId: string
+}
+
 export type GetRoomMessagesOptions = FetchMultipartMessagesOptions
 
 export interface FetchMultipartMessagesOptions {
@@ -609,6 +614,18 @@ export default class Chatkit {
         jwt: this.getServerToken(),
       })
       .then(() => {})
+  }
+
+  fetchMultipartMessage(options: FetchMultipartMessageOptions): Promise<any> {
+    return this.serverInstance
+      .request({
+        method: "GET",
+        path: `/rooms/${encodeURIComponent(
+          options.roomId,
+        )}/messages/${encodeURIComponent(options.messageId)}`,
+        jwt: this.getServerToken(),
+      })
+      .then(res => JSON.parse(res.body))
   }
 
   getRoomMessages(options: GetRoomMessagesOptions): Promise<any> {
