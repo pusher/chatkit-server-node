@@ -886,12 +886,59 @@ test("getRoomMessages", (t, client, end, fail) => {
     .catch(fail)
 })
 
+test("fetchMultipartMessage", (t, client, end, fail) => {
+  const user = randomUser()
+  const messageTextA = randomString()
+
+  client
+    .createUser(user)
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      }),
+    )
+    .then(room =>
+      client
+        .sendSimpleMessage({
+          userId: user.id,
+          roomId: room.id,
+          text: messageTextA,
+        })
+        .then(({ message_id: messageId }) =>
+          client.fetchMultipartMessage({
+            roomId: room.id,
+            messageId,
+          }),
+        )
+        .then(res => {
+          t.is(res.parts.length, 1)
+          t.is(res.parts[0].type, "text/plain")
+          t.is(res.parts[0].content, messageTextA)
+
+          // non-existent message
+          return client.fetchMultipartMessage({
+            roomId: room.id,
+            messageId: "90210",
+          })
+        })
+        .then(() => fail("expected 404"))
+        .catch(err => {
+          t.is(err.status, 404)
+          t.is(err.error, "services/chatkit/not_found/message_not_found")
+          end()
+        }),
+    )
+    .catch(fail)
+})
+
 test("fetchMultipartMessages", (t, client, end, fail) => {
   const user = randomUser()
   const messageTextA = randomString()
   const messageTextB = randomString()
   const messageTextC = randomString()
   const messageTextD = randomString()
+  const messageTextE = randomString()
 
   client
     .createUser(user)
@@ -957,6 +1004,24 @@ test("fetchMultipartMessages", (t, client, end, fail) => {
           t.is(res[1].parts.length, 1)
           t.is(res[1].parts[0].type, "text/plain")
           t.is(res[1].parts[0].content, messageTextA)
+
+          // fetch single message
+          return client.sendSimpleMessage({
+            userId: user.id,
+            roomId: room.id,
+            text: messageTextE,
+          })
+        })
+        .then(({ message_id: messageId }) =>
+          client.fetchMultipartMessage({
+            roomId: room.id,
+            messageId,
+          }),
+        )
+        .then(res => {
+          t.is(res.parts[0].type, "text/plain")
+          t.is(res.parts.length, 1)
+          t.is(res.parts[0].content, messageTextE)
           end()
         }),
     )
