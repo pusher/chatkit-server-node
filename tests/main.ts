@@ -980,7 +980,7 @@ test("editMultipartMessage", (t, client, end, fail) => {
                   messageId: messageId,
                   parts: [
                     { type: "text/plain", content: "edited" + messageText },
-                    { type: "image/jpeg", content: "https://a.b.com/edited-img.jpg" },
+                    { type: "image/jpeg", url: "https://a.b.com/edited-img.jpg" },
                   ]
                 })
             )
