@@ -63,6 +63,20 @@ export interface AttachmentOptions {
   type: string
 }
 
+export interface EditMessageOptions extends UserIdOptions {
+  roomId: string
+  messageId: string
+  text: string
+  attachment?: AttachmentOptions
+}
+
+export interface EditMultipartMessageOptions {
+  roomId: string
+  messageId: string
+  userId: string
+  parts: Array<NewPart>
+}
+
 export interface DeleteMessageOptions {
   messageId: string
   roomId: string
@@ -564,6 +578,71 @@ export default class Chatkit {
         }),
       )
       .then(({ body }) => JSON.parse(body))
+  }
+
+  editMessage(options: EditMessageOptions): Promise<void> {
+    let messagePayload: any = { text: options.text }
+
+    if (options.attachment) {
+      messagePayload.attachment = {
+        resource_link: options.attachment.resourceLink,
+        type: options.attachment.type,
+      }
+    }
+
+    return this.serverInstanceV2
+      .request({
+        method: "PUT",
+        path: `/rooms/${encodeURIComponent(options.roomId)}/messages/${encodeURIComponent(options.messageId)}`,
+        jwt: this.generateAccessToken({
+          su: true,
+          userId: options.userId,
+        }).token,
+        body: messagePayload,
+      })
+      .then(() => {})
+  }
+
+  editSimpleMessage(options: EditMessageOptions): Promise<void> {
+    return this.editMultipartMessage({
+      roomId: options.roomId,
+      messageId: options.messageId,
+      userId: options.userId,
+      parts: [{ type: "text/plain", content: options.text }],
+    })
+  }
+
+  editMultipartMessage(options: EditMultipartMessageOptions): Promise<void> {
+    if (options.parts.length === 0) {
+      return Promise.reject(
+        new TypeError("message must contain at least one part"),
+      )
+    }
+
+    return Promise.all(
+      options.parts.map(
+        (part: any) =>
+          part.file
+            ? this.uploadAttachment({
+                userId: options.userId,
+                roomId: options.roomId,
+                part,
+              })
+            : part,
+      ),
+    )
+      .then(parts =>
+        this.serverInstance.request({
+          method: "PUT",
+          path: `/rooms/${encodeURIComponent(options.roomId)}/messages/${encodeURIComponent(options.messageId)}`,
+          jwt: this.generateAccessToken({
+            su: true,
+            userId: options.userId,
+          }).token,
+          body: { parts },
+        }),
+      )
+      .then(() => {})
   }
 
   private uploadAttachment({
