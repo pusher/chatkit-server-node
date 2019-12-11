@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Additions
 - Adds message editing via `edit{Simple,Multipart,}Message`.
 
+## 2.3.0 Yanked
+
 ## [2.2.0](https://github.com/pusher/chatkit-server-node/compare/2.1.1...2.2.0)
 
 ### Additions
