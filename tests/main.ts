@@ -850,10 +850,8 @@ test("editMessage", (t, client, end, fail) => {
             })
             .then( () =>
               client
-                .editMessage({
+                .editMessage(room.id, messageId, {
                   userId: user.id,
-                  roomId: room.id,
-                  messageId: messageId,
                   text: "edited" + messageText,
                 })
             )
@@ -910,10 +908,8 @@ test("editSimpleMessage", (t, client, end, fail) => {
             })
             .then( () =>
               client
-                .editSimpleMessage({
+                .editSimpleMessage(room.id, messageId, {
                   userId: user.id,
-                  roomId: room.id,
-                  messageId: messageId,
                   text: "edited" + messageText,
                 })
             )
@@ -974,10 +970,8 @@ test("editMultipartMessage", (t, client, end, fail) => {
             })
             .then( () =>
               client
-                .editMultipartMessage({
+                .editMultipartMessage(room.id, messageId, {
                   userId: user.id,
-                  roomId: room.id,
-                  messageId: messageId,
                   parts: [
                     { type: "text/plain", content: "edited" + messageText },
                     { type: "image/jpeg", url: "https://a.b.com/edited-img.jpg" },

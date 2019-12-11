@@ -64,15 +64,11 @@ export interface AttachmentOptions {
 }
 
 export interface EditMessageOptions extends UserIdOptions {
-  roomId: string
-  messageId: string
   text: string
   attachment?: AttachmentOptions
 }
 
 export interface EditMultipartMessageOptions {
-  roomId: string
-  messageId: string
   userId: string
   parts: Array<NewPart>
 }
@@ -580,7 +576,7 @@ export default class Chatkit {
       .then(({ body }) => JSON.parse(body))
   }
 
-  editMessage(options: EditMessageOptions): Promise<void> {
+  editMessage(roomId: string, messageId: string, options: EditMessageOptions): Promise<void> {
     let messagePayload: any = { text: options.text }
 
     if (options.attachment) {
@@ -593,7 +589,7 @@ export default class Chatkit {
     return this.serverInstanceV2
       .request({
         method: "PUT",
-        path: `/rooms/${encodeURIComponent(options.roomId)}/messages/${encodeURIComponent(options.messageId)}`,
+        path: `/rooms/${encodeURIComponent(roomId)}/messages/${encodeURIComponent(messageId)}`,
         jwt: this.generateAccessToken({
           su: true,
           userId: options.userId,
@@ -603,16 +599,14 @@ export default class Chatkit {
       .then(() => {})
   }
 
-  editSimpleMessage(options: EditMessageOptions): Promise<void> {
-    return this.editMultipartMessage({
-      roomId: options.roomId,
-      messageId: options.messageId,
+  editSimpleMessage(roomId: string, messageId: string, options: EditMessageOptions): Promise<void> {
+    return this.editMultipartMessage(roomId, messageId, {
       userId: options.userId,
       parts: [{ type: "text/plain", content: options.text }],
     })
   }
 
-  editMultipartMessage(options: EditMultipartMessageOptions): Promise<void> {
+  editMultipartMessage(roomId: string, messageId: string, options: EditMultipartMessageOptions): Promise<void> {
     if (options.parts.length === 0) {
       return Promise.reject(
         new TypeError("message must contain at least one part"),
@@ -625,7 +619,7 @@ export default class Chatkit {
           part.file
             ? this.uploadAttachment({
                 userId: options.userId,
-                roomId: options.roomId,
+                roomId: roomId,
                 part,
               })
             : part,
@@ -634,7 +628,7 @@ export default class Chatkit {
       .then(parts =>
         this.serverInstance.request({
           method: "PUT",
-          path: `/rooms/${encodeURIComponent(options.roomId)}/messages/${encodeURIComponent(options.messageId)}`,
+          path: `/rooms/${encodeURIComponent(roomId)}/messages/${encodeURIComponent(messageId)}`,
           jwt: this.generateAccessToken({
             su: true,
             userId: options.userId,
