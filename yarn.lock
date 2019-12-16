@@ -36,12 +36,13 @@
     "@types/node" "*"
 
 "@types/got@^9.4.0":
-  version "9.4.0"
-  resolved "https://registry.yarnpkg.com/@types/got/-/got-9.4.0.tgz#5c8b0f5a0dc1b67e676430561a0b85a0fde1d12d"
-  integrity sha512-18c/Bu9tpv6owaz17urNFfkzfxdmr3PoREqFpAkUasBbV9gc7OqChRj/e2f98abiJo7j++PhArfm66EFqAY4qA==
+  version "9.6.9"
+  resolved "https://registry.yarnpkg.com/@types/got/-/got-9.6.9.tgz#b3192188b96c871b9c67dc80d1b0336441432a38"
+  integrity sha512-w+ZE+Ovp6fM+1sHwJB7RN3f3pTJHZkyABuULqbtknqezQyWadFEp5BzOXaZzRqAw2md6/d3ybxQJt+BNgpvzOg==
   dependencies:
     "@types/node" "*"
     "@types/tough-cookie" "*"
+    form-data "^2.5.0"
 
 "@types/minimatch@*":
   version "3.0.3"
@@ -1163,6 +1164,15 @@ forever-agent@~0.6.1:
   resolved "https://registry.yarnpkg.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
   integrity sha1-+8cfDEGt6zf5bFd60e1C2P2sypE=
 
+form-data@^2.5.0:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.5.1.tgz#f2cbec57b5e59e23716e128fe44d4e5dd23895f4"
+  integrity sha512-m21N3WOmEEURgk6B9GLOE4RuWOFf28Lhh9qGYeNlGq4VDXUlJy2th2slBNU8Gp8EzloYZOibZJ7t5ecIrFSjVA==
+  dependencies:
+    asynckit "^0.4.0"
+    combined-stream "^1.0.6"
+    mime-types "^2.1.12"
+
 form-data@~2.3.2:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.3.3.tgz#dcce52c05f644f298c6a7ab936bd724ceffbf3a6"
@@ -1171,6 +1181,11 @@ form-data@~2.3.2:
     asynckit "^0.4.0"
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
+
+fp-ts@1.14.4, fp-ts@^1.0.0:
+  version "1.14.4"
+  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-1.14.4.tgz#df431e1bfe590f23ad418ca8c889880106a5008f"
+  integrity sha512-A20kqVBpV/VOpDmEDudb+FP/qOV+V/yEqHQQfHPHLHeX3alFM0JjX1cXNcU8+p8z5yeCkHFolKo7uJMRwUSMFA==
 
 fragment-cache@^0.2.1:
   version "0.2.1"
@@ -1393,6 +1408,13 @@ invariant@^2.2.2:
   integrity sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==
   dependencies:
     loose-envify "^1.0.0"
+
+io-ts@1.5.2-:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/io-ts/-/io-ts-1.5.2.tgz#e57ca59689ead86736542e27d44a9a0358d37931"
+  integrity sha512-97sFhiqyKqCj2iLJ3NUuAMDYh2pQm/VuSHu/zNbCdZt+I53PiQ/nkKIP7gKpM1fOAa9+xfHS675Ifit+4lP8kw==
+  dependencies:
+    fp-ts "^1.0.0"
 
 is-accessor-descriptor@^0.1.6:
   version "0.1.6"
@@ -2588,7 +2610,7 @@ tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
   integrity sha1-WuaBd/GS1EViadEIr6k/+HQ/T2Q=
 
-typescript@^2.6.1:
+typescript@^2.8.1:
   version "2.9.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.9.2.tgz#1cbf61d05d6b96269244eb6a3bce4bd914e0f00c"
   integrity sha512-Gr4p6nFNaoufRIY4NMdpQRNmgxVIGMs4Fcu/ujdYk3nAZqk7supzBE9idmvfZIlH/Cuj//dvi+019qEue9lV0w==
@@ -2602,6 +2624,11 @@ union-value@^1.0.0:
     get-value "^2.0.6"
     is-extendable "^0.1.1"
     set-value "^0.4.3"
+
+unknown-ts@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/unknown-ts/-/unknown-ts-0.1.0.tgz#b34c5ec61fe84e734fa59cd9ddc3ebc32a9ecce7"
+  integrity sha512-P+mV7fa1UAJ32HN+P1/eswQ33wmXt4+AuE20K0+ixzBe3t+NF51jp7gr0W6w+dSqBPvwmwSRVJIJHqaTdyf6Ag==
 
 unset-value@^1.0.0:
   version "1.0.0"

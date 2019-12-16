@@ -1486,6 +1486,47 @@ test("unreadCount and lastMessageAt", (t, client, end, fail) => {
     )
 })
 
+test("RoomRoles", (t, client, end, fail) => {
+  const user = randomUser()
+  const role = randomString()
+
+  client
+    .createUser(user)
+    .then(() => 
+      client.createRoomRole({
+        name: role,
+        permissions: []
+      })
+    )
+    .then(() =>
+      client.createRoom({
+        creatorId: user.id,
+        name: randomString(),
+      })
+    )
+    .then(room =>
+      client
+        .assignRoomRoleToUser({
+          userId: user.id,
+          roomId: room.id,
+          name: role,
+        })
+        .then(() =>
+          client.removeRoomRoleForUser({
+            userId: user.id,
+            roomId: room.id
+          })
+        )
+    )
+    .then(() =>
+      client.deleteRoomRole({
+        name: role,
+      })
+    )
+    .then(end)
+    .catch(fail)
+})
+
 function test(
   msg: string,
   cb: (

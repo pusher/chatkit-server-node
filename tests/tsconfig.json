@@ -5,9 +5,9 @@
     "module": "commonjs",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "declaration": true,
     "outDir": "target",
-    "strict": true
+    "strict": true,
+    "allowJs": true
   },
   "exclude": [
     "node_modules",

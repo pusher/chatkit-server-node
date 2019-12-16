@@ -11,17 +11,26 @@ import {
   TokenWithExpiry,
 } from "@pusher/platform-node"
 
-import { getCurrentTimeInSeconds } from "./utils"
+import {
+  getCurrentTimeInSeconds,
+  validateProperties,
+} from "./utils"
 import packageJSON from "../package.json"
+import * as t from 'io-ts'
+import "unknown-ts"
+
+const NonEmptyString = t.refinement(t.string, s => s.length != 0, "NonEmptyString");
 
 export interface AuthenticationOptions {
   userId: string
   authPayload?: AuthenticatePayload
 }
 
-export interface UserIdOptions {
-  userId: string
-}
+const UserIdOptions = t.interface({
+  userId: NonEmptyString
+},"UserIdOptions");
+type UserIdOptions = t.TypeOf<typeof UserIdOptions>;
+export { UserIdOptions };
 
 export interface GetRoomOptions {
   roomId: string
@@ -98,9 +107,14 @@ export interface GetUsersOptions {
   limit?: number
 }
 
-export interface RemoveRoomRoleForUserOptions extends UserIdOptions {
-  roomId: string
-}
+const RemoveRoomRoleForUserOptions = t.intersection([
+  UserIdOptions,
+  t.interface({
+    roomId: NonEmptyString
+  })
+],"RemoveRoomRoleForUserOptions");
+type RemoveRoomRoleForUserOptions = t.TypeOf<typeof RemoveRoomRoleForUserOptions>;
+export { RemoveRoomRoleForUserOptions };
 
 export interface BasicAssignRoleToUserOptions {
   userId: string
@@ -983,6 +997,7 @@ export default class Chatkit {
   }
 
   removeRoomRoleForUser(options: RemoveRoomRoleForUserOptions): Promise<void> {
+    validateProperties(options, RemoveRoomRoleForUserOptions)
     return this.authorizerInstance
       .request({
         method: "DELETE",
