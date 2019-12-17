@@ -17,7 +17,6 @@ import {
 } from "./utils"
 import packageJSON from "../package.json"
 import * as t from 'io-ts'
-import "unknown-ts"
 
 const NonEmptyString = t.refinement(t.string, s => s.length != 0, "NonEmptyString");
 

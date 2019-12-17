@@ -20,27 +20,27 @@ test("validateProperties", t => {
 test("validatePropertiesUndefinedFails", t => {
   t.throws(
     () => validateProperties({user: "foo", roomId: "bar"}, RemoveRoomRoleForUserOptions),
-    RegExp('Invalid value undefined supplied to : RemoveRoomRoleForUserOptions/userId: NonEmptyString'))
+    RegExp('.*Invalid value undefined supplied.*RemoveRoomRoleForUserOptions.*userId.*NonEmptyString.*'))
   t.end()
 })
 
 test("validatePropertiesNullFails", t => {
   t.throws(
     () => validateProperties({userId: "foo", roomId: null}, RemoveRoomRoleForUserOptions),
-    RegExp('Invalid value null supplied to : RemoveRoomRoleForUserOptions/roomId: NonEmptyString'))
+    RegExp('.*Invalid value null supplied to.*RemoveRoomRoleForUserOptions.*roomId.*NonEmptyString.*'))
   t.end();
 })
 
 test("validatePropertiesEmptyFails", t => {
   t.throws(
     () => validateProperties({userId: "foo", roomId: ""}, RemoveRoomRoleForUserOptions),
-    RegExp('Invalid value "" supplied to : RemoveRoomRoleForUserOptions/roomId: NonEmptyString'))
+    RegExp('.*Invalid value "" supplied to.*RemoveRoomRoleForUserOptions.*roomId.*NonEmptyString.*'))
   t.end();
 })
 
 test("validatePropertiesWrongTypeFails", t => {
   t.throws(
     () => validateProperties({userId: "foo", roomId: 42}, RemoveRoomRoleForUserOptions),
-    RegExp('Invalid value 42 supplied to : RemoveRoomRoleForUserOptions/roomId: NonEmptyString'))
+    RegExp('.*Invalid value 42 supplied to.*RemoveRoomRoleForUserOptions.*roomId.*NonEmptyString.*'))
   t.end();
 })
