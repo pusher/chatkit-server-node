@@ -18,7 +18,7 @@ import {
 import packageJSON from "../package.json"
 import * as t from 'io-ts'
 
-const NonEmptyString = t.refinement(t.string, s => s.length != 0, "NonEmptyString");
+const NonEmptyString = t.refinement(t.string, s => s.length !== 0, "NonEmptyString");
 
 export interface AuthenticationOptions {
   userId: string
