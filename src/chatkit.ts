@@ -18,119 +18,217 @@ import {
 import packageJSON from "../package.json"
 import * as t from 'io-ts'
 
-const NonEmptyString = t.refinement(t.string, s => s.length !== 0, "NonEmptyString");
+// Refinement is used instead of Branded, otherwise the typescript API changes.
+// import { NonEmptyString } from "io-ts-types/lib/NonEmptyString"
+const NonEmptyString = t.refinement(t.string, s => s.length !== 0, "NonEmptyString")
+// const ValueIsIntLike = t.refinement(t.string | t.number, v => typeof v === "string" && parseInt(v) || v, "NonEmptyString")
 
 export interface AuthenticationOptions {
   userId: string
   authPayload?: AuthenticatePayload
 }
 
-const UserIdOptions = t.interface({
+export const ValueIsIntLike = new t.Type<string | number, string, unknown>(
+  "ValueIsIntLike",
+  t.number.is,
+  (u, c) => {
+    if (t.number.is(u)) {
+      return Number.isInteger(u) ? t.success(u) : t.failure(u, c)
+    } else if (t.string.is(u)) {
+      var v = Number.parseInt(u)
+      return Number.isInteger(v) ? t.success(v) : t.failure(u, c)
+    } else {
+      return t.failure(u, c)
+    }
+  },
+  String,
+)
+type ValueIsIntLike = t.TypeOf<typeof ValueIsIntLike>
+
+export const UserIdOptions = t.interface({
   userId: NonEmptyString
-},"UserIdOptions");
-type UserIdOptions = t.TypeOf<typeof UserIdOptions>;
-export { UserIdOptions };
+},"UserIdOptions")
+type UserIdOptions = t.TypeOf<typeof UserIdOptions>
 
-export interface GetRoomOptions {
-  roomId: string
-}
+export const RoomIdOptions = t.interface({
+  roomId: NonEmptyString
+},"RoomIdOptions")
+type RoomIdOptions = t.TypeOf<typeof RoomIdOptions>
 
-export interface SendMessageOptions extends UserIdOptions {
-  roomId: string
-  text: string
-  attachment?: AttachmentOptions
-}
+export const MessageIdOptions = t.interface({
+  // ValueIsIntLike is used because an number is returned from sendMessage.
+  // This is a bug that should probably be fixed.
+  messageId: ValueIsIntLike
+},"MessageIdOptions")
+type MessageIdOptions = t.TypeOf<typeof MessageIdOptions>
 
-export interface SendMultipartMessageOptions {
-  roomId: string
-  userId: string
-  parts: Array<NewPart>
-}
+export const GetRoomOptions = t.intersection([
+  RoomIdOptions,
+  t.interface({})
+], "GetRoomOptions")
+type GetRoomOptions = t.TypeOf<typeof GetRoomOptions>
 
-export type NewPart = NewInlinePart | NewURLPart | NewAttachmentPart
+export const MimeType = t.interface({
+  type: NonEmptyString
+},"MimeType")
+type MimeType = t.TypeOf<typeof MimeType>
 
-export interface NewInlinePart {
-  type: string
-  content: string
-}
+export const AttachmentOptions = t.intersection([
+  MimeType,
+  t.interface({ resourceLink: t.string })
+], "AttachmentOptions")
+type AttachmentOptions = t.TypeOf<typeof AttachmentOptions>
 
-export interface NewURLPart {
-  type: string
-  url: string
-}
-
-export interface NewAttachmentPart {
-  type: string
-  file: Buffer
-  name?: string
-  customData?: any
-}
-
-export interface AttachmentOptions {
-  resourceLink: string
-  type: string
-}
-
-export interface EditMessageOptions extends UserIdOptions {
-  text: string
-  attachment?: AttachmentOptions
-}
-
-export interface EditMultipartMessageOptions {
-  userId: string
-  parts: Array<NewPart>
-}
-
-export interface DeleteMessageOptions {
-  messageId: string
-  roomId: string
-}
-
-export interface DeleteUserOptions extends UserIdOptions {}
-export interface GetUserRoomOptions extends UserIdOptions {}
-export interface GetUserJoinableRoomOptions extends UserIdOptions {}
-export interface GetUserRolesOptions extends UserIdOptions {}
-export interface RemoveGlobalRoleForUserOptions extends UserIdOptions {}
-
-export interface GetRoomsOptions {
-  fromId?: string
-  includePrivate?: boolean
-}
-
-export interface GetUserOptions {
-  id: string
-}
-
-export interface GetUsersOptions {
-  fromTimestamp?: string
-  limit?: number
-}
-
-const RemoveRoomRoleForUserOptions = t.intersection([
+export const SendMessageOptions = t.intersection([
   UserIdOptions,
-  t.interface({
-    roomId: NonEmptyString
-  })
+  RoomIdOptions,
+  t.interface({text: t.string}),
+  t.partial({attachment: AttachmentOptions})
+], "SendMessageOptions")
+type SendMessageOptions = t.TypeOf<typeof SendMessageOptions>
+
+export const NewInlinePart = t.intersection([
+  MimeType,
+  t.interface({ content: t.string })
+], "NewInlinePart")
+type NewInlinePart = t.TypeOf<typeof NewInlinePart>
+
+export const NewURLPart = t.intersection([
+  MimeType,
+  t.interface({ url: t.string })
+], "NewURLPart")
+type NewURLPart = t.TypeOf<typeof NewURLPart>
+
+// export declare class IdentityType<A, O = A, I = unknown> extends t.Type<A, O, I>{
+//   constructor(name: string)
+// }
+
+export const BufferType = new t.Type<Buffer>(
+  'BufferType',
+  (u): u is Buffer => u instanceof Buffer,
+  (u, c) => (u instanceof Buffer ? t.success(u) : t.failure(u, c)),
+  t.identity
+)
+type BufferType = t.TypeOf<typeof BufferType>
+
+export const NewAttachmentPart = t.intersection([
+  MimeType,
+  t.interface({ file: BufferType }),
+  t.partial({
+    name: t.string,
+    customData: t.any })
+], "NewAttachmentPart")
+type NewAttachmentPart = t.TypeOf<typeof NewAttachmentPart>
+
+export const NewPart = t.union([
+  NewInlinePart,
+  NewURLPart,
+  NewAttachmentPart
+], "NewPart")
+type NewPart = t.TypeOf<typeof NewPart>
+
+export const SendMultipartMessageOptions = t.intersection([
+  UserIdOptions,
+  RoomIdOptions,
+  t.interface({parts: t.array(NewPart)}),
+], "SendMultipartMessageOptions")
+type SendMultipartMessageOptions = t.TypeOf<typeof SendMultipartMessageOptions>
+
+export const EditMessageOptions = t.intersection([
+  UserIdOptions,
+  t.interface({ text: t.string }),
+  t.partial({ attachment: AttachmentOptions })
+], "EditMessageOptions")
+type EditMessageOptions = t.TypeOf<typeof EditMessageOptions>
+
+export const EditMultipartMessageOptions = t.intersection([
+  UserIdOptions,
+  t.interface({ parts: t.array(NewPart) })
+], "EditMultipartMessageOptions")
+type EditMultipartMessageOptions = t.TypeOf<typeof EditMultipartMessageOptions>
+
+export const DeleteMessageOptions = t.intersection([
+  RoomIdOptions,
+  MessageIdOptions
+], "DeleteMessageOptions")
+type DeleteMessageOptions = t.TypeOf<typeof DeleteMessageOptions>
+
+export const DeleteUserOptions = t.intersection([
+  UserIdOptions,
+  t.interface({})
+], "DeleteUserOptions")
+type DeleteUserOptions = t.TypeOf<typeof DeleteUserOptions>
+
+export const GetUserRoomOptions = t.intersection([
+  UserIdOptions,
+  t.interface({})
+], "GetUserRoomOptions")
+type GetUserRoomOptions = t.TypeOf<typeof GetUserRoomOptions>
+
+export const GetUserJoinableRoomOptions = t.intersection([
+  UserIdOptions,
+  t.interface({})
+], "GetUserJoinableRoomOptions")
+type GetUserJoinableRoomOptions = t.TypeOf<typeof GetUserJoinableRoomOptions>
+
+export const GetUserRolesOptions = t.intersection([
+  UserIdOptions,
+  t.interface({})
+], "GetUserRolesOptions")
+type GetUserRolesOptions = t.TypeOf<typeof GetUserRolesOptions>
+
+export const RemoveGlobalRoleForUserOptions = t.intersection([
+  UserIdOptions,
+  t.interface({})
+], "RemoveGlobalRoleForUserOptions")
+type RemoveGlobalRoleForUserOptions = t.TypeOf<typeof RemoveGlobalRoleForUserOptions>
+
+export const GetRoomsOptions = t.partial({
+  fromId: t.string,
+  includePrivate: t.boolean
+}, "GetRoomsOptions")
+type GetRoomsOptions = t.TypeOf<typeof GetRoomsOptions>
+
+export const GetUserOptions = t.interface({
+  id: t.string
+}, "GetUserOptions")
+type GetUserOptions = t.TypeOf<typeof GetUserOptions>
+
+export const GetUsersOptions = t.partial({
+  fromTimestamp: t.string,
+  limit: t.number
+}, "GetUsersOptions")
+type GetUsersOptions = t.TypeOf<typeof GetUsersOptions>
+
+export const RemoveRoomRoleForUserOptions = t.intersection([
+  UserIdOptions,
+  RoomIdOptions
 ],"RemoveRoomRoleForUserOptions");
 type RemoveRoomRoleForUserOptions = t.TypeOf<typeof RemoveRoomRoleForUserOptions>;
-export { RemoveRoomRoleForUserOptions };
 
-export interface BasicAssignRoleToUserOptions {
-  userId: string
-  name: string
-}
+export const BasicAssignRoleToUserOptions = t.intersection([
+  UserIdOptions,
+  t.interface({ name: t.string })
+], "BasicAssignRoleToUserOptions")
+type BasicAssignRoleToUserOptions = t.TypeOf<typeof BasicAssignRoleToUserOptions>
 
-export interface AssignGlobalRoleToUserOptions
-  extends BasicAssignRoleToUserOptions {}
+export const AssignGlobalRoleToUserOptions = t.intersection([
+  BasicAssignRoleToUserOptions,
+  t.interface({})
+], "AssignGlobalRoleToUserOptions")
+type AssignGlobalRoleToUserOptions = t.TypeOf<typeof AssignGlobalRoleToUserOptions>
 
-export interface AssignRoleToUserOptions extends BasicAssignRoleToUserOptions {
-  roomId?: string
-}
+export const AssignRoleToUserOptions = t.intersection([
+  BasicAssignRoleToUserOptions,
+  t.partial({ roomId: t.string})
+], "AssignRoleToUserOptions")
+type AssignRoleToUserOptions = t.TypeOf<typeof AssignRoleToUserOptions>
 
-export interface AssignRoomRoleToUserOptions
-  extends BasicAssignRoleToUserOptions {
-  roomId: string
-}
+export const AssignRoomRoleToUserOptions = t.intersection([
+  RoomIdOptions,
+  BasicAssignRoleToUserOptions,
+], "AssignRoleToUserOptions")
+type AssignRoomRoleToUserOptions = t.TypeOf<typeof AssignRoomRoleToUserOptions>
 
 export interface DeleteRoleOptions {
   name: string
@@ -195,12 +293,18 @@ export interface GetReadCursorsForRoomOptions {
   roomId: string
 }
 
-export interface FetchMultipartMessageOptions {
-  roomId: string
-  messageId: string
-}
+export const FetchMultipartMessageOptions = t.intersection([
+  RoomIdOptions,
+  MessageIdOptions
+], "FetchMultipartMessageOptions")
+export type FetchMultipartMessageOptions = t.TypeOf<typeof FetchMultipartMessageOptions>
 
 export type GetRoomMessagesOptions = FetchMultipartMessagesOptions
+// export const GetRoomMessagesOptions = t.intersection([
+//   RoomIdOptions,
+//   MessageIdOptions
+// ], "GetRoomMessagesOptions")
+// export type GetRoomMessagesOptions = t.TypeOf<typeof GetRoomMessagesOptions>
 
 export interface FetchMultipartMessagesOptions {
   direction?: string
@@ -466,6 +570,7 @@ export default class Chatkit {
   }
 
   getUser(options: GetUserOptions): Promise<any> {
+    validateProperties(options, GetUserOptions)
     return this.serverInstance
       .request({
         method: "GET",
@@ -476,6 +581,7 @@ export default class Chatkit {
   }
 
   getUsers(options: GetUsersOptions = {}): Promise<any> {
+    validateProperties(options, GetUsersOptions)
     return this.serverInstance
       .request({
         method: "GET",
@@ -510,6 +616,7 @@ export default class Chatkit {
   // Room interactions
 
   getRoom(options: GetRoomOptions): Promise<any> {
+    validateProperties(options, GetRoomOptions)
     const jwt = this.generateAccessToken({
       su: true,
     })
@@ -526,6 +633,7 @@ export default class Chatkit {
   }
 
   sendMessage(options: SendMessageOptions): Promise<any> {
+    validateProperties(options, SendMessageOptions)
     let messagePayload: any = { text: options.text }
 
     if (options.attachment) {
@@ -549,6 +657,7 @@ export default class Chatkit {
   }
 
   sendSimpleMessage(options: SendMessageOptions): Promise<any> {
+    validateProperties(options, SendMessageOptions)
     return this.sendMultipartMessage({
       roomId: options.roomId,
       userId: options.userId,
@@ -557,6 +666,7 @@ export default class Chatkit {
   }
 
   sendMultipartMessage(options: SendMultipartMessageOptions): Promise<any> {
+    validateProperties(options, SendMultipartMessageOptions)
     if (options.parts.length === 0) {
       return Promise.reject(
         new TypeError("message must contain at least one part"),
@@ -590,6 +700,7 @@ export default class Chatkit {
   }
 
   editMessage(roomId: string, messageId: string, options: EditMessageOptions): Promise<void> {
+    validateProperties(options, EditMessageOptions)
     let messagePayload: any = { text: options.text }
 
     if (options.attachment) {
@@ -613,6 +724,7 @@ export default class Chatkit {
   }
 
   editSimpleMessage(roomId: string, messageId: string, options: EditMessageOptions): Promise<void> {
+    validateProperties(options, EditMessageOptions)
     return this.editMultipartMessage(roomId, messageId, {
       userId: options.userId,
       parts: [{ type: "text/plain", content: options.text }],
@@ -620,6 +732,7 @@ export default class Chatkit {
   }
 
   editMultipartMessage(roomId: string, messageId: string, options: EditMultipartMessageOptions): Promise<void> {
+    validateProperties(options, EditMultipartMessageOptions)
     if (options.parts.length === 0) {
       return Promise.reject(
         new TypeError("message must contain at least one part"),
@@ -691,6 +804,7 @@ export default class Chatkit {
   }
 
   deleteMessage(options: DeleteMessageOptions): Promise<void> {
+    validateProperties(options, DeleteMessageOptions)
     return this.serverInstance
       .request({
         method: "DELETE",
@@ -703,6 +817,7 @@ export default class Chatkit {
   }
 
   fetchMultipartMessage(options: FetchMultipartMessageOptions): Promise<any> {
+    validateProperties(options, FetchMultipartMessageOptions)
     return this.serverInstance
       .request({
         method: "GET",
@@ -715,6 +830,7 @@ export default class Chatkit {
   }
 
   getRoomMessages(options: GetRoomMessagesOptions): Promise<any> {
+    // validateProperties(options, GetRoomMessagesOptions)
     return this.fetchMessages({
       ...options,
       serverInstance: this.serverInstanceV2,
@@ -750,6 +866,7 @@ export default class Chatkit {
   }
 
   getRooms(options: GetRoomsOptions = {}): Promise<any> {
+    validateProperties(options, GetRoomsOptions)
     return this.serverInstance
       .request({
         method: "GET",
@@ -947,14 +1064,17 @@ export default class Chatkit {
   assignGlobalRoleToUser(
     options: AssignGlobalRoleToUserOptions,
   ): Promise<void> {
+    validateProperties(options, AssignGlobalRoleToUserOptions)
     return this.assignRoleToUser(options)
   }
 
   assignRoomRoleToUser(options: AssignRoomRoleToUserOptions): Promise<void> {
+    validateProperties(options, AssignRoomRoleToUserOptions)
     return this.assignRoleToUser(options)
   }
 
   private assignRoleToUser(options: AssignRoleToUserOptions): Promise<void> {
+    validateProperties(options, AssignRoleToUserOptions)
     return this.authorizerInstance
       .request({
         method: "PUT",
